@@ -1,3 +1,6 @@
+# This module will be removed. For now raise an ImportError
+raise ImportError
+
 import time
 from datetime import datetime, date, timedelta
 

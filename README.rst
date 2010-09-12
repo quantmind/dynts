@@ -1,15 +1,33 @@
+:Dowloads: http://pypi.python.org/pypi/dynts/
+:Source: http://github.com/quantmind/dynts
+:Keywords: timeserie, quantitative, finance, statistics
+
+--
 
 Quantitative financial timeseries analysis
+
 
 Requirements
 =====================
  * numpy__
  * ply__
  * rpy2__
- * python-dateutil__
+ * ccy__
 
-Run Tests
+Running Tests
 =================
+Form the package directory::
+	
+	python runtest.py
+	
+or, once installed::
 
-	python test.py
+	from dynts import runtests
+	runtests()
+	
+	
+__ http://numpy.scipy.org/
+__ http://www.dabeaz.com/ply/
+__ http://rpy.sourceforge.net/rpy2.html
+__ http://code.google.com/p/ccy/ 
 	
