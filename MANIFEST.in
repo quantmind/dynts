@@ -1,0 +1,11 @@
+include CHANGELOG.rst
+include LICENSE
+include MANIFEST.in
+include README.rst
+include requirements.txt
+recursive-include dynts/templates *
+recursive-include dynts/media *
+include docs/make.bat
+include docs/Makefile
+include docs/source/conf.py
+recursive-include docs *.rst

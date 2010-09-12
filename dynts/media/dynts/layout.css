@@ -1,0 +1,31 @@
+.colM #content-main {
+	min-width: 960px;
+}
+.data-id-wrap {
+	overflow: hidden;
+}
+.data-id-main {
+    float: left;
+    overflow:hidden;
+    width: 49%;
+}
+.data-id-main .aligned .vLargeTextField,
+.data-id-main textarea {
+	width: 400px;
+}
+.data-id-instrument {
+    float: right;
+    width: 49%;
+    overflow:hidden;
+}
+.instrument-group {
+	/*display: none;*/
+}
+
+.jflow-dataid.list {
+    margin-bottom:20px;
+}
+
+.jflow-dataid.list .hd h3 {
+    font-size: 16px;
+}

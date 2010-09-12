@@ -1,0 +1,8 @@
+div.econometric-plot {
+	border: 1px solid rgb(145,145,145);
+	background: #fff;
+}
+div.econometric-plot .uppermenu {background: url(../img/sprite.png) repeat-x;
+							     border-bottom: 1px solid rgb(145,145,145);}
+div.econometric-plot .lowermenu {background: url(../img/sprite.png) repeat-x;
+							     border-bottom: 1px solid rgb(145,145,145);}

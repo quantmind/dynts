@@ -1,0 +1,41 @@
+
+div.econometric-plot {float: left; width: 99%;}
+div.econometric-plot .menu {width: 100%; float: left; clear: right;}
+div.econometric-plot .main {width: 100%; float: left;}
+div.econometric-plot .canvas-container {padding: 10px 10px; width: auto; float: none; display: block;}
+/*div.econometric-plot-canvas {width: 100%; overflow: hidden;}*/
+div.econometric-plot .uppermenu {height: 34px; line-height:34px; float: left; width:100%;}
+div.econometric-plot .lowermenu {height: 34px; line-height:34px; float: left; width:100%;}
+div.econometric-plot .uppermenu input {height: 20px; margin-top: 6px;
+									width: 97%; margin-left:0.99%;}
+div.econometric-plot .dateholder {float: left; width: auto;
+							   margin-left: 10px;
+							   line-height: 34px;
+							   font-weight: bold}
+div.econometric-plot .nav-menu {float: left; width: auto; margin-left: 10px;}
+div.econometric-plot .nav-menu ul {float: left; width: auto; list-style-type: none;}
+div.econometric-plot .nav-menu li {float: left; list-style-type: none;
+							    display: inline; background: transparent;}
+div.econometric-plot .nav-menu ul li:hover {background: rgb(224,224,224);}
+div.econometric-plot .nav-menu ul li.clicked {background: rgb(154,154,154);}
+div.econometric-plot .nav-menu ul li a {display: block;
+									 line-height: 34px;
+									 height: 34px;
+									 padding: 0 3px;
+									 background-repeat: no-repeat;
+									 background-position: center;
+									 width: 25px;
+									 cursor: pointer;
+									 border: 1px outset rgb(114,114,114);}
+
+a.zoom-out   {background-image: url(img/zoom_out.png);}
+a.reload     {background-image: url(img/arrow_rotate_clockwise.png);}
+a.edit-chart {background-image: url(img/chart_line_edit.png);}
+
+.loader      {background-image: url(img/ajax-loader.gif);
+			  background-repeat: no-repeat;
+			  background-position: center;
+			  height: 34px; width: 34px; display: block;
+			  float:right; margin-right: 2%;}
+			  
+.dataErrorMessage {color: rgb(179,0,0); font-weight: bold;}
