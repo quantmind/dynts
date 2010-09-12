@@ -39,7 +39,7 @@ def evaluate(e, start = None, end = None, variables = None, loader = None):
         e = parse(e)
     variables = variables or {}
     symbols = e.symbols()
-    data = dynts_providers.load(symbols, start, end)
+    data = dynts_providers.load(symbols, start, end, loader = loader)
     return dslresult(e,data)
     
     
