@@ -26,11 +26,12 @@ else:
 for scheme in INSTALL_SCHEMES.values():
     scheme['data'] = scheme['purelib']
  
-def get_version():
+def get_module():
     if root_dir not in sys.path:
         sys.path.insert(0,root_dir)
-    pkg = __import__(package_name)
-    return pkg.get_version()
+    return __import__(package_name)
+
+mod = get_module()
 
 
 def read(fname):
@@ -83,19 +84,21 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
         
 
 setup(
-        name         = 'dynts',
-        version      = get_version(),
-        author       = 'Luca Sbardella',
-        author_email = 'luca.sbardella@gmail.com',
-        url          = 'http://code.google.com/p/dynts/',
-        license      = 'BSD',
-        description  = 'Quantitative financial timeseries analysis',
-        long_description = read('docs/source/overview.rst'),
+        name         = package_name,
+        version      = mod.__version__,
+        author       = mod.__author__,
+        author_email = mod.__contact__,
+        url          = mod.__homepage__,
+        license      = mod.__license__,
+        description  = mod.__doc__,
+        long_description = read('README.rst'),
         packages     = packages,
         cmdclass     = cmdclasses,
         data_files   = data_files,
-        install_requires = ['ply>3.0','python-dateutil',
-                            'numpy','rpy2'],
+        install_requires = ['ply>3.0',
+                            'ccy>=0.3.7',
+                            'numpy',
+                            'rpy2'],
         classifiers = [
             'Development Status :: 2 - Pre-Alpha',
             'Environment :: Plugins',
@@ -103,8 +106,9 @@ setup(
             'License :: OSI Approved :: BSD License',
             'Operating System :: OS Independent',
             'Programming Language :: Python',
-            'Topic :: Utilities',
-            'Topic :: Database'
+            'Topic :: Scientific/Engineering',
+            'Topic :: Scientific/Engineering :: Mathematics',
+            'Topic :: Office/Business :: Financial'
         ],
     )
  

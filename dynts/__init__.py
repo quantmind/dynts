@@ -1,3 +1,5 @@
+'''Quantitative financial timeseries analysis'''
+
 VERSION = (0, 1, 'a2')
  
 def get_version():
