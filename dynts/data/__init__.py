@@ -42,7 +42,7 @@ class DataProviders(dict):
     loader = TimeSerieLoader()
     proxies = {}
         
-    def load(self, symbols, start, end, provider = None):
+    def load(self, symbols, start = None, end = None, provider = None):
         return self.loader(self,symbols,start,end, provider = provider)
     
     def register(self, provider):
@@ -52,9 +52,7 @@ class DataProviders(dict):
         self[name] = provider
         
 
-        
-        
-providers = DataProviders()
+dynts_providers = DataProviders()
 
-providers.register(google())
-providers.register(yahoo())
+dynts_providers.register(google())
+dynts_providers.register(yahoo())

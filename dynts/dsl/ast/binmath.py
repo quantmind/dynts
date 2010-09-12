@@ -5,19 +5,16 @@ class BinMathOp(BinOp):
     def __init__(self,left,right,op):
         super(BinMathOp,self).__init__(left,right,op)
     
-    def dooper(self, le, ri, unwind):
-        if isinstance(self.left,Number) and isinstance(self.right,Number):
-            return unwind.numberData(self.simpleoper(le,ri))
+    def dooper(self, le, ri):
+        if isnumber(le) and isnumber(ri):
+            return self.simpleoper(le,ri)
         else:
-            return unwind.tsData(data = self.complexoper(le,ri), label = str(self))
+            return self.complexoper(le,ri)
     
     def _unwind(self, values, unwind, full = False, **kwargs):
         le = self.left.unwind(values, unwind, **kwargs)
         ri = self.right.unwind(values, unwind, **kwargs)
-        res = self.dooper(le.data,ri.data, unwind)
-        if full:
-            res.applyoper()
-        return res
+        return self.dooper(le,ri)
     
     def lineardecomp(self):
         if isinstance(self.left,Number):
@@ -31,10 +28,19 @@ class BinMathOp(BinOp):
             return dr
     
     def simpleoper(self,le,ri):
+        '''Neeeds implementation'''
         pass
     
     def complexoper(self,le,ri):
-        return self.simpleoper(le,ri)
+        name = str(self)
+        if isnumber(le):
+            data = self.simpleoper(le, ri.values())
+            return ri.clone(data = data, name = name)
+        elif isnumber(ri):
+            data = self.simpleoper(le.values(), ri)
+            return le.clone(data = data, name = name)
+        else:
+            raise NotImplementedError
             
     
 

@@ -33,11 +33,16 @@ DynTS makes timeserie manipulation easy and fun. This is a simple multiplication
 	>>> import dynts
 	>>> e = dynts.parse('2*GOOG')
 	>>> e
-	2.0 * GOOG
+	2.0 * goog
 	>>> len(e)
 	2
 	>>> list(e)
-	[2.0, GOOG]
+	[2.0, goog]
+	>>> ts = dynts.evaluate(e).unwind()
+	>>> ts
+	timeserie:zoo:2.0 * goog
+	>>> len(ts)
+	251
 
 
 Requirements

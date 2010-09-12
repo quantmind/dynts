@@ -1,7 +1,9 @@
 from datetime import date, datetime, timedelta
-from dynts.exceptions import MissingPackage
+
 from rpy2 import rinterface
 from rpy2.robjects import r,numpy2ri
+
+from dynts.exceptions import MissingPackage
 
 def loadlib(lib):
     try:
@@ -29,10 +31,34 @@ class rpyobject(object):
     
 
 # Convert to and From R date and python date
-rdate0 = date(1970,1,1)
-py2rdate = lambda x : (x-rdate0).days
-r2pydate = lambda x : rdate0 + timedelta(days = int(x))
+EPOCH = 1970
+_EPOCH_ORD = date(EPOCH, 1, 1).toordinal()
 
+
+def rdate0(dte):
+    year, month, day = dte.timetuple()[:3]
+    return date(year, month, 1).toordinal() - _EPOCH_ORD + day - 1
+
+def rdate1(dte):
+    year, month, day, hour, minute, second = dte.timetuple()[:6]
+    days = date(year, month, 1).toordinal() - _EPOCH_ORD + day - 1
+    return days + (hour + (minute + (second + 0.000001*dte.microsecond)/60.0)/60.0)/24.0
+
+_converter = {datetime:rdate1,
+              date:rdate0}
+
+def py2rdate(dte):
+    return _converter[dte.__class__](dte)
+
+
+def r2pydate(tstamp):
+    if not tstamp - round(tstamp):
+        ordinal = _EPOCH_ORD + tstamp
+        return date.fromordinal(ordinal)
+    else:
+        return datetime.fromordinal(tstamp)
+    
+    
 def isoformat(dte):
     if isinstance(dte,datetime):
         raise NotImplementedError

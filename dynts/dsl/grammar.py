@@ -19,11 +19,11 @@ def p_expression_binop(p):
         p[0] = DivideOp(p[1],p[3])
     elif v == '=':
         p[0] = EqualOp(p[1],p[3])
-    elif v == concat_operator:
+    elif v == settings.concat_operator:
         p[0] = ConcatenationOp(p[1],p[3])
-    elif v == separator_operator:
+    elif v == settings.separator_operator:
         p[0] = SplittingOp(p[1],p[3])
-    elif v == field_operator:
+    elif v == settings.field_operator:
         p[0] = Symbol(p[1], field = p[3])
         
 

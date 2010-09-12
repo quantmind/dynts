@@ -1,4 +1,4 @@
 ply>=3.0
 numpy
 rpy2
-ccy
+ccy>=0.3.8

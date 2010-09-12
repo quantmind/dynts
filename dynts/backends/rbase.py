@@ -20,7 +20,7 @@ class rts(tsbase,rpyobject):
         '''This is not an efficient method'''
         return self.values()[i]
     
-    def factory(self, date, data):
+    def factory(self, date, data, raw = False):
         raise NotImplementedError
     
     def dateconvert(self, dte):
@@ -29,11 +29,13 @@ class rts(tsbase,rpyobject):
     def dateinverse(self, key):
         return r2pydate(key)
     
-    def make(self, date, data):
-        if not date:
+    def make(self, date, data, raw = False):
+        if date is None:
             ts = None
         else:
-            ts = self.factory(date, data)
+            if not isinstance(data,ny.ndarray):
+                data = ny.array(data)
+            ts = self.factory(date, data, raw = raw)
         self._ts = ts
         
     def keys(self):

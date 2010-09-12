@@ -81,7 +81,7 @@ class tsbase(object):
     def colnames(self):
         raise NotImplementedError
     
-    def make(self, date, data):
+    def make(self, date, data, **kwargs):
         '''Fill timeserie object:
          * *date* iterable/iterator/generator over dates
          * *data* iterable/iterator/generator over values
@@ -121,3 +121,10 @@ class tsbase(object):
     def merge(self, ts, all = True):
         raise NotImplementedError
     
+    def clone(self, data = None, name = None):
+        name = name or self.name
+        data = data if data is not None else self.values()
+        ts = self.__class__(self.__class__.type, name)
+        ts.make(self.keys(),data,raw=True)
+        return ts
+        

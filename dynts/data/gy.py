@@ -1,12 +1,13 @@
 import os
 import csv
 from urllib import urlopen
+import numpy as ny
 try:
     import httplib2
 except:
     httplib2 = None
 
-from dateutil.parser import parse as DateFromString
+from ccy import dateFromString
 
 from dynts.conf import settings
 
@@ -26,7 +27,7 @@ class WebCsv(DataProvider):
         self.h = None
         
     def string_to_date(self, sdte):
-        return DateFromString(sdte)
+        return dateFromString(sdte)
     
     def request(self, url):
         if self.h:
@@ -52,6 +53,7 @@ class WebCsv(DataProvider):
         fields = {}        
         std  = self.string_to_date
         datestr = None
+        dates = []
         for r in data:
             try:
                 if not datestr:
@@ -66,25 +68,20 @@ class WebCsv(DataProvider):
                         fields[str(k).upper()] = []
                 
                 dt  = std(r[datestr])
+                dates.append(dt)
                 for k,v in r.items():
                     nts = fields.get(str(k).upper(),None)
                     if nts is not None:
                         try:
                             nts.append(float(v))
-                            #nts[dt] = float(v)
                         except:
                             continue
             except:
                 continue
         
-        if field:
-            return fields.get(str(field).upper(),None)
-        else:
-            return fields
-            #ts = numerictsv()
-            #for k,v in fields.items():
-            #    ts.addts(v);
-            #return ts
+        field = field or 'CLOSE'
+        return {'date': dates,
+                'value': fields.get(str(field).upper(),None)}
 
 
 class google(WebCsv):

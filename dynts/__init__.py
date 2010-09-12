@@ -16,28 +16,31 @@ __contact__  = "luca@quantmind.com"
 __homepage__ = "http://github.com/quantmind/dynts/"
 
 
-from backends import timeserie, BACKENDS
-from data import providers, TimeSerieLoader
-from dsl import parse
+from backends import timeserie, istimeserie, BACKENDS
+from data import dynts_providers, TimeSerieLoader
+from dsl import parse, dslresult
 
 
 def get(symbols, start = None, end = None, provider = None):
     if not hasattr(symbols,'__iter__'):
         symbols = [symbols]
-    res = providers.load(symbols, start, end, provider = provider)
+    res = dynts_providers.load(symbols, start, end, provider = provider)
     return res
 
 
 def evaluate(e, start = None, end = None, variables = None):
     '''Evaluate expression *e*.
-     * *e* instance of :ref:`Expr <expr>' obtained using the parse function.
+     * *e* instance of :ref:`Expr <expr>' obtained using the parse function or a string.
      * *start* start date
      * *end* end date
      * *variables* dictionary of variables to replace strings
     '''
+    if isinstance(e,basestring):
+        e = parse(e)
     variables = variables or {}
     symbols = e.symbols()
-    data = providers.load(symbols, start, end)
+    data = dynts_providers.load(symbols, start, end)
+    return dslresult(e,data)
     
     
 def add2path():

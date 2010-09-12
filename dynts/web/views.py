@@ -1,14 +1,15 @@
 from django import http
 from djpcms.views import appview
 
-from dateutil.parser import parse as DateFromString
+from ccy import date2yyyymmdd, dateFromString
+
 
 def date2yyyymmdd(dte):
     return dte.day + 100*(dte.month + 100*dte.year)
 
 class TimeserieView(appview.AppView):
-    '''View used to obtain timeseries.
-The only view available is an Ajax Get view.'''
+    '''```djpcms``` application view which can be used to obtain timeseries.
+The only view available is an Ajax Get response.'''
     _methods      = ('get',)
     
     def get_response(self, djp):
@@ -28,7 +29,6 @@ The only view available is an Ajax Get view.'''
                 return None
                 
     def econometric_data(self, data):
-        proxy  = self.get_proxy()
         cts    = data.get('command',None)
         start  = data.get('start',None)
         end    = data.get('end',None)
@@ -37,18 +37,19 @@ The only view available is an Ajax Get view.'''
         if object:
             cts = self.codeobject(object)
         if start:
-            start = date2yyyymmdd(DateFromString(str(start)).date())
+            start = dateFromString(str(start))
         if end:
-            end = date2yyyymmdd(DateFromString(str(end)).date())
+            end = dateFromString(str(end))
         try:
-            return proxy.get(cts,start,end)
+            return self.getdata(cts,start,end)
         except IOError, e:
             return ''
     
     def codeobject(self, object):
         return str(object)
     
-    def get_proxy(self):
-        return self
+    def getdata(self,cts,start,end):
+        '''Get the actual data. Needs to be implemented.'''
+        raise NotImplementedError
     
     

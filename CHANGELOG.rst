@@ -1,5 +1,8 @@
 
-dynts 0.1
+dynts 0.1.a3
+====================================
+
+dynts 0.1.a2 - 2010 Sep 12
 ====================================
 * Added ccy__ as requirement. To handle dates and calendars.
 * Added ``runtests`` on the root directory. A shortcut script for running tests.

@@ -1,5 +1,13 @@
 from dynts.conf import settings
+from dynts import timeserie, istimeserie
 from dynts.dsl.ast.errors import *
+
+def isnumber(value):
+    try:
+        float(value)
+        return True
+    except:
+        return False
 
 class Expr(object):
     '''Base class for abstract syntax nodes
@@ -104,7 +112,7 @@ class Number(BaseExpression):
         super(Number,self).__init__(value)
         
     def _unwind(self, values, unwind, **kwargs):
-        return unwind.numberData(self.value)
+        return self.value
 
 
 class String(BaseExpression):
@@ -126,13 +134,16 @@ class Symbol(BaseExpression):
         super(Symbol,self).__init__(value)
     
     def symbols(self):
-        return [self]
+        return [str(self)]
     
-    def _unwind(self, values, unwind, full = False, **kwargs):
-        dt = unwind.tsData(values.get(self.value),str(self))
-        if full:
-            dt.applyoper()
-        return dt
+    def _unwind(self, values, unwind, **kwargs):
+        sdata = values[str(self)]
+        if istimeserie(sdata):
+            return sdata
+        else:
+            ts = timeserie(self, date = sdata['date'], data = sdata['value'])
+            values[str(self)] = ts
+            return ts
     
     def lineardecomp(self):
         return linearDecomp().append(self)
@@ -232,15 +243,11 @@ class ConcatenationOp(ConcatOp):
         super(ConcatenationOp,self).__init__(left, right, settings.concat_operator)
         
     def _unwind(self, values, unwind, sametype = True, **kwargs):
-        if sametype:
-            ts = unwind.sameListData(label = str(self))
-        else:
-            ts = unwind.listData(label = str(self))
-            
-        for c in self:
-            v = c.unwind(values, unwind)
-            ts.append(v)
-        return ts
+        result = []
+        for child in self:
+            result.append(child.unwind(values, unwind))
+        return result
+    
     
 class SplittingOp(ConcatOp):
     

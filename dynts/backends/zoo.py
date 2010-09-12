@@ -27,11 +27,12 @@ class timeserie(rts):
     def __init__(self, *args, **kwargs):
         super(timeserie,self).__init__(*args, **kwargs)
     
-    def factory(self, date, data):
-        tdate = self.dateconvert
-        adt = IntVector([tdate(dt) for dt in date])
+    def factory(self, date, data, raw = False):
+        if not raw:
+            tdate = self.dateconvert
+            date = IntVector([tdate(dt) for dt in date])
         #data = FloatVector(data)
-        return self.r['zoo'](data,adt)
+        return self.r['zoo'](data,date)
     
     def colnames(self):
         #TODO: Not working since we did not set names
