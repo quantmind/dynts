@@ -39,11 +39,13 @@ class TimeSerieLoader(object):
 
 
 class DataProviders(dict):
-    loader = TimeSerieLoader()
     proxies = {}
         
-    def load(self, symbols, start = None, end = None, provider = None):
-        return self.loader(self,symbols,start,end, provider = provider)
+    def load(self, symbols, start = None, end = None, provider = None, loader = None):
+        loader = loader or TimeSerieLoader()
+        if isinstance(loader,type):
+            loader = loader()
+        return loader(self,symbols,start,end, provider = provider)
     
     def register(self, provider):
         '''Register a new data provider. *provider* must be an instance of

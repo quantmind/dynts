@@ -8,7 +8,7 @@ class tsbase(object):
     
     def __init__(self, typ, name = '', date = None, data = None):
         self.__class__.type  = typ
-        self.name    = name
+        self.name    = str(name)
         self.make(date,data)
         
     def __repr__(self):

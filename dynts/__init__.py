@@ -28,7 +28,7 @@ def get(symbols, start = None, end = None, provider = None):
     return res
 
 
-def evaluate(e, start = None, end = None, variables = None):
+def evaluate(e, start = None, end = None, variables = None, loader = None):
     '''Evaluate expression *e*.
      * *e* instance of :ref:`Expr <expr>' obtained using the parse function or a string.
      * *start* start date

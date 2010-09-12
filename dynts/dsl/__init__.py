@@ -32,9 +32,29 @@ class dslresult(object):
     def __str__(self):
         return self.__repr__()
     
-    def unwind(self):
+    def unwind(self, format = None):
         unwind = object()
-        return self.expression.unwind(self.data,unwind)
+        ts = self.expression.unwind(self.data,unwind)
+        if format is None:
+            return ts
+        elif format.lower() == 'flot':
+            return self.toflot(ts)
+        else:
+            return ts
+        
+    def toflot(self, ts):
+        from dynts.web import flot
+        res = flot.Flot()
+        result = flot.MultiPlot(res)
+        if not isinstance(ts,list):
+            ts = [ts]
+        for serie in ts:
+            data = []
+            for dt,val in serie.items():
+                data.append([flot.pydate2flot(dt),val])
+            serie = flot.Serie(label = serie.name, data = data)
+            res.add(serie)
+        return result
         
         
     
