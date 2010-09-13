@@ -6,18 +6,37 @@ Domain Specific Language
 
 .. _dsl-parse:
 
-parse
-===========
+Parsing timeserie scripts
+==============================
+Parsing timeserie expression is accomplished using the :func:`dynts.parse` function:
 
-.. autofunction:: dynts.dsl.parse
+.. autofunction:: dynts.parse
 
+For example::
+
+	>>> import dynts
+	>>> r = dynts.parse('GOOG/2,YHOO')
+	>>> r.type
+	'concatenationop'
+	>>> len(r)
+	2
+
+Now lets load some data using the built-in dataproviders::
+
+	>>> result = dynts.evaluate(r)
+	>>> result.expression
+	goog / 2.0 , yhoo
+	>>> ts = result.unwind()
+	>>> len(ts)
+	2
+	
 
 .. _dsl-expr:
 
 Expr
 ===========
 
-.. autoclass:: dynts.dsl.Expr
+.. autoclass:: dynts.Expr
    :members:
 
 

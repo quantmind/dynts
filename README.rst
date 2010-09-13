@@ -27,8 +27,9 @@ To create a timeserie object directly::
 
 DSL
 =======
-
-DynTS makes timeserie manipulation easy and fun. This is a simple multiplication::
+At the core of the library there is a Domain-Specific-Language (DSL_) dedicated
+to timeserie analysis and manipulation. DynTS makes timeserie manipulation easy and fun.
+This is a simple multiplication::
 	
 	>>> import dynts
 	>>> e = dynts.parse('2*GOOG')
@@ -47,18 +48,21 @@ DynTS makes timeserie manipulation easy and fun. This is a simple multiplication
 
 Requirements
 =====================
+There are several requirements that must be met:
 
-* numpy__
-* ply__
-* rpy2__
-* ccy__
- 
-and it is also dependent on several R packages, depending on the back-end used.
-These two are always needed:
+* numpy_ arrays and matrices.
+* ply_ the building block of the DSL_.
+* rpy2_ if an R_ timeserie back-end is used (default).
+* ccy_ for date and currency manipulation.
 
-* zoo__
-* PerformanceAnlytics__
+Depending on the back-end used, additional dependencies need to be met.
+For example, there are back-ends depending on the following R packages:
 
+* zoo_ and PerformanceAnlytics_ for the ``zoo`` back-end (currently the default one)
+* timeSeries_ for the ``rmetrics`` back-end 
+
+Installing rpy2_ on Linux is straightforward, on windows it requires the
+`python for windows`__ extension library.
 
 Running Tests
 =================
@@ -71,11 +75,13 @@ or, once installed::
 	from dynts import runtests
 	runtests()
 	
-	
-__ http://numpy.scipy.org/
-__ http://www.dabeaz.com/ply/
-__ http://rpy.sourceforge.net/rpy2.html
-__ http://code.google.com/p/ccy/
-__ http://cran.r-project.org/web/packages/zoo/index.html
-__ http://cran.r-project.org/web/packages/PerformanceAnalytics/index.html
-	
+.. _numpy: http://numpy.scipy.org/
+.. _ply: http://www.dabeaz.com/ply/
+.. _rpy2: http://rpy.sourceforge.net/rpy2.html
+.. _DSL: http://en.wikipedia.org/wiki/Domain-specific_language
+.. _R: http://www.r-project.org/
+.. _ccy: http://code.google.com/p/ccy/
+.. _zoo: http://cran.r-project.org/web/packages/zoo/index.html
+.. _PerformanceAnlytics: http://cran.r-project.org/web/packages/PerformanceAnalytics/index.html
+.. _timeSeries: http://cran.r-project.org/web/packages/timeSeries/index.html
+__ http://sourceforge.net/projects/pywin32/files/

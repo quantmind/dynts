@@ -4,12 +4,12 @@
 DynTS
 =================================
 
-.. rubric:: A domain specific language for Timeseries analysis.
+A domain specific language for Timeseries analysis.
 
 Dive In
 ==============
 
- :ref:`Overview <intro-overview>`
+ :ref:`Overview and Installation <intro-overview>`
 
 
 Contents
@@ -21,6 +21,7 @@ Contents
    dsl/index
    backends/index
    web/index
+   settings
 
 	
 Indices and tables

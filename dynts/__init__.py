@@ -18,7 +18,7 @@ __homepage__ = "http://github.com/quantmind/dynts/"
 
 from backends import timeserie, istimeserie, BACKENDS
 from data import dynts_providers, TimeSerieLoader
-from dsl import parse, dslresult
+from dsl import parse, dslresult, Expr
 
 
 def get(symbols, start = None, end = None, provider = None):
