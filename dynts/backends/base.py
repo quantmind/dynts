@@ -38,7 +38,8 @@ class TimeSeries(object):
         return self.shape[1]
     
     def asdict(self):
-        '''Return a wrapper of ``self`` which expose dictionary-like functionalities.'''
+        '''Return an instance of :class:`dynts.utils.wrappers.asdict`
+which exposes dictionary-like functionalities of ``self``.'''
         return wrappers.asdict(self)
     
     def dateconvert(self, dte):

@@ -1,4 +1,6 @@
-.. _settings:
+.. _exceptions:
+
+.. module:: dynts.exceptions
 
 =====================
 Exceptions

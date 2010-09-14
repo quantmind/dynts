@@ -8,4 +8,5 @@ Internals
    :maxdepth: 1
    
    settings
+   utils
    exceptions

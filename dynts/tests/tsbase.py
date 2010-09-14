@@ -2,30 +2,30 @@ import unittest
 from itertools import izip
 
 from dynts import timeseries
-from dynts.utils.populate import populate, datepopulate
+from dynts.utils.populate import populate, datepopulate, randomts, date
 
 
 class TestTS(unittest.TestCase):
     backend = None
     
-    def getdata(self, size = 100, cols = 1, delta = 1):
-        date = datepopulate(size = size, delta = delta)
+    def getdata(self, size = 100, cols = 1, delta = 1, start = None):
+        dates = datepopulate(size = size, delta = delta)
         data = populate(size = size, cols = cols)
-        return date,data
+        return dates,data
         
     def getts(self, returndata = False, delta = 1, cols = 1):
-        date,data = self.getdata(100,cols,delta)
-        ts   = timeseries(name = 'test', date = date, data = data, backend = self.backend)
+        dates,data = self.getdata(100,cols,delta)
+        ts   = timeseries(name = 'test', date = dates, data = data, backend = self.backend)
         if returndata:
-            return ts,list(date),list(data)
+            return ts,list(dates),list(data)
         else:
             return ts
     
     def testInit(self):
-        ts,date,data = self.getts(True)
+        ts,dates,data = self.getts(True)
         self.assertEqual(ts.type,self.backend)
-        self.assertEqual(len(ts),len(date))
-        for dt,dt1 in izip(date,ts.dates()):
+        self.assertEqual(len(ts),len(dates))
+        for dt,dt1 in izip(dates,ts.dates()):
             self.assertEqual(dt,dt1)
             
         self.assertTrue(ts.isregular())
@@ -67,8 +67,10 @@ class TestTS(unittest.TestCase):
         #self.assertEqual(len(names),1)
         
     def testDictionary(self):
-        ts = self.getts(cols = 2)
+        '''Test included in documentation'''
+        ts = randomts(cols = 2, start = date(2010,1,1), size = 50)
         dts = ts.asdict()
-        v0 = dts[ts.start()]
-        v1 = dts[ts.end()]
+        values = ts.values()
+        self.assertEqual(dts[ts.start()].all(),values[0].all())
+        self.assertEqual(dts[ts.end()].all(),values[49].all())
     
