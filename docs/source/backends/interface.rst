@@ -54,9 +54,11 @@ It may be useful to move functionality of the ts into a seperate 'analytics' obj
     >>> ts_ma40 = ts.analytics.ma(window = 40)
 
 
-    
+   
 TimeSeries Interface
 ============================
 
 .. autoclass:: dynts.TimeSeries
    :members:
+   :member-order: bysource
+   

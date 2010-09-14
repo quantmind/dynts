@@ -1,9 +1,15 @@
 from itertools import izip
 from dynts.exceptions import *
+from dynts.utils import wrappers
 
 
 class TimeSeries(object):
-    '''Interface class for timeseries back-ends'''
+    '''Interface class for timeseries back-ends.
+    
+    .. attribute:: type
+    
+        string indicating the backend type (zoo, rmetrics, numpy, etc...)
+    '''
     type = None
     
     def __init__(self, name = '', date = None, data = None):
@@ -23,6 +29,17 @@ class TimeSeries(object):
     
     def description(self):
         return self.name
+    
+    def __len__(self):
+        return self.shape[0]
+    
+    def count(self):
+        '''Number of series in the timeseries'''
+        return self.shape[1]
+    
+    def asdict(self):
+        '''Return a wrapper of ``self`` which expose dictionary-like functionalities.'''
+        return wrappers.asdict(self)
     
     def dateconvert(self, dte):
         return dte
@@ -47,23 +64,29 @@ class TimeSeries(object):
         return self.log().delta(k)
     
     def dates(self):
+        '''Returns an iterable over ``datetime.date`` instances in the timeseries.'''
         c = self.dateinverse
         for key in self.keys():
             yield c(key)
             
-    def __len__(self):
-        return self.shape[0]
-    
-    def count(self):
-        return self.shape[1]
+    def values(self):
+        '''Returns a ``numpy.ndarray`` containing the values of the timeseries.
+Implementations should try not to copy data if possible. This function
+can be used to access the timeseries as if it was a matrix.'''
+        raise NotImplementedError
     
     def items(self):
+        '''Returns a python ``generator`` which can be used to iterate over
+:func:`dates` and :func:`values` returning a two dimensional
+tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
+function.'''
         for d,v in izip(self.dates(),self.values()):
             yield d,v
     
     def display(self):
+        '''Nicely display self on the shell. Useful during prototyping and development.'''
         for d,v in self.items():
-            print d,v
+            print('%s: %s' % d,v)
             
     # PURE VIRTUAL FUNCTIONS
     
@@ -78,13 +101,6 @@ class TimeSeries(object):
         raise NotImplementedError
     
     def colnames(self):
-        raise NotImplementedError
-    
-    def make(self, date, data, **kwargs):
-        '''Fill timeserie object:
-         * *date* iterable/iterator/generator over dates
-         * *data* iterable/iterator/generator over values
-        '''
         raise NotImplementedError
     
     def delta(self, k = 1):
@@ -109,9 +125,11 @@ class TimeSeries(object):
         raise NotImplementedError
     
     def start(self):
+        '''Start date of timeseries'''
         raise NotImplementedError
     
     def end(self):
+        '''End date of timeseries'''
         raise NotImplementedError
     
     def window(self, start, end):
@@ -127,3 +145,15 @@ class TimeSeries(object):
         ts.make(self.keys(),data,raw=True)
         return ts
         
+    def __add__(self, other):
+        return addts(self,other)
+    
+    # INTERNALS
+    ################################################################
+    
+    def make(self, date, data, **kwargs):
+        '''Internal function to create the inner data:
+        
+* *date* iterable/iterator/generator over dates
+* *data* iterable/iterator/generator over values'''
+        raise NotImplementedError

@@ -20,7 +20,7 @@ Contents
    
    dsl/index
    backends/index
-   settings
+   internals/index
    web/index
 
 	

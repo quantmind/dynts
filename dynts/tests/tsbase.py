@@ -66,4 +66,9 @@ class TestTS(unittest.TestCase):
         #names = ts.colnames()
         #self.assertEqual(len(names),1)
         
+    def testDictionary(self):
+        ts = self.getts(cols = 2)
+        dts = ts.asdict()
+        v0 = dts[ts.start()]
+        v1 = dts[ts.end()]
     

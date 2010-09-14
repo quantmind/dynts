@@ -13,5 +13,6 @@ To create a timeserie object directly you need the timeserie function:
    :maxdepth: 2
 
    interface
+   design
    zoo
    rmetrics

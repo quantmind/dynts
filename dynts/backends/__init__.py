@@ -4,13 +4,15 @@ from base import TimeSeries
 
 BACKENDS = {
     'zoo': 'zoo',
-    'rmetrics': 'rmetrics'
+    'rmetrics': 'rmetrics',
+    'numpy': 'tsnumpy',
 }
 
 istimeseries = lambda value : isinstance(value,TimeSeries)
 
 def timeseries(name = '', backend = None, **kwargs):
     '''Create a new :class:`dynts.TimeSeries' object.'''
+    from dynts import InavlidBackEnd
     backend = backend or settings.backend
     bname = BACKENDS.get(backend,None)
     if bname:
@@ -19,4 +21,8 @@ def timeseries(name = '', backend = None, **kwargs):
         bmodule = backend
     module = import_module(bmodule)
     name = name or bmodule
-    return getattr(module, 'TimeSeries')(name = name, **kwargs)
+    try:
+        factory = getattr(module, 'TimeSeries')
+    except AttributeError:
+        raise InavlidBackEnd('Could not find a TimeSeries class in module %s' % bmodule)
+    return factory(name = name, **kwargs)

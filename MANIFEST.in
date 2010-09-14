@@ -1,8 +1,10 @@
+include AUTHORS
 include CHANGELOG.rst
 include LICENSE
 include MANIFEST.in
 include README.rst
 include requirements.txt
+include runtests.py
 recursive-include dynts/templates *
 recursive-include dynts/media *
 include docs/make.bat

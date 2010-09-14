@@ -39,7 +39,7 @@ def randomts(size = 100, cols = 1, start = None, delta = 1,
              generator = None, backend=None, name='randomts'):
     dates = datepopulate(size,start=start,delta=delta)
     data  = populate(size,cols=cols,generator=generator)
-    return timeserie(name=name,backend=backend,date=dates,data=data)
+    return timeseries(name=name,backend=backend,date=dates,data=data)
 
 def randomwalk(size = 100, cols = 1, start = None, delta = 1,
                backend=None, name='randomwalk', sigma = 0.1, mu = 0.0):
