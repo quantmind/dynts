@@ -90,7 +90,7 @@ can be used to access the timeseries as if it was a matrix.'''
     
     def items(self):
         '''Returns a python ``generator`` which can be used to iterate over
-:func:`dates` and :func:`values` returning a two dimensional
+:func:`dynts.TimeSeries.dates` and :func:`dynts.TimeSeries.values` returning a two dimensional
 tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
 function.'''
         for d,v in izip(self.dates(),self.values()):

@@ -42,6 +42,9 @@ TimeSeries View
 		Check if the code is an instance of the view underlying model.
 		If that is the case it returns the object, otherwise it returns ``None``.
 
+	.. function:: codeobject(object)
+		
+		Inverse of :func:`get_object`
 
 .. _jQuery: http://jquery.com/
 .. _django: http://www.djangoproject.com/
