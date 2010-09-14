@@ -1,6 +1,6 @@
 .. _utilities:
 
-.. module:: dynts.utils
+.. module:: utils
 
 ==========================
 Utilities
@@ -8,7 +8,7 @@ Utilities
 
 
 
-.. module:: dynts.utils.wrappers
+.. module:: utils.wrappers
 
 Timeseries wrappers
 ============================

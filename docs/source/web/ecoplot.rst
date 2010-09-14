@@ -1,3 +1,4 @@
+.. _ecoplot-web:
 
 =========================
 Ecoplot JQuery Plugin

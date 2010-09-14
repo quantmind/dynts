@@ -7,7 +7,7 @@ from ccy import date2yyyymmdd, dateFromString
 def date2yyyymmdd(dte):
     return dte.day + 100*(dte.month + 100*dte.year)
 
-class TimeserieView(appview.AppView):
+class TimeSeriesView(appview.AppView):
     '''```djpcms``` application view which can be used to obtain timeseries.
 The only view available is an Ajax Get response.'''
     _methods      = ('get',)
@@ -49,7 +49,8 @@ The only view available is an Ajax Get response.'''
         return str(object)
     
     def getdata(self,cts,start,end):
-        '''Get the actual data. Needs to be implemented.'''
+        '''Pure virtual function which needs to be implemented by implementations.
+It retrieve the actual timeseries data.'''
         raise NotImplementedError
     
     

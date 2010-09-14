@@ -4,14 +4,14 @@ from dynts.data import dynts_providers
 
 registered_functions = {}
 
-def parse(input, method = None):
-    '''Function for parsing a dsl script. If succesful, it returns an instance
-of :class:`dynts.Expr`.'''
+def parse(timeseries_expression, method = None):
+    '''Function for parsing :ref:`timeseries expressions <dsl-script>`.
+If succesful, it returns an instance of :class:`dynts.dsl.Expr`.'''
     from ply import yacc
     from rules import rules
     ru = rules(registered_functions)
     ru.build()
-    ru.input(str(input).lower())
+    ru.input(str(timeseries_expression).lower())
     tokens     = ru.tokens
     precedence = ru.precedence
     yacc       = yacc.yacc(method = method or 'SLR')

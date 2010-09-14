@@ -1,7 +1,5 @@
 .. _exceptions:
 
-.. module:: dynts.exceptions
-
 =====================
 Exceptions
 =====================

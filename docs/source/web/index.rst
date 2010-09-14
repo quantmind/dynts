@@ -18,7 +18,7 @@ Contents
 .. toctree::
    :maxdepth: 1
    
-   plugin
    ecoplot
+   plugin
 
 __ http://www.djangoproject.com/

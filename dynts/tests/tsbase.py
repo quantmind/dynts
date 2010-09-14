@@ -73,4 +73,11 @@ class TestTS(unittest.TestCase):
         values = ts.values()
         self.assertEqual(dts[ts.start()].all(),values[0].all())
         self.assertEqual(dts[ts.end()].all(),values[49].all())
-    
+        
+    def testCSVformatter(self):
+        ts = randomts(name = "serie1,serie2",
+                      cols = 2, start = date(2010,1,1), size = 50)
+        self.assertEqual(ts.names(),['serie1','serie2'])
+        csv = ts.dump('csv')
+        self.assertTrue(csv)
+        

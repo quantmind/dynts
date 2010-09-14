@@ -6,7 +6,7 @@
 :Documentation: http://packages.python.org/dynts/
 :Dowloads: http://pypi.python.org/pypi/dynts/
 :Source: http://github.com/quantmind/dynts
-:Keywords: timeserie, quantitative, finance, statistics
+:Keywords: timeserie, quantitative, finance, statistics, web
 
 --
 
@@ -55,6 +55,8 @@ Requirements
 =====================
 There are several requirements that must be met:
 
+* python_ 2.4 or later. Note that Python 3 series are not supported yet.
+* simplejson_ if python_ version is less then 2.6
 * numpy_ arrays and matrices.
 * ply_ the building block of the DSL_.
 * rpy2_ if an R_ TimeSeries back-end is used (default).
@@ -111,3 +113,5 @@ __ http://github.com/quantmind/dynts/issues
 .. _zoo: http://cran.r-project.org/web/packages/zoo/index.html
 .. _PerformanceAnlytics: http://cran.r-project.org/web/packages/PerformanceAnalytics/index.html
 .. _timeSeries: http://cran.r-project.org/web/packages/timeSeries/index.html
+.. _Python: http://www.python.org/
+.. _simplejson: http://pypi.python.org/pypi/simplejson/

@@ -2,12 +2,12 @@
 dynts 0.1.a3
 ====================================
 
-dynts 0.1.a2 - 2010 Sep 12
+dynts 0.1.a2
 ====================================
-* Added ccy__ as requirement. To handle dates and calendars.
+* Added ccy_ as requirement to handle dates currencies and calendars.
 * Added ``runtests`` on the root directory. A shortcut script for running tests.
 * Development moved to github http://github.com/quantmind/dynts
-* **11 tests**
+* **16 tests**
 
 dynts 0.1.a1  - 2010 July 17
 ====================================
@@ -16,4 +16,4 @@ dynts 0.1.a1  - 2010 July 17
 * Moved all tests into the tests module
  
 
-__ http://code.google.com/p/ccy/
+.. _ccy: http://code.google.com/p/ccy/

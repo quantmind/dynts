@@ -17,9 +17,12 @@ __homepage__ = "http://github.com/quantmind/dynts/"
 
 
 from dynts.exceptions import *
-from backends import timeseries, TimeSeries, istimeseries, BACKENDS
+from backends import timeseries, TimeSeries, istimeseries, Formatters, BACKENDS
 from data import dynts_providers, TimeSerieLoader
 from dsl import parse, dslresult, Expr
+import formatters
+Formatters['json'] = formatters.toflot
+Formatters['csv'] = formatters.tocsv
 
 
 def get(symbols, start = None, end = None, provider = None):

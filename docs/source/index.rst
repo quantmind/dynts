@@ -4,10 +4,7 @@
 DynTS
 =================================
 
-A domain specific language for Timeseries analysis.
-
-Dive In
-==============
+A domain specific language for Timeseries_ analysis and manipulation.
 
  :ref:`Overview and Installation <intro-overview>`
 
@@ -31,3 +28,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+
+.. _Timeseries: http://en.wikipedia.org/wiki/Time_series

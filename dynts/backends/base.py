@@ -3,6 +3,8 @@ from dynts.exceptions import *
 from dynts.utils import wrappers
 
 
+Formatters = {}
+
 class TimeSeries(object):
     '''Interface class for timeseries back-ends.
     
@@ -27,6 +29,16 @@ class TimeSeries(object):
     def __str__(self):
         return self.description()
     
+    def names(self):
+        '''List of names for each timeseries'''
+        N = self.count()
+        names = self.name.split(',')[:N]
+        n = 0
+        while len(names) < N:
+            n += 1
+            names.append('unnamed%s' % n)
+        return names        
+        
     def description(self):
         return self.name
     
@@ -89,6 +101,14 @@ function.'''
         for d,v in self.items():
             print('%s: %s' % d,v)
             
+    def dump(self, format = None, **kwargs):
+        '''Dump the timeseries using a specific :ref:`format <formatter>`.'''
+        formatter = Formatters.get(format,None)
+        if not format:
+            return self.display()
+        else:
+            return formatter(self,**kwargs)
+        
     # PURE VIRTUAL FUNCTIONS
     
     @property
