@@ -4,18 +4,16 @@
 Ecoplot JQuery Plugin
 =========================
 
-Dynts comes with a fully fledged JQuery plugin for manipulating timeseries and scatter plots
-directly on the browser. The plugin is located on the ``media`` directory.
+Dynts comes with a fully fledged jQuery_ plugin for manipulating
+timeseries and scatter plots directly on the browser.
+The plugin is located on the ``media`` directory.
 
 Dependencies
 ==========================
 There are two dependencies:
 
-* jQuery__ javascript library.
-* Flot__ javascript plotting library. For convenience, this library is shipped with dynts.
-
-__ http://jquery.com/
-__ http://code.google.com/p/flot/
+* jQuery_ javascript library.
+* Flot_ javascript plotting library. For convenience, this library is shipped within the ``media`` directory.
 
 The scripts to include are the followings::
 
@@ -35,7 +33,8 @@ It is as easy as this::
 	
 
 
-
+.. _jQuery: http://jquery.com/
+.. _flot: http://code.google.com/p/flot/
 
 
 
