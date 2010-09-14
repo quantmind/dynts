@@ -4,11 +4,6 @@
 Timeserie Interface
 ===========================
 
-
-.. autoclass:: dynts.backends.base.tsbase
-   :members:
-
-
 .. _bckend-prop_func:
 
 Proposed functionality
@@ -60,3 +55,8 @@ It may be useful to move functionality of the ts into a seperate 'analytics' obj
 
 
     
+TimeSeries Interface
+============================
+
+.. autoclass:: dynts.TimeSeries
+   :members:

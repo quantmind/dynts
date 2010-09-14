@@ -1,10 +1,7 @@
-import numpy as np
+import numpy as ny
 
-from dynts.backends.base import tsbase, MissingPackage
+from dynts import TimeSeries
 
-
-
-
-class timeserie(tsbase):
+class timeserie(TimeSeries):
     '''A timeserie based on numpy'''
     pass

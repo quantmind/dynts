@@ -20,8 +20,8 @@ Contents
    
    dsl/index
    backends/index
-   web/index
    settings
+   web/index
 
 	
 Indices and tables

@@ -1,4 +1,4 @@
-import tsbase
+from dynts.tests import tsbase
 
 class TestZooTS(tsbase.TestTS):
     backend = 'zoo'

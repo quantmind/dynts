@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from random import uniform, randint
 import numpy as ny
 
-from dynts import timeserie
+from dynts import timeseries
 
 def_converter = lambda x: x
 def_generator = lambda x : uniform(0,1)

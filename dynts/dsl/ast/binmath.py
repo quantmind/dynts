@@ -41,7 +41,6 @@ class BinMathOp(BinOp):
             return le.clone(data = data, name = name)
         else:
             raise NotImplementedError
-            
     
 
 class PlusOp(BinMathOp):

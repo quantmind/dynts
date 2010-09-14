@@ -9,6 +9,7 @@ class timeserie(rts):
     
 __ http://cran.r-project.org/web/packages/timeSeries/index.html
     '''
+    type = 'rmetrics'
     libraries = ['timeSeries','zoo']
         
     def __init__(self, *args, **kwargs):

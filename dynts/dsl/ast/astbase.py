@@ -1,5 +1,5 @@
 from dynts.conf import settings
-from dynts import timeserie, istimeserie
+from dynts import timeseries, istimeseries
 from dynts.dsl.ast.errors import *
 
 def isnumber(value):
@@ -138,10 +138,10 @@ class Symbol(BaseExpression):
     
     def _unwind(self, values, unwind, **kwargs):
         sdata = values[str(self)]
-        if istimeserie(sdata):
+        if istimeseries(sdata):
             return sdata
         else:
-            ts = timeserie(self, date = sdata['date'], data = sdata['value'])
+            ts = timeseries(self, date = sdata['date'], data = sdata['value'])
             values[str(self)] = ts
             return ts
     

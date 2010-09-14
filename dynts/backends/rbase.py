@@ -3,10 +3,10 @@ import numpy as ny
 
 from dynts.utils.rutils import rpyobject, py2rdate, r2pydate, isoformat
 
-from base import tsbase
+from dynts import TimeSeries
 
 
-class rts(tsbase,rpyobject):
+class rts(TimeSeries,rpyobject):
     '''Base class for R-based timeseries objects'''
     
     @property
@@ -87,6 +87,6 @@ class rts(tsbase,rpyobject):
         name = kwargs.pop('name','')
         date = kwargs.pop('date',None)
         data = kwargs.pop('data',None)
-        ts  = cls(cls.type,name=name,date=date,data=data)
+        ts  = cls(name=name,date=date,data=data)
         ts._ts = self.rc(command, *args, **kwargs)
         return ts

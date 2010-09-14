@@ -1,7 +1,7 @@
 import unittest
 from itertools import izip
 
-from dynts import timeserie
+from dynts import timeseries
 from dynts.utils.populate import populate, datepopulate
 
 
@@ -15,7 +15,7 @@ class TestTS(unittest.TestCase):
         
     def getts(self, returndata = False, delta = 1, cols = 1):
         date,data = self.getdata(100,cols,delta)
-        ts   = timeserie(name = 'test', date = date, data = data, backend = self.backend)
+        ts   = timeseries(name = 'test', date = date, data = data, backend = self.backend)
         if returndata:
             return ts,list(date),list(data)
         else:

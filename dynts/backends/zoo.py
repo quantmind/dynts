@@ -1,7 +1,7 @@
 from itertools import izip
 from rpy2.robjects import IntVector
 
-from dynts.backends.rbase import tsbase, rts
+from dynts.backends.rbase import TimeSeries, rts
 
  
 def v2bool(v):
@@ -12,7 +12,7 @@ def v2bool(v):
     
 
 def tozoo(ts):
-    if isinstance(ts,tsbase):
+    if isinstance(ts,TimeSeries):
         if ts.type == 'zoo':
             return ts
         else:
@@ -22,6 +22,7 @@ def tozoo(ts):
 
 
 class timeserie(rts):
+    type = 'zoo'
     libraries = ['zoo,PerformanceAnalytics']
         
     def __init__(self, *args, **kwargs):

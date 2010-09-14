@@ -1,3 +1,8 @@
+
+.. rubric:: A Domain Specific Language for Timeseries Analysis.
+
+--
+
 :Documentation: http://packages.python.org/dynts/
 :Dowloads: http://pypi.python.org/pypi/dynts/
 :Source: http://github.com/quantmind/dynts
@@ -64,6 +69,8 @@ For example, there are back-ends depending on the following R packages:
 Installing rpy2_ on Linux is straightforward, on windows it requires the
 `python for windows`__ extension library.
 
+__ http://sourceforge.net/projects/pywin32/files/
+
 Running Tests
 =================
 Form the package directory::
@@ -75,6 +82,26 @@ or, once installed::
 	from dynts import runtests
 	runtests()
 	
+If you are behind a proxy, some tests will fail unless you write a little script
+which looks like this::
+
+	from dynts.conf import settings
+	from dynts import runtests
+	settings.proxies['http'] = 'http://your.proxy.com:80'
+
+	if __name__ == '__main__':
+	    runtests()
+	    
+	    
+Community
+=================
+Trying to use an IRC channel **#dynts** on ``irc.freenode.net``
+(you can use the webchat at http://webchat.freenode.net/).
+
+If you find a bug or would like to request a feature, please `submit an issue`__.
+
+__ http://github.com/quantmind/dynts/issues
+    
 .. _numpy: http://numpy.scipy.org/
 .. _ply: http://www.dabeaz.com/ply/
 .. _rpy2: http://rpy.sourceforge.net/rpy2.html
@@ -84,4 +111,3 @@ or, once installed::
 .. _zoo: http://cran.r-project.org/web/packages/zoo/index.html
 .. _PerformanceAnlytics: http://cran.r-project.org/web/packages/PerformanceAnalytics/index.html
 .. _timeSeries: http://cran.r-project.org/web/packages/timeSeries/index.html
-__ http://sourceforge.net/projects/pywin32/files/

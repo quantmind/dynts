@@ -16,7 +16,7 @@ __contact__  = "luca@quantmind.com"
 __homepage__ = "http://github.com/quantmind/dynts/"
 
 
-from backends import timeserie, istimeserie, BACKENDS
+from backends import timeseries, TimeSeries, istimeseries, BACKENDS
 from data import dynts_providers, TimeSerieLoader
 from dsl import parse, dslresult, Expr
 

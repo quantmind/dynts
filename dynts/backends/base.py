@@ -2,12 +2,11 @@ from itertools import izip
 from dynts.exceptions import *
 
 
-class tsbase(object):
-    '''Base class for timeseries back-ends'''
+class TimeSeries(object):
+    '''Interface class for timeseries back-ends'''
     type = None
     
-    def __init__(self, typ, name = '', date = None, data = None):
-        self.__class__.type  = typ
+    def __init__(self, name = '', date = None, data = None):
         self.name    = str(name)
         self.make(date,data)
         
@@ -124,7 +123,7 @@ class tsbase(object):
     def clone(self, data = None, name = None):
         name = name or self.name
         data = data if data is not None else self.values()
-        ts = self.__class__(self.__class__.type, name)
+        ts = self.__class__(name)
         ts.make(self.keys(),data,raw=True)
         return ts
         
