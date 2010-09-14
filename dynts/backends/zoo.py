@@ -1,7 +1,8 @@
 from itertools import izip
 from rpy2.robjects import IntVector
 
-from dynts.backends.rbase import TimeSeries, rts
+import dynts
+from dynts.backends.rbase import rts
 
  
 def v2bool(v):
@@ -21,12 +22,9 @@ def tozoo(ts):
         raise ValueError('%s is not a timeserie object' % ts)
 
 
-class timeserie(rts):
+class TimeSeries(rts):
     type = 'zoo'
     libraries = ['zoo,PerformanceAnalytics']
-        
-    def __init__(self, *args, **kwargs):
-        super(timeserie,self).__init__(*args, **kwargs)
     
     def factory(self, date, data, raw = False):
         if not raw:

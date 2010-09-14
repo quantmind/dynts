@@ -19,4 +19,4 @@ def timeseries(name = '', backend = None, **kwargs):
         bmodule = backend
     module = import_module(bmodule)
     name = name or bmodule
-    return getattr(module, 'timeserie')(name = name, **kwargs)
+    return getattr(module, 'TimeSeries')(name = name, **kwargs)

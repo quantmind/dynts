@@ -10,22 +10,22 @@
 
 --
 
-Timeserie analysis and a timeserie domain specific language written in Python.
+Timeseries analysis and a timeseries domain specific language written in Python.
 
 
 Timeserie Object
 ========================
 
-To create a timeserie object directly::
+To create a timeseries object directly::
 
-	>>> from dynts import timeserie
-	>>> ts = timeserie('test')
+	>>> from dynts import timeseries
+	>>> ts = timeseries('test')
 	>>> ts.type
 	'zoo'
 	>>> ts.name
 	'test'
 	>>> ts
-	timeserie:zoo:test
+	TimeSeries:zoo:test
 	>>> str(ts)
 	'test'
 
@@ -46,7 +46,7 @@ This is a simple multiplication::
 	[2.0, goog]
 	>>> ts = dynts.evaluate(e).unwind()
 	>>> ts
-	timeserie:zoo:2.0 * goog
+	TimeSeries:zoo:2.0 * goog
 	>>> len(ts)
 	251
 
@@ -57,7 +57,7 @@ There are several requirements that must be met:
 
 * numpy_ arrays and matrices.
 * ply_ the building block of the DSL_.
-* rpy2_ if an R_ timeserie back-end is used (default).
+* rpy2_ if an R_ TimeSeries back-end is used (default).
 * ccy_ for date and currency manipulation.
 
 Depending on the back-end used, additional dependencies need to be met.

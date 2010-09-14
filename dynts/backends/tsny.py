@@ -1,7 +1,7 @@
 import numpy as ny
 
-from dynts import TimeSeries
+import dynts
 
-class timeserie(TimeSeries):
+class TimeSeries(dynts.TimeSeries):
     '''A timeserie based on numpy'''
     pass

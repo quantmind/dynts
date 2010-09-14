@@ -1,12 +1,12 @@
 from rpy2 import rinterface
 import numpy as ny
 
+import dynts
 from dynts.utils.rutils import rpyobject, py2rdate, r2pydate, isoformat
 
-from dynts import TimeSeries
 
 
-class rts(TimeSeries,rpyobject):
+class rts(dynts.TimeSeries,rpyobject):
     '''Base class for R-based timeseries objects'''
     
     @property

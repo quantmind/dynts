@@ -4,16 +4,13 @@ from rpy2.robjects import StrVector
 from dynts.backends.rbase import rts, r2pydate, isoformat, ny
 
 
-class timeserie(rts):
+class TimeSeries(rts):
     '''Timeserie backend based on Rmetrics timeserie__ package
     
 __ http://cran.r-project.org/web/packages/timeSeries/index.html
     '''
     type = 'rmetrics'
     libraries = ['timeSeries','zoo']
-        
-    def __init__(self, *args, **kwargs):
-        super(timeserie,self).__init__(*args, **kwargs)
         
     def factory(self, date, data):
         tdate = self.dateconvert
