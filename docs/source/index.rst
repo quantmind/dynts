@@ -17,6 +17,7 @@ Contents
    
    dsl/index
    backends/index
+   formatters
    internals/index
    web/index
 

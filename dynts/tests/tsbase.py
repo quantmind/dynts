@@ -3,6 +3,7 @@ from itertools import izip
 
 from dynts import timeseries
 from dynts.utils.populate import populate, datepopulate, randomts, date
+from dynts.exceptions import *
 
 
 class TestTS(unittest.TestCase):
@@ -80,4 +81,18 @@ class TestTS(unittest.TestCase):
         self.assertEqual(ts.names(),['serie1','serie2'])
         csv = ts.dump('csv')
         self.assertTrue(csv)
+        
+    def testXLSformatter(self):
+        ts = randomts(name = "serie1,serie2",
+                      cols = 2, start = date(2010,1,1), size = 50)
+        try:
+            import xlwt
+        except ImportError:
+            try:
+                csv = ts.dump('xls')
+            except FormattingException:
+                pass
+        else:
+            xls = ts.dump('xls')
+            self.assertTrue(xls)
         

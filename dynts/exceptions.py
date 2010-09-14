@@ -14,6 +14,11 @@ class MissingDataProvider(DyntsException):
 a Data provider is not available'''
     pass
 
+class FormattingException(DyntsException):
+    '''A :class:`DyntsException` exception raised when
+an exception occurs duting formatting of a :class:`dynts.TimeSeries`'''
+    pass
+
 class DateNotFound(DyntsException):
     '''A :class:`DyntsException` exception raised when 
     a date is not found in a :class:`dynts.TimeSeries`.'''

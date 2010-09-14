@@ -102,7 +102,7 @@ function.'''
             print('%s: %s' % d,v)
             
     def dump(self, format = None, **kwargs):
-        '''Dump the timeseries using a specific :ref:`format <formatter>`.'''
+        '''Dump the timeseries using a specific :ref:`format <formatters>`.'''
         formatter = Formatters.get(format,None)
         if not format:
             return self.display()

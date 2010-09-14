@@ -23,6 +23,7 @@ from dsl import parse, dslresult, Expr
 import formatters
 Formatters['json'] = formatters.toflot
 Formatters['csv'] = formatters.tocsv
+Formatters['xls'] = formatters.toxls
 
 
 def get(symbols, start = None, end = None, provider = None):
