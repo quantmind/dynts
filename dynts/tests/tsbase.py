@@ -14,9 +14,12 @@ class TestTS(unittest.TestCase):
         data = populate(size = size, cols = cols)
         return dates,data
         
-    def getts(self, returndata = False, delta = 1, cols = 1):
-        dates,data = self.getdata(100,cols,delta)
+    def getts(self, returndata = False, delta = 1, cols = 1, size = 100):
+        dates,data = self.getdata(size,cols,delta)
         ts   = timeseries(name = 'test', date = dates, data = data, backend = self.backend)
+        self.assertEqual(ts.shape,(size,cols))
+        self.assertEqual(len(ts),size)
+        self.assertEqual(ts.count(),cols)
         if returndata:
             return ts,list(dates),list(data)
         else:
@@ -67,13 +70,28 @@ class TestTS(unittest.TestCase):
         #names = ts.colnames()
         #self.assertEqual(len(names),1)
         
-    def testDictionary(self):
+    def testBinaryTreeWrapper(self):
         '''Test included in documentation'''
         ts = randomts(cols = 2, start = date(2010,1,1), size = 50)
-        dts = ts.asdict()
+        dts = ts.asbtree()
+        self.assertEqual(dts.shape,ts.shape)
         values = ts.values()
         self.assertEqual(dts[ts.start()].all(),values[0].all())
         self.assertEqual(dts[ts.end()].all(),values[49].all())
+        
+    def testHashWrapper(self):
+        ts = randomts(cols = 2, start = date(2010,1,1), size = 50)
+        dts = ts.ashash()
+        self.assertEqual(dts.shape,ts.shape)
+        self.assertFalse(dts.modified)
+        dts[date(2009,2,1)] = [56.4,78.6]
+        self.assertTrue(dts.modified)
+        self.assertEqual(len(dts),len(ts)+1)
+        dts = dts.getts()
+        self.assertEqual(ts.type,dts.type)
+        self.assertEqual(len(dts),len(ts)+1)
+        self.assertEqual(dts.count(),ts.count())
+        self.assertTrue(dts.isconsistent())
         
     def testCSVformatter(self):
         ts = randomts(name = "serie1,serie2",

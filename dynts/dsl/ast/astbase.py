@@ -1,6 +1,6 @@
 from dynts.conf import settings
 from dynts import timeseries, istimeseries
-from dynts.dsl.ast.errors import *
+from dynts.exceptions import *
 
 def isnumber(value):
     try:
@@ -77,13 +77,7 @@ class BaseExpression(Expr):
     
 class Expression(BaseExpression):
     '''Base class for single expression
-    '''
-    def __init__(self, value):
-        super(Expression,self).__init__(value)
-        
-    def info(self):
-        return str(self.value)
-    
+    '''    
     def symbols(self):
         return self.value.symbols()
     
@@ -131,6 +125,7 @@ class Symbol(BaseExpression):
     '''Timeserie symbol. This expression is replaced by a timeserie value for the symbol
     '''
     def __init__(self, value, field = None):
+        value = settings.symboltransform(value)
         super(Symbol,self).__init__(value)
     
     def symbols(self):
@@ -280,7 +275,15 @@ class BinOp(ConcatOp):
     
     
 class EqualOp(BinOp):
+    '''Equal operator expression. For example
     
+* ``window = 35``
+* ``param = AMZN``
+
+The left hand side is the name of the parameter, while the right-hand side
+is the parameter values which can be a :class:`Symbol`.
+The left hand side is **never** a symbol. 
+'''
     def __init__(self,left,right):
         super(EqualOp,self).__init__(left,right,"=")
         if not isinstance(self.left,Symbol):
@@ -288,36 +291,37 @@ class EqualOp(BinOp):
     
     def _unwind(self, values, unwind, **kwargs):
         data = self.right.unwind(values, unwind, **kwargs)
-        return unwind.keyValue(str(self.left), data.data)
+        return {str(self.left):data}
     
     def symbols(self):
         return self.right.symbols()
  
  
 class Bracket(Expression):
-    
+    '''A :class:`dynts.dsl.Expr` class for enclosing group of :class:`dynts.dsl.Expr`.
+It forms the building block of :class:`dynts.dsl.Function` and other operators.'''
     def __init__(self,value,pl,pr):
         self.__pl = pl
         self.__pr = pr
         super(Bracket,self).__init__(value)
-        #self._process(value)
     
     def info(self):
         return '%s%s%s' % (self.__pl,self.value,self.__pr)
     
-    def _process(self,value):
-        if self.concat_operator == None:
-            self.children.append(value)
-        else:
-            if self.isconcatoper(value):
-                cs = value.children
-                for c in cs:
-                    self._process(c)
+    def _unwind(self, *args, **kwargs):
+        data = self.value.unwind(*args, **kwargs)
+        if not isinstance(data,list):
+            data = [data]
+        args = []
+        kwargs = {}
+        for item in data:
+            if isinstance(item,dict):
+                kwargs.update(item)
             else:
-                self.childrens.append(value)
+                args.append(item)
+        return args,kwargs
                 
-    
-        
+                
 class uMinus(Expression):
     def __init__(self,value):
         Expression.__init__(self,value)

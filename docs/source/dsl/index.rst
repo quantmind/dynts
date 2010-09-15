@@ -75,4 +75,25 @@ A symbol is any string expression which is not a function. For example::
 Symbols are special types of the abstract syntax tree which defines the timeserie DSL.
 values of symbol are given by external data providers such as blooberg, yahoo finance, google finance
 and so forth.
+
+Brackets
+~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: dynts.dsl.Bracket
+   :members:
+   
 	
+Function
+~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: dynts.dsl.Function
+   :members:
+
+
+Functions Registry
+=============================
+To implement new functions, one needs to derive from the base class:
+
+.. autoclass:: dynts.dsl.FunctionBase
+   :members:
+   

@@ -1,24 +1,62 @@
 from bisect import bisect_left
+
+from numpy import ndarray, array
+
 from dynts.exceptions import *
 
 
-class asdict(object):
+class TimeSerieWrap(object):
+    
+    def __init__(self, ts, **kwargs):
+        self.ts = ts
+        self.modified = False
+        self.wrap(**kwargs)
+        
+    def wrap(self, **kwargs):
+        pass
+        
+    def get(self, dt, default = None):
+        '''Equivalent to::
+
+    self[dt]
+    
+but catches exceptions and return *default*.'''
+        try:
+            return self[dt]
+        except DateNotFound:
+            return default
+        
+    def getts(self):
+        return self.ts
+        
+    @property
+    def shape(self):
+        return (len(self),self.ts.count())
+
+
+class asbtree(TimeSerieWrap):
     '''Wrap a :class:`dynts.TimeSeries` and
-expose dictionary-like functionalities. A :class:`dynts.TimeSeries` instance
-has a shortcut method which construct a ``asdict``. Here is an example::
+expose binary-tree like functionalities. A :class:`dynts.TimeSeries` instance
+has a shortcut method which construct a ``asbtree``. Here is an example::
 
     >>> from dynts.utils.populate import randomts, date
     >>> ts = randomts(cols = 2, start = date(2010,1,1), size = 50)
-    >>> dts = ts.asdict()
+    >>> dts = ts.asbtree()
     >>> sts.find_ge(ts.start())
     1
     >>> sts.find_ge(ts.end())
     49
 '''
-    def __init__(self, ts):
-        self.ts = ts
-        self.dates  = list(ts.dates())
+    def wrap(self):
+        ts = self.ts
+        dates   = ts.dates()
+        if not isinstance(dates,ndarray):
+            dates = array(list(dates))
+        self.dates  = dates
         self.values = ts.values()
+    
+    def __len__(self):
+        return len(self.dates)
     
     def __getitem__(self, dt):
         '''Get the value at *dt* otherwise it raises
@@ -31,17 +69,6 @@ an :class:`dynts.exceptions.DateNotFound`.'''
             return self.values[index]
         else:
             raise DateNotFound
-    
-    def get(self, dt, default = None):
-        '''Equivalent to::
-
-    self[dt]
-    
-but catches exceptions and return *default*.'''
-        try:
-            return self[dt]
-        except DateNotFound:
-            return default
         
     def find_ge(self, dt):
         '''Building block of all searches. Find the 
@@ -55,9 +82,6 @@ exception will raise, otherwise it returns the index.
             return i
         raise RightOutOfBound
 
-    def __len__(self):
-        return len(self.dates)
-    
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__,self.ts.__repr__())
     
@@ -69,4 +93,44 @@ exception will raise, otherwise it returns the index.
         i2 = self.find_ge(end)
         return self.dates[i1-1:i2-1]
 
+
+class ashash(TimeSerieWrap):
+    
+    def wrap(self):
+        ts = self.ts
+        hash = {}
+        self.hash   = hash
+        self.keys   = hash.iterkeys
+        self.values = hash.itervalues
+        for dt,v in ts.items():
+            hash[dt] = v
+    
+    def __len__(self):
+        return len(self.hash)
         
+    def __getitem__(self, dt):
+        '''Get the value at *dt* otherwise it raises
+an :class:`dynts.exceptions.DateNotFound`.'''
+        try:
+            index = self.hash[dt]
+        except KeyError:
+            raise DateNotFound
+    
+    def __setitem__(self, dt, item):
+        self.hash[dt] = item
+        self.modified = True
+
+    def items(self):
+        h = self.hash
+        for dt in sorted(self.keys()):
+            yield dt,h[dt]
+            
+    def getts(self):
+        if self.modified:
+            hash   = self.hash
+            dates  = sorted(self.keys())
+            values = (hash[dt] for dt in dates)
+            return self.ts.clone(date = dates, data = values)
+        else:
+            return self.ts
+    

@@ -1,4 +1,5 @@
 from itertools import izip
+from collections import deque
 from dynts.exceptions import *
 from dynts.utils import wrappers
 
@@ -11,6 +12,10 @@ class TimeSeries(object):
     .. attribute:: type
     
         string indicating the backend type (zoo, rmetrics, numpy, etc...)
+        
+    .. attribute:: shape
+    
+        tuple containing the timeseries dimensions.
     '''
     type = None
     
@@ -49,10 +54,15 @@ class TimeSeries(object):
         '''Number of series in the timeseries'''
         return self.shape[1]
     
-    def asdict(self):
-        '''Return an instance of :class:`dynts.utils.wrappers.asdict`
-which exposes dictionary-like functionalities of ``self``.'''
-        return wrappers.asdict(self)
+    def asbtree(self):
+        '''Return an instance of :class:`dynts.utils.wrappers.asbtree`
+which exposes binary tree like functionalities of ``self``.'''
+        return wrappers.asbtree(self)
+    
+    def ashash(self):
+        '''Return an instance of :class:`dynts.utils.wrappers.ashash`
+which exposes hash-table like functionalities of ``self``.'''
+        return wrappers.ashash(self)
     
     def dateconvert(self, dte):
         return dte
@@ -82,6 +92,22 @@ which exposes dictionary-like functionalities of ``self``.'''
         for key in self.keys():
             yield c(key)
             
+    def lagdates(self, step = 1):
+        if step == 1:
+            dates = self.dates()
+            dt0 = dates.next()
+            for dt1 in dates:
+                yield dt1,dt0
+                dt0 = dt1
+        else:
+            q = deque()
+            while done:
+                done+=1
+                lag.append(dates.next())
+            for dt1 in dates:
+                lag.append(dt1)
+                yield dt1,lag.pop(0)
+            
     def values(self):
         '''Returns a ``numpy.ndarray`` containing the values of the timeseries.
 Implementations should try not to copy data if possible. This function
@@ -95,11 +121,23 @@ tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
 function.'''
         for d,v in izip(self.dates(),self.values()):
             yield d,v
+            
+    def lagitems(self, step = 1):
+        '''Efficient iteration over lagged elements.'''
+        done = 0
+        items  = self.items()
+        lag    = deque()
+        while done:
+            done+=1
+            lag.append(items.next())
+        for i1 in items:
+            lag.append(i1)
+            yield i1,lag.pop(0)
     
     def display(self):
         '''Nicely display self on the shell. Useful during prototyping and development.'''
         for d,v in self.items():
-            print('%s: %s' % d,v)
+            print('%s: %s' % (d,v))
             
     def dump(self, format = None, **kwargs):
         '''Dump the timeseries using a specific :ref:`format <formatters>`.'''
@@ -108,7 +146,14 @@ function.'''
             return self.display()
         else:
             return formatter(self,**kwargs)
-        
+    
+    def isconsistent(self):
+        '''Check if the timeseries is consistent'''
+        for dt1,dt0 in self.lagdates():
+            if dt1 <= dt0:
+                return False
+        return True
+    
     # PURE VIRTUAL FUNCTIONS
     
     @property
@@ -159,11 +204,14 @@ function.'''
     def merge(self, ts, all = True):
         raise NotImplementedError
     
-    def clone(self, data = None, name = None):
+    def clone(self, date = None, data = None, name = None):
         name = name or self.name
         data = data if data is not None else self.values()
         ts = self.__class__(name)
-        ts.make(self.keys(),data,raw=True)
+        if date is None:
+            ts.make(self.keys(),data,raw=True)
+        else:
+            ts.make(date,data)
         return ts
         
     def __add__(self, other):

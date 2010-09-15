@@ -33,6 +33,24 @@ class TestDsl(unittest.TestCase):
         for v1,v2 in izip(ts1.values(),ts2.values()):
             self.assertAlmostEqual(v1,2.*v2)
         
-    def testFunction(self):
-        '''Test a function with one argument'''
-        pass
+
+
+class TestMeanFunction(unittest.TestCase):
+    function = 'mean'
+    
+    def testNoParameters(self):
+        '''Test mean function with zero parameters'''
+        expression = '%s(GOOG)' % self.function
+        result = dynts.evaluate(expression)
+        self.assertEqual(str(result),expression)
+        self.assertEqual(len(result.data),1)
+        data = result.unwind()
+        self.assertEqual(len(data),1)
+        
+    def testOneParameter(self):
+        '''Test mean function with one parameter'''
+        result = dynts.evaluate('mean(GOOG,window=20)')
+        self.assertEqual(len(result.data),1)
+        data = result.unwind()
+        self.assertEqual(len(data),1)
+        

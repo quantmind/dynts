@@ -96,3 +96,5 @@ class rules(object):
 
     def input(self, data):
         self.lexer.input(data)
+    
+

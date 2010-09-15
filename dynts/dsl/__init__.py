@@ -1,15 +1,16 @@
 from dynts.dsl.grammar import *
 from dynts.exceptions import DyntsException
 from dynts.data import dynts_providers
+from dynts.dsl.registry import FunctionBase, function_registry
 
-registered_functions = {}
 
-def parse(timeseries_expression, method = None):
+def parse(timeseries_expression, method = None, functions = None):
     '''Function for parsing :ref:`timeseries expressions <dsl-script>`.
 If succesful, it returns an instance of :class:`dynts.dsl.Expr`.'''
     from ply import yacc
     from rules import rules
-    ru = rules(registered_functions)
+    functions = functions if functions is not None else function_registry
+    ru = rules(functions)
     ru.build()
     ru.input(str(timeseries_expression).lower())
     tokens     = ru.tokens
@@ -28,7 +29,7 @@ class dslresult(object):
         return u'%s' % self.expression
     
     def __repr__(self):
-        return '%s' % self.expression
+        return self.expression.__repr__()
     
     def __str__(self):
         return self.__repr__()

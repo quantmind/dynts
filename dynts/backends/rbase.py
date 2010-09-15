@@ -34,7 +34,9 @@ class rts(dynts.TimeSeries,rpyobject):
             ts = None
         else:
             if not isinstance(data,ny.ndarray):
-                data = ny.array(data)
+                if not hasattr(data,'__len__'):
+                    data = list(data)
+                data = ny.asarray(data)
             ts = self.factory(date, data, raw = raw)
         self._ts = ts
         
