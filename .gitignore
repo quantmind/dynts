@@ -6,3 +6,4 @@ dist/*
 docs/build/*
 parser.out
 parsetab.py
+MANIFEST
