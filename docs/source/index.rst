@@ -15,8 +15,10 @@ Contents
 .. toctree::
    :maxdepth: 1
    
+   interface/index
    dsl/index
    backends/index
+   loader
    formatters
    internals/index
    web/index

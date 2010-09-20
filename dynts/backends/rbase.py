@@ -12,9 +12,12 @@ class rts(dynts.TimeSeries,rpyobject):
     @property
     def shape(self):
         try:
-            return tuple(self.rc('dim'))
+            s = tuple(self.rc('dim'))
         except:
-            return self.values().shape
+            s = self.values().shape
+        if len(s) == 1:
+            s += 1,
+        return s
     
     def __getitem__(self, i):
         '''This is not an efficient method'''
