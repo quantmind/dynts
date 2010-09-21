@@ -32,3 +32,32 @@ Dynts is currently shipped with two providers:
 
 * ``google`` finance
 * ``yahoo`` finance
+
+To check for registered providers::
+
+	>>> from dynts.data import providers
+	>>> providers
+	>>> providers.keys()
+	['google','yahoo']
+	
+
+Registering
+=================
+Let's say we create a new provider along these lines::
+
+	from dynts.data import DataProvider
+	
+	class MyCustomProvider(DataProvider):
+	
+	    def get(ticker, startdate, enddate, field=None):
+	    	...
+	
+Registration is obtained simply::
+
+	>>> from dynts.data import register
+	>>> register(MyCustomProvider)
+	>>> providers.keys()
+	['mycustomprovider','google','yahoo']
+
+	 
+	 

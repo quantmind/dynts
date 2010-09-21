@@ -1,6 +1,5 @@
 from dynts.dsl.grammar import *
 from dynts.exceptions import DyntsException
-from dynts.data import dynts_providers
 from dynts.dsl.registry import FunctionBase, function_registry
 
 

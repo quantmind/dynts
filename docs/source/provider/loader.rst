@@ -13,7 +13,7 @@ functions::
 	>>> ts = dynts.evaluate('YHOO,AMZN', loader = customdataloader)
 
 
-The data loader Interface
+The data loader class
 ==================================
 
 .. autoclass:: dynts.TimeSerieLoader

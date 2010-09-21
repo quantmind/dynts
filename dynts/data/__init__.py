@@ -20,8 +20,8 @@ def safetodate(dte):
 
 
 class TimeSerieLoader(object):
-    '''Load timeseries. This class can be replaced by a custom one.'''
-    
+    '''Cordinates the loading of timeseries data into :class:`dynts.dsl.Symbol`.
+This class can be replaced by a custom one if required.'''
     def load(self, providers, symbols, start, end, provider = None):
         '''Load symbols data.
         
@@ -71,15 +71,24 @@ class DataProviders(dict):
     def register(self, provider):
         '''Register a new data provider. *provider* must be an instance of
     DataProvider. If provider name is already available, it will be replaced.'''
-        name = provider.code.lower()
-        self[name] = provider
+        if isinstance(provider,type):
+            provider = provider()
+        self[provider.code] = provider
         
     def unregister(self, provider):
         '''Unregister an existing data provider. *provider* must be an instance of
     DataProvider. If provider name is already available, it will be replaced.'''
+        if isinstance(provider,type):
+            provider = provider()
+        if isinstance(provider,DataProvider):
+            provider = provider.code
+        return self.pop(provider,None)
         
 
-dynts_providers = DataProviders()
+providers = DataProviders()
+register = providers.register
+unregister = providers.unregister
 
-dynts_providers.register(google())
-dynts_providers.register(yahoo())
+register(google)
+register(yahoo)
+

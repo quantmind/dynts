@@ -2,7 +2,7 @@
 dynts 0.1 - Not yet Released
 ====================================
 * Development moved to github http://github.com/quantmind/dynts
-* **21 tests**
+* **22 tests**
 
 dynts 0.1.a2  - 2010 September 12
 ====================================
