@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from dynts.conf import settings
+from dynts.exceptions import *
 
 from ccy import todate
 
@@ -32,12 +33,13 @@ This class can be replaced by a custom one if required.'''
         start, end = self.dates(start, end)
         data = {}
         for symbol in symbols:
-            ticker, field, provider = self.parse_symbol(symbol, provider = provider)
+            ticker, field, provider = self.parse_symbol(symbol)
             p  = providers.get(provider,None)
             if not p:
                 raise MissingDataProvider('data provider %s not available' % provider)
-            ts = p.get(ticker, start, end, field) 
-            data[symbol] = ts
+            result = p.get(ticker, start, end, field)
+            self.onresult(symbol,result)
+            data[symbol] = result
         return data
     
     def dates(self, start, end):
@@ -54,19 +56,47 @@ There should be no reason to override this function.'''
             start = end - timedelta(days=int(round(30.4*settings.months_history)))
         return start,end
     
-    def parse_symbol(self, symbol, provider =None):
-        provider = provider or settings.default_provider
-        return str(symbol), None, provider
+    def parse_symbol(self, symbol):
+        '''Parse a symbol to obtain information regarding ticker, field and provider.
+Must return a tuple containing::
 
+    (ticker,fied,provider)
+'''
+        symbol = str(symbol)
+        bits = symbol.split(':')
+        pnames = providers.keys()
+        provider = settings.default_provider
+        if len(bits) == 1:
+            return symbol,None,provider
+        elif len(bits) == 2:
+            if bits[1] in pnames:
+                return bits[0],None,bits[1]
+            else:
+                return bits[0],bits[1],provider
+        elif len(bits) == 3:
+            if bits[1] in pnames:
+                return bits[0],bits[2],bits[1]
+            elif bits[2] in pnames:
+                return bits[0],bits[1],bits[2]
+            else:
+                raise BadSymbol('Could not parse %s. Unrecognized provider.' % symbol)
+        else:
+            raise BadSymbol('Could not parse %s.' % symbol)
+
+    def onresult(self, symbol, result):
+        '''Post-processing hook for result obtained from a data-provider.
+By default do nothing.'''
+        pass
+        
 
 class DataProviders(dict):
     proxies = {}
         
-    def load(self, symbols, start = None, end = None, provider = None, loader = None):
-        loader = loader or TimeSerieLoader()
+    def load(self, symbols, start = None, end = None, loader = None):
+        loader = loader or settings.default_loader or TimeSerieLoader
         if isinstance(loader,type):
             loader = loader()
-        return loader.load(self,symbols,start,end, provider = provider)
+        return loader.load(self,symbols,start,end)
     
     def register(self, provider):
         '''Register a new data provider. *provider* must be an instance of
@@ -82,7 +112,7 @@ class DataProviders(dict):
             provider = provider()
         if isinstance(provider,DataProvider):
             provider = provider.code
-        return self.pop(provider,None)
+        return self.pop(str(provider).upper(),None)
         
 
 providers = DataProviders()

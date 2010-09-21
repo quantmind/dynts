@@ -6,7 +6,7 @@ class DataProvider(object):
     .. attribute:: code
     
         The string code for the provider.
-        This attribute is obtained from the class name in lower case.'''
+        This attribute is obtained from the class name in upper case.'''
         
     def __repr__(self):
         return self.code + ' financial data provider'
@@ -22,7 +22,7 @@ class DataProvider(object):
         return True
     
     def __get_code(self):
-        return self.__class__.__name__.lower()
+        return self.__class__.__name__.upper()
     code = property(fget = __get_code)
     
     def weblink(self, ticker):

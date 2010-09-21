@@ -1,11 +1,21 @@
 import unittest
 
 import dynts
-from dynts.data import DataProvider, providers, register, unregister
+from dynts.data import DataProvider, TimeSerieLoader
+from dynts.data import providers, register, unregister
 
 
 class CustomProvider(DataProvider):
     pass
+
+class CustomLoader(TimeSerieLoader):
+    data = {}
+    
+    def onresult(self, symbol, result):
+        '''Store result in the class data dictionary'''
+        self.data[symbol] = result
+        
+
 
 class TestDataProvider(unittest.TestCase):
     
@@ -13,12 +23,23 @@ class TestDataProvider(unittest.TestCase):
         ts = dynts.evaluate('GOOG:yahoo')
         self.assertTrue(ts)
         
-    def testregistration(self):
+    def testProviderRegistration(self):
         register(CustomProvider)
         self.assertEqual(len(providers),3)
-        p = providers['customprovider']
+        p = providers['CUSTOMPROVIDER']
         self.assertTrue(isinstance(p,CustomProvider))
-        unregister('customprovider')
+        unregister('CUSTOMPROVIDER')
         self.assertEqual(len(providers),2)
-        p = providers.get('customprovider',None)
+        p = providers.get('CUSTOMPROVIDER',None)
         self.assertEqual(p,None)
+        
+    def testCustomLoader(self):
+        from dynts.conf import settings
+        settings.default_loader = CustomLoader
+        ts = dynts.evaluate('BLT:google').unwind()
+        data = CustomLoader.data
+        self.assertTrue(data)
+        self.assertTrue('BLT:GOOGLE' in data)
+        
+        
+        

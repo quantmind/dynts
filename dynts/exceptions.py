@@ -14,25 +14,36 @@ class MissingDataProvider(DyntsException):
 a Data provider is not available'''
     pass
 
+
+class BadSymbol(DyntsException):
+    '''A :class:`DyntsException` exception raised when
+an exception occurs during parsing of a :class:`dynts.dsl.Symbol`'''
+    pass
+
+
 class FormattingException(DyntsException):
     '''A :class:`DyntsException` exception raised when
-an exception occurs duting formatting of a :class:`dynts.TimeSeries`'''
+an exception occurs during formatting of a :class:`dynts.TimeSeries`'''
     pass
+
 
 class DateNotFound(DyntsException):
     '''A :class:`DyntsException` exception raised when 
     a date is not found in a :class:`dynts.TimeSeries`.'''
     pass
 
+
 class DyntsOutOfBound(DyntsException):
     '''A :class:`DyntsException` exception raised when 
     trying to access :class:`dynts.TimeSeries` outside its dates range.'''
     pass
 
+
 class RightOutOfBound(DyntsOutOfBound):
     '''A :class:`DyntsOutOfBound` exception raised when 
     trying to access :class:`dynts.TimeSeries` after the end date.'''
     pass
+
 
 class LeftOutOfBound(DyntsOutOfBound):
     '''A :class:`DyntsOutOfBound` exception raised when 
@@ -44,15 +55,18 @@ class ExpressionError(DyntsException):
     '''A :class:`DyntsException` exception raised when errors occur during
 dsl language translation.
     '''
+
     
 class CouldNotParse(ExpressionError):
     
     def __init__(self, f):
         msg = 'Failed to parse expression "%s"' % (f)
         super(CouldNotParse,self).__init__(msg)
+
     
 class FunctionError(ExpressionError):
     '''Function Error'''
+
         
 class FunctionInternalError(FunctionError):
     '''Function Error'''

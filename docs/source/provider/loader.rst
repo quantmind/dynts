@@ -12,10 +12,14 @@ functions::
 	>>> import mydata.loader import customdataloader
 	>>> ts = dynts.evaluate('YHOO,AMZN', loader = customdataloader)
 
+Alternatively, one can specify a new loader in the :ref:`settings <settings>`::
+
+	>>> from dynts.conf import settings
+	>>> settings.default_loader = customdataloader
 
 The data loader class
 ==================================
 
-.. autoclass:: dynts.TimeSerieLoader
+.. autoclass:: dynts.data.TimeSerieLoader
    :members:
    :member-order: bysource
