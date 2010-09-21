@@ -9,3 +9,4 @@ Timeserie Backends
 
    zoo
    rmetrics
+   numpy

@@ -97,31 +97,47 @@ are all valid inputs returning::
     
 assuming ``yahoo`` is the provider in :attr:`dynts.conf.Settings.default_provider`.
 
-This function is called before retriving data.
+This function is called before retrieving data. As with previous functions there should be no reason to
+override this method. One could use the
+:func:`dynts.data.TimeSerieLoader.default_provider_for_ticker` to twick
+the behaviour when the provider is not available.
 '''
         if not symbol:
             raise BadSymbol("symbol not provided")
         symbol = str(symbol)
         bits = symbol.split(self.separator)
         pnames = providers.keys()
-        provider = settings.default_provider
-        if len(bits) == 1:
-            return symbol,None,provider
-        elif len(bits) == 2:
+        ticker = symbol
+        provider = None
+        field = None
+        if len(bits) == 2:
+            ticker = bits[0]
             if bits[1] in pnames:
-                return bits[0],None,bits[1]
+                provider = bits[1]
             else:
-                return bits[0],bits[1],provider
+                field = bits[1]
         elif len(bits) == 3:
+            ticker = bits[0]
             if bits[1] in pnames:
-                return bits[0],bits[2],bits[1]
+                provider = bits[1]
+                field = bits[2]
             elif bits[2] in pnames:
-                return bits[0],bits[1],bits[2]
+                provider = bits[2]
+                field = bits[1]
             else:
                 raise BadSymbol('Could not parse %s. Unrecognized provider.' % symbol)
-        else:
+        elif len(bits) > 3:
             raise BadSymbol('Could not parse %s.' % symbol)
-
+        
+        if provider is None:
+            provider = self.default_provider_for_ticker(ticker, field)
+        return ticker,field,provider
+ 
+    def default_provider_for_ticker(self, ticker, field):
+        '''Calculate the provider when not available in the symbol. By default it returns
+:attr:`dynts.conf.Settings.default_provider`.'''
+        return settings.default_provider
+    
     def preprocess(self, ticker, start, end, field):
         '''Preprocess **hook**. This is **called before requesting data** to
 a dataprovider. Return a tuple of date intervals. By default return::

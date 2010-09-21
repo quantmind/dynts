@@ -19,6 +19,9 @@ Data provider interface
 ==================================
 
 A data provider is a class which derives from :class:`dynts.data.DataProvider`
+and is responsable for loading actual data into :class:`dynts.dsl.Symbol`.
+A data provider can be a simple web service, your own data source or a professional
+streaming source.
 
 .. autoclass:: dynts.data.DataProvider
    :members:
