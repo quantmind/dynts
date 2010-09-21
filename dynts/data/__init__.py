@@ -22,14 +22,28 @@ def safetodate(dte):
 
 class TimeSerieLoader(object):
     '''Cordinates the loading of timeseries data into :class:`dynts.dsl.Symbol`.
-This class can be replaced by a custom one if required.'''
+This class can be overritten by a custom one if required. There are three **hooks**
+which can be used to customized its behaviour:
+:func:`dynts.data.TimeSerieLoader.preprocess`,
+:func:`dynts.data.TimeSerieLoader.onresult` and
+:func:`dynts.data.TimeSerieLoader.onfinishload`.
+
+.. attribute:: separator
+    
+    character for separating ticker, field and vendor. Default ``:``'''
+
+    separator = ':'
+    
     def load(self, providers, symbols, start, end, provider = None):
         '''Load symbols data.
         
 * *providers* Dictionary of registered data providers.
 * *symbols* list of symbols to load
 * *start* start date
-* *end* end date'''
+* *end* end date.
+
+There is no need to override this function, just use one the three hooks
+available.'''
         start, end = self.dates(start, end)
         data = {}
         for symbol in symbols:
@@ -37,10 +51,14 @@ This class can be replaced by a custom one if required.'''
             p  = providers.get(provider,None)
             if not p:
                 raise MissingDataProvider('data provider %s not available' % provider)
-            result = p.get(ticker, start, end, field)
-            self.onresult(symbol,result)
+            intervals = self.preprocess(ticker, start, end, field)
+            if intervals:
+                result = p.get(ticker, start, end, field)
+            else:
+                result = None
+            result = self.onresult(symbol,result)
             data[symbol] = result
-        return data
+        return self.onfinishload(data)
     
     def dates(self, start, end):
         '''Preconditioning on dates. This function makes sure the *start*
@@ -61,9 +79,27 @@ There should be no reason to override this function.'''
 Must return a tuple containing::
 
     (ticker,fied,provider)
+    
+For example::
+
+    intc
+    intc:open
+    intc:volume:google
+    intc:google
+    
+are all valid inputs returning::
+
+    intc,None,yahoo
+    intc,open,yahoo
+    intc,volume,google
+    intc,None,google
+    
+assuming ``yahoo`` is the provider in :attr:`dynts.conf.Settings.default_provider`.
 '''
+        if not symbol:
+            raise BadSymbol("symbol not provided")
         symbol = str(symbol)
-        bits = symbol.split(':')
+        bits = symbol.split(self.separator)
         pnames = providers.keys()
         provider = settings.default_provider
         if len(bits) == 1:
@@ -83,11 +119,26 @@ Must return a tuple containing::
         else:
             raise BadSymbol('Could not parse %s.' % symbol)
 
+    def preprocess(self, ticker, start, end, field):
+        '''Preprocess **hook**. This is **called before requesting data** to
+a dataprovider. Return a tuple of date intervals. By default return::
+
+    ([start,end],)
+    
+It could be overritten to modify the intervals
+'''
+        return [start, end],
+    
     def onresult(self, symbol, result):
-        '''Post-processing hook for result obtained from a data-provider.
-By default do nothing.'''
-        pass
-        
+        '''Post-processing **hook** for result obtained from a data-provider.
+By default return result. It could be used to store data into a cache or database.'''
+        return result
+    
+    def onfinishload(self, data):
+        '''Another post-processing **hook** invoked when the loading is finished.
+By default retun *data*.'''
+        return data
+
 
 class DataProviders(dict):
     proxies = {}

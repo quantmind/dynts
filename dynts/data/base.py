@@ -12,7 +12,8 @@ class DataProvider(object):
         return self.code + ' financial data provider'
     
     def get(self, ticker, startdate, enddate, field = None):
-        '''This is the function to implemenet.
+        '''This is the function to implement. It is not called directly but by the
+:class:`dynts.data.TimeSerieLoader`.
         '''
         raise NotImplementedError
     

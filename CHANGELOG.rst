@@ -1,8 +1,10 @@
 
-dynts 0.1 - Not yet Released
+dynts 0.1 - Development
 ====================================
 * Development moved to github http://github.com/quantmind/dynts
-* **23 tests**
+* Added ccy_ to dependencies.
+* **23 tests**.
+
 
 dynts 0.1.a2  - 2010 September 12
 ====================================

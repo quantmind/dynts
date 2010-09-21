@@ -14,6 +14,7 @@ class CustomLoader(TimeSerieLoader):
     def onresult(self, symbol, result):
         '''Store result in the class data dictionary'''
         self.data[symbol] = result
+        return result
         
 
 
