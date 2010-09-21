@@ -18,7 +18,7 @@ Contents
    interface/index
    dsl/index
    backends/index
-   loader
+   provider/index
    formatters
    internals/index
    web/index

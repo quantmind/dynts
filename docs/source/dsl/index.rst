@@ -1,5 +1,7 @@
 .. _index-dsl:
 
+.. module:: dynts.dsl
+
 ===========================
 Domain Specific Language
 ===========================
@@ -23,7 +25,7 @@ Here few script examples:
 
 Parsing timeserie scripts
 ==============================
-Parsing timeserie expression is accomplished using the :func:`dynts.parse` function:
+Parsing timeseries expressions is accomplished using the :func:`dynts.parse` function:
 
 
 .. autofunction:: dynts.parse
@@ -38,7 +40,7 @@ For example::
 	>>> len(r)
 	2
 
-Now lets load some data using the built-in dataproviders::
+Now lets load some data using the built-in :ref:`data providers <data-providers>`::
 
 	>>> result = dynts.evaluate(r)
 	>>> result.expression

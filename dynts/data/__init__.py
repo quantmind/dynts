@@ -74,6 +74,10 @@ class DataProviders(dict):
         name = provider.code.lower()
         self[name] = provider
         
+    def unregister(self, provider):
+        '''Unregister an existing data provider. *provider* must be an instance of
+    DataProvider. If provider name is already available, it will be replaced.'''
+        
 
 dynts_providers = DataProviders()
 

@@ -4,7 +4,7 @@
 Web Tools
 ===========================
 
-.. module:: web
+.. module:: dynts.web
 
 Dynts comes with a ``web`` and a ``media`` module which can be used to display timeseries
 data on the web using Python and Javascript.
