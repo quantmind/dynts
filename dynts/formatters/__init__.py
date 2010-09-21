@@ -4,12 +4,6 @@ import csv
 
 from dynts.exceptions import FormattingException
 
-try:
-    from tsplot import toplot
-except:
-    toplot = None
-
-
 default_converter = lambda x : x.isoformat()
 
 
@@ -65,3 +59,13 @@ __ http://pypi.python.org/pypi/xlwt'''
         return stream.getvalue()
     
      
+def toplot(ts, **kwargs):
+    try:
+        import tsplot
+        return tsplot.toplot(ts, **kwargs)
+    except ImportError:
+        raise FormattingException('To plot timeseries, matplotlib is required.')
+
+
+        
+    

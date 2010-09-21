@@ -24,8 +24,7 @@ import formatters
 Formatters['json'] = formatters.toflot
 Formatters['csv'] = formatters.tocsv
 Formatters['xls'] = formatters.toxls
-if formatters.toplot:
-    Formatters['plot'] = formatters.toplot
+Formatters['plot'] = formatters.toplot
 
 
 def evaluate(expression, start = None, end = None, loader = None):

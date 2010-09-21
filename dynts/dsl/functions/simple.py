@@ -16,8 +16,10 @@ class ScalarFunction(FunctionBase):
     def __call__(self, args, window = 20, **kwargs):
         result = []
         for arg in args:
-            result.append(self.apply(arg,**kwargs))
-        return result
+            ts = self.apply(arg, window = window, **kwargs)
+            result.append(ts)
+        if result:
+            return result if len(result)>1 else result[0]
 
 class Mean(ScalarFunction):
     """Moving average function"""
