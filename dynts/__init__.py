@@ -24,21 +24,37 @@ import formatters
 Formatters['json'] = formatters.toflot
 Formatters['csv'] = formatters.tocsv
 Formatters['xls'] = formatters.toxls
+if formatters.toplot:
+    Formatters['plot'] = formatters.toplot
 
 
-def evaluate(e, start = None, end = None, loader = None):
-    '''Evaluate expression *e*.
+def evaluate(expression, start = None, end = None, loader = None):
+    '''Evaluate expression *e*. This and :func:`dynts.parse`
+represent the main entry point of the library.
     
-* *e* string or an instance of :ref:`Expr <expr>' obtained using the parse function.
-* *start* start date.
-* *end* end date.
+* *expression* string or an instance of :class:`dynts.dsl.Expr` obtained using
+  the :func:`dynts.parse` function.
+* *start* start date or ``None``.
+* *end* end date or ``None``.
 * *loader* Optional :class:`dynts.data.TimeSerieLoader` class or instance.
+
+*expression* is parsed and the :class:`dynts.expr.Symbol` are sent to the
+:class:`dynts.data.TimeSerieLoader` instance for retrieving actual timeseries data.
+It returns an instance of :class:`dynts.dslresult`.
+
+Typical usage::
+
+    >>> import dynts
+    >>> r = dynts.evaluate('min(GS,window=30)')
+    >>> r
+    min(GS,window=30)
+    >>> ts = r.unwind()
     '''
-    if isinstance(e,basestring):
-        e = parse(e)
-    symbols = e.symbols()
+    if isinstance(expression,basestring):
+        expression = parse(expression)
+    symbols = expression.symbols()
     data = providers.load(symbols, start, end, loader = loader)
-    return dslresult(e,data)
+    return dslresult(expression,data)
     
 
 

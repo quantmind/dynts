@@ -23,5 +23,6 @@ required.
 .. toctree::
    :maxdepth: 2
    
+   evaluate
    provider
    loader

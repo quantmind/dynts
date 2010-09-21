@@ -121,6 +121,13 @@ class String(BaseExpression):
         return unwind.stringData(self.value)
 
 
+class Parameter(BaseExpression):
+    
+    def __init__(self, value):
+        value = str(value).lower()
+        super(Parameter,self).__init__(value)
+        
+
 class Symbol(BaseExpression):
     '''Timeserie symbol. This expression is replaced by a timeserie value for the symbol
     '''
@@ -145,8 +152,7 @@ class Symbol(BaseExpression):
 
 
 class MultiExpression(Expr):
-    '''
-    Base class for expression involving two or more elements
+    '''Base class for expression involving two or more elements
     '''
     def __init__(self, concat_operator, concatenate = True):
         self.__concatenate   = concatenate
@@ -159,17 +165,9 @@ class MultiExpression(Expr):
     def __iter__(self):
         return self.children.__iter__()
         
-    def internal_info(self):
-        cs = None
-        for c in self.children:
-            if cs == None:
-                cs = '%s' % c
-            else:
-                cs += ' %s %s' % (self.concat_operator,c)
-        return cs
-    
     def info(self):
-        return self.internal_info()
+        c = self.concat_operator
+        return reduce(lambda x,y: '%s%s%s' % (x,c,y),self.children)
     
     def symbols(self):
         cs = []
@@ -285,16 +283,15 @@ is the parameter values which can be a :class:`Symbol`.
 The left hand side is **never** a symbol. 
 '''
     def __init__(self,left,right):
+        if not isinstance(left,Parameter):
+            if not isinstance(left,Symbol):
+                raise ValueError('Left-hand-side of %s should be a string' % self)
+            left = Parameter(left.value)
         super(EqualOp,self).__init__(left,right,"=")
-        if not isinstance(self.left,Symbol):
-            raise ValueError('Left-hand-side of %s should be a Symbol' % self)
-    
+        
     def _unwind(self, values, unwind, **kwargs):
         data = self.right.unwind(values, unwind, **kwargs)
         return {str(self.left):data}
-    
-    def symbols(self):
-        return self.right.symbols()
  
  
 class Bracket(Expression):

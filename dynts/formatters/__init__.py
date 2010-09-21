@@ -4,7 +4,14 @@ import csv
 
 from dynts.exceptions import FormattingException
 
+try:
+    from tsplot import toplot
+except:
+    toplot = None
+
+
 default_converter = lambda x : x.isoformat()
+
 
 def tsiterator(ts, dateconverter = None):
     dateconverter = dateconverter or default_converter

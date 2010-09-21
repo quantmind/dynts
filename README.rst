@@ -75,6 +75,7 @@ Optional Requirements
 
 * xlwt_ to create spreadsheet from timeseries.
 * simplejson_ if python_ version is less then 2.6
+* matplotlib_ for plotting.
 
 __ http://sourceforge.net/projects/pywin32/files/
 
@@ -121,3 +122,4 @@ __ http://github.com/quantmind/dynts/issues
 .. _Python: http://www.python.org/
 .. _xlwt: http://pypi.python.org/pypi/xlwt
 .. _simplejson: http://pypi.python.org/pypi/simplejson/
+.. _matplotlib: http://matplotlib.sourceforge.net/

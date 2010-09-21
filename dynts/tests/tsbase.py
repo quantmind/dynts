@@ -113,4 +113,18 @@ class TestTS(unittest.TestCase):
         else:
             xls = ts.dump('xls')
             self.assertTrue(xls)
+            
+    def testPlot(self):
+        ts = randomts(name = "serie1,serie2",
+                      cols = 2, start = date(2010,1,1), size = 50)
+        try:
+            import matpotlib
+        except ImportError:
+            try:
+                csv = ts.dump('plot')
+            except FormattingException:
+                pass
+        else:
+            plot = ts.dump('plot')
+            self.assertTrue(plot)
         

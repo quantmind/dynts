@@ -47,6 +47,7 @@ available.'''
         start, end = self.dates(start, end)
         data = {}
         for symbol in symbols:
+            # Get ticker, field and provider
             ticker, field, provider = self.parse_symbol(symbol)
             p  = providers.get(provider,None)
             if not p:
@@ -61,7 +62,7 @@ available.'''
         return self.onfinishload(data)
     
     def dates(self, start, end):
-        '''Preconditioning on dates. This function makes sure the *start*
+        '''Pre-conditioning on dates. This function makes sure the *start*
 and *end* date are consistent. It never fails and always return a two-element tuple
 containing *start*,*end* with *start* less or equal *end*
 and *end* never after today.
@@ -95,6 +96,8 @@ are all valid inputs returning::
     intc,None,google
     
 assuming ``yahoo`` is the provider in :attr:`dynts.conf.Settings.default_provider`.
+
+This function is called before retriving data.
 '''
         if not symbol:
             raise BadSymbol("symbol not provided")
@@ -125,7 +128,10 @@ a dataprovider. Return a tuple of date intervals. By default return::
 
     ([start,end],)
     
-It could be overritten to modify the intervals
+It could be overritten to modify the intervals. If the return is ``None`` or 
+an empty container, the :func:`dynts.data.DataProvider.get` method won't be called,
+otherwise it will be called as many times as the number of intervals in the return tuple
+(by default once).
 '''
         return [start, end],
     

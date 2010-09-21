@@ -144,6 +144,8 @@ function.'''
         formatter = Formatters.get(format,None)
         if not format:
             return self.display()
+        elif not formatter:
+            raise FormattingException('Formatter %s not available' % format)
         else:
             return formatter(self,**kwargs)
     

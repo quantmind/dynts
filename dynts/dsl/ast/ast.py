@@ -6,7 +6,7 @@ A function is defined a-la Python as::
     
     func(expression, **kwargs)
     
-where *kwargs* is a dictionary of iput parameters. For example, the rolling-standard deviation
+where *kwargs* is a dictionary of input parameters. For example, the rolling-standard deviation
 is defined as::
 
     std(expression,window=20)
