@@ -1,5 +1,4 @@
 
-
 toupper = lambda x : str(x).upper()
 
 class Settings(object):
@@ -49,10 +48,15 @@ To change settings::
         self.months_history     = 12
         self.proxies = {}
         self.symboltransform = toupper
+        self.default_daycounter = 'ACT/365'
         
     @property
     def special_operators(self):
         return [self.concat_operator,self.separator_operator]
+    
+    def getdc(self):
+        import ccy
+        return ccy.getdc(self.default_daycounter)
     
         
         

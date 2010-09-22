@@ -1,10 +1,10 @@
-from dynts.tests import tsbase
+from dynts.tests import tsinterface
 
-class TestZooTS(tsbase.TestTS):
-    backend = 'zoo'
+#class TestZooTS(tsinterface.TestTS):
+#    backend = 'zoo'
 
-#class TestNumpyTS(tsbase.TestTS):
-#    backend = 'numpy'
+class TestNumpyTS(tsinterface.TestTS):
+    backend = 'numpy'
 
 
 #class TestRmetricsTS(tsbase.TestTS):

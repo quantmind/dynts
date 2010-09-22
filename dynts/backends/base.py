@@ -11,7 +11,7 @@ class TimeSeries(object):
     
     .. attribute:: type
     
-        string indicating the backend type (zoo, rmetrics, numpy, etc...)
+        string indicating the backend type (``zoo``, ``rmetrics``, ``numpy``, etc...)
         
     .. attribute:: shape
     
@@ -72,15 +72,15 @@ which exposes hash-table like functionalities of ``self``.'''
     
     def max(self):
         '''Max value'''
-        return self.rollmax()[0]
+        return self.apply('max')[0]
     
     def min(self):
         '''Max value'''
-        return self.rollmin()[0]
+        return self.apply('min')[0]
     
     def mean(self):
         '''Mean value'''
-        return self.rollmean()[0]
+        return self.apply('mean')[0]
     
     def returns(self, k = 1):
         '''Calculate returns as delta(log(self))'''
@@ -121,18 +121,6 @@ tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
 function.'''
         for d,v in izip(self.dates(),self.values()):
             yield d,v
-            
-    def lagitems(self, step = 1):
-        '''Efficient iteration over lagged elements.'''
-        done = 0
-        items  = self.items()
-        lag    = deque()
-        while done:
-            done+=1
-            lag.append(items.next())
-        for i1 in items:
-            lag.append(i1)
-            yield i1,lag.pop(0)
     
     def display(self):
         '''Nicely display self on the shell. Useful during prototyping and development.'''
@@ -158,6 +146,18 @@ function.'''
     
     # PURE VIRTUAL FUNCTIONS
     
+    def start(self):
+        '''Start date of timeseries'''
+        raise NotImplementedError
+    
+    def end(self):
+        '''End date of timeseries'''
+        raise NotImplementedError
+    
+    def frequency(self):
+        '''Average frequency of dates'''
+        raise NotImplementedError
+    
     @property
     def shape(self):
         raise NotImplementedError
@@ -180,25 +180,32 @@ function.'''
     def log(self):
         raise NotImplementedError
     
+    def logdelta(self):
+        pass
+    
     def stddev(self):
         raise NotImplementedError
     
-    def rollmax(self, window = None):
-        raise NotImplementedError
+    def apply(self, func, **kwargs):
+        return self._rollapply(func, window = len(self), **kwargs)
     
-    def rollmin(self, window = None):
-        raise NotImplementedError
+    def rollapply(self, func, window = 20, **kwargs):
+        '''A generic :ref:`rolling function <rolling-function>` for function *func*.'''
+        window = window or len(self)
+        self.precondition(window<=len(self) and window > 0,DyntsOutOfBound)
+        return self._rollapply(func, window = window, **kwargs)
     
-    def rollmean(self, window = None):
-        raise NotImplementedError
+    def rollmax(self, **kwargs):
+        '''A :ref:`rolling function <rolling-function>` for max values'''
+        return self.rollapply('max',**kwargs)
     
-    def start(self):
-        '''Start date of timeseries'''
-        raise NotImplementedError
+    def rollmin(self, **kwargs):
+        '''A :ref:`rolling function <rolling-function>` for max values'''
+        return self.rollapply('min',**kwargs)
     
-    def end(self):
-        '''End date of timeseries'''
-        raise NotImplementedError
+    def rollmean(self, **kwargs):
+        '''A :ref:`rolling function <rolling-function>` for mean values'''
+        return self.rollapply('mean',**kwargs)
     
     def window(self, start, end):
         raise NotImplementedError
@@ -222,9 +229,16 @@ function.'''
     # INTERNALS
     ################################################################
     
+    def _rollapply(func, window = 20, **kwargs):
+        raise NotImplementedError
+    
     def make(self, date, data, **kwargs):
         '''Internal function to create the inner data:
         
 * *date* iterable/iterator/generator over dates
 * *data* iterable/iterator/generator over values'''
         raise NotImplementedError
+    
+    def precondition(self, precond, errorclass = DyntsException, msg = ''):
+        if not precond:
+            raise errorclass(msg)

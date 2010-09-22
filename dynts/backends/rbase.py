@@ -72,13 +72,8 @@ class rts(dynts.TimeSeries,rpyobject):
     def frequency(self):
         return self.rc('frequency')[0]
     
-    def rollmax(self, window = None):
-        window = window or len(self)
-        return self.rcts('rollmax',window)
-    
-    def rollmean(self, window = None):
-        window = window or len(self)
-        return self.rcts('rollmean',window)
+    def _rollapply(self, func, window = None, align = 'center', **kwargs):
+        return self.rcts('roll%s' % func,window, align = align)
     
     def window(self, start, end):
         c = self.dateconvert

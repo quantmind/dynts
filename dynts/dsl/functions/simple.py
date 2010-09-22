@@ -23,19 +23,26 @@ class ScalarFunction(FunctionBase):
 
 class Mean(ScalarFunction):
     """Moving average function"""
-    def apply(self, ts, window = 20, **kwargs):
-        return ts.rollmean(window)
+    def apply(self, ts, **kwargs):
+        return ts.rollmean(**kwargs)
     
     
 class Max(ScalarFunction):
     """Moving average function"""
-    def apply(self, ts, window = 20, **kwargs):
-        return ts.rollmax(window)
+    def apply(self, ts, **kwargs):
+        return ts.rollmax(**kwargs)
+    
     
 class Min(ScalarFunction):
     """Moving average function"""
-    def apply(self, ts, window = 20, **kwargs):
-        return ts.rollmin(window)
+    def apply(self, ts, **kwargs):
+        return ts.rollmin(**kwargs)
+    
+    
+class Avol(ScalarFunction):
+    '''Annualised volatility'''
+    def apply(self, ts, **kwargs):
+        return ts.rollavol(**kwargs)
     
     
 class Regression(FunctionBase):

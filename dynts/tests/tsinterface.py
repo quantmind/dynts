@@ -31,8 +31,13 @@ class TestTS(unittest.TestCase):
         self.assertEqual(len(ts),len(dates))
         for dt,dt1 in izip(dates,ts.dates()):
             self.assertEqual(dt,dt1)
-            
+        
+    def test_isregular(self):
+        ts = self.getts()
         self.assertTrue(ts.isregular())
+            
+    def test_frequency(self):
+        ts = self.getts()
         f = ts.frequency()
         self.assertAlmostEqual(f,1)
     
@@ -59,9 +64,10 @@ class TestTS(unittest.TestCase):
         
     def testMerge(self):
         ts = self.getts()
-        ts2 = self.getts(delta = 2)
+        ts2 = self.getts(delta = 2, cols = 2)
         ts3 = ts.merge(ts2)
         self.assertTrue(len(ts3)>0)
+        self.assertEqual(ts3.count(),3)
         
     def testMultivariate(self):
         ts = self.getts(cols = 2)
@@ -69,6 +75,13 @@ class TestTS(unittest.TestCase):
         self.assertEqual(len(va),2)
         #names = ts.colnames()
         #self.assertEqual(len(names),1)
+        
+    def testRollingMin(self):
+        ts = self.getts(cols = 2)
+        mts30 = ts.rollmin(window = 30)
+        mts60 = ts.rollmin(window = 60)
+        self.assertEqual(len(mts30),len(ts) - 29)
+        self.assertEqual(len(mts60),len(ts) - 59)
         
     def testBinaryTreeWrapper(self):
         '''Test included in documentation'''

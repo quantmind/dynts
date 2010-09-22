@@ -1,4 +1,4 @@
-from bisect import bisect_left
+from bisect import bisect_left, bisect_right
 
 from numpy import ndarray, array
 
@@ -71,27 +71,36 @@ an :class:`dynts.exceptions.DateNotFound`.'''
             raise DateNotFound
         
     def find_ge(self, dt):
-        '''Building block of all searches. Find the 
-leftmost value greater or equal to *dt*. If *dt* is greater than the
-:func:`dynts.TimeSeries.end` date a :class:`dynts.exceptions.RightOutOfBound`
-exception will raise, otherwise it returns the index.
+        '''Building block of all searches. Find the index
+corresponding to the leftmost value greater or equal to *dt*.
+If *dt* is greater than the
+:func:`dynts.TimeSeries.end` a :class:`dynts.exceptions.RightOutOfBound`
+exception will raise.
 
 *dt* must be a python datetime.date instance.'''
         i = bisect_left(self.dates,dt)
         if i != len(self.dates):
             return i
         raise RightOutOfBound
+    
+    def find_le(self, dt):
+        '''Find the index corresponding to the rightmost
+value less than or equal to *dt*.
+If *dt* is less than :func:`dynts.TimeSeries.end`
+a :class:`dynts.exceptions.LeftOutOfBound`
+exception will raise.
+
+*dt* must be a python datetime.date instance.'''
+        i = bisect_right(self.dates,dt)
+        if i:
+            return i-1
+        raise LeftOutOfBound
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__,self.ts.__repr__())
     
     def __str__(self):
         return '%s(%s)' % (self.__class__.__name__,self.ts)
-    
-    def range(self, start, end):
-        i1 = self.find_ge(start)
-        i2 = self.find_ge(end)
-        return self.dates[i1-1:i2-1]
 
 
 class ashash(TimeSerieWrap):
@@ -112,7 +121,7 @@ class ashash(TimeSerieWrap):
         '''Get the value at *dt* otherwise it raises
 an :class:`dynts.exceptions.DateNotFound`.'''
         try:
-            index = self.hash[dt]
+            return self.hash[dt]
         except KeyError:
             raise DateNotFound
     
