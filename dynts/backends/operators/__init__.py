@@ -12,6 +12,7 @@ _ops = { 'add' : _addoper,
         'div' : _divoper,
         }
 
+
 def _get_op(op_name):
     global _ops
     op = _ops.get(op_name, None)

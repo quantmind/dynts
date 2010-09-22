@@ -24,6 +24,35 @@ class TestTS(unittest.TestCase):
             return ts,list(dates),list(data)
         else:
             return ts
+        
+    def _applyTest(self, fname):
+        ts  = self.getts()
+        val = getattr(ts,fname)()
+        for v in ts.values():
+            self.assertTrue(cross(tsmax) >= v)
+        ts = self.getts(cols = 2)
+        val = getattr(ts,fname)()
+        for v in ts.values():
+            self.assertTrue(tsmax >= v)
+            
+    def _rollingTest(self, func):
+        ts = self.getts(cols = 2)
+        rollfun = 'roll%s' % func
+        mts30 = getattr(ts,rollfun)(window = 30)
+        mts60 = getattr(ts,rollfun)(window = 60)
+        self.assertEqual(len(mts30),len(ts) - 29)
+        self.assertEqual(len(mts60),len(ts) - 59)
+        self.assertEqual(mts30.count(),2)
+        self.assertEqual(mts60.count(),2)
+        values = ts.values()
+        date = ts.dates()
+        c = 0
+        for dt,v in mts30.items():
+            tst = ts.clone(date[c:c+30],values[c:c+30])
+            tv = getattr(ts,func)()
+            c += 1
+            for a,b in izip(v,tv):
+                self.assertAlmostEqual(a,b)
     
     def testInit(self):
         ts,dates,data = self.getts(True)
@@ -42,6 +71,7 @@ class TestTS(unittest.TestCase):
         self.assertAlmostEqual(f,1)
     
     def testMax(self):
+        self._applyTest('max')
         ts = self.getts()
         tsmax = ts.max()
         for v in ts.values():
@@ -77,12 +107,11 @@ class TestTS(unittest.TestCase):
         #self.assertEqual(len(names),1)
         
     def testRollingMin(self):
-        ts = self.getts(cols = 2)
-        mts30 = ts.rollmin(window = 30)
-        mts60 = ts.rollmin(window = 60)
-        self.assertEqual(len(mts30),len(ts) - 29)
-        self.assertEqual(len(mts60),len(ts) - 59)
+        self._rollingTest('min')
         
+    def testRollingMax(self):
+        self._rollingTest('max')    
+            
     def testBinaryTreeWrapper(self):
         '''Test included in documentation'''
         ts = randomts(cols = 2, start = date(2010,1,1), size = 50)

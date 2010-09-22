@@ -10,6 +10,7 @@ BACKENDS = {
 
 istimeseries = lambda value : isinstance(value,TimeSeries)
 
+
 def timeseries(name = '', backend = None, **kwargs):
     '''Create a new :class:`dynts.TimeSeries` object.'''
     from dynts import InavlidBackEnd
