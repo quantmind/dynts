@@ -92,22 +92,6 @@ which exposes hash-table like functionalities of ``self``.'''
         for key in self.keys():
             yield c(key)
             
-    def lagdates(self, step = 1):
-        if step == 1:
-            dates = self.dates()
-            dt0 = dates.next()
-            for dt1 in dates:
-                yield dt1,dt0
-                dt0 = dt1
-        else:
-            q = deque()
-            while done:
-                done+=1
-                lag.append(dates.next())
-            for dt1 in dates:
-                lag.append(dt1)
-                yield dt1,lag.pop(0)
-            
     def values(self):
         '''Returns a ``numpy.ndarray`` containing the values of the timeseries.
 Implementations should try not to copy data if possible. This function
@@ -121,6 +105,9 @@ tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
 function.'''
         for d,v in izip(self.dates(),self.values()):
             yield d,v
+            
+    def series(self):
+        raise NotImplementedError
     
     def display(self):
         '''Nicely display self on the shell. Useful during prototyping and development.'''

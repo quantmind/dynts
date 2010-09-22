@@ -1,9 +1,14 @@
+#
+# TimeSeries Backend based on numpy
+#
+#
 from collections import deque
 from itertools import izip
 import numpy as ny
 
 import dynts
 from dynts.utils.iterators import laggeddates
+from dynts.utils.skiplist import RollingOrderedListOperation
 
 
 arraytype = ny.ndarray
@@ -12,33 +17,16 @@ arraytype = ny.ndarray
 arrayfunc = lambda func, *args : [func(*items) for items in izip()]
 
 
-_functions = {'min':min,'max':max}
+_functions = {'min':min,
+              'max':max}
 
 
 def rollsingle(self, func, window = 20, name = None, **kwargs):
     '''Efficient rolling window calculation for min, max type functions'''
-    lfunc  = lambda *args : [func(*items) for items in izip(*args)]
-    values = self.values().__iter__()
-    pipe   = deque()
-    w1     = window-1
-    wrange = range(w1)
-    
-    for val in values:
-        for v in range(len(pipe)):
-            pipe.append(lfunc(val,pipe.popleft()))
-        pipe.append(val)
-        if len(pipe) == w1:
-            break
-        
-    data = []
-    for val in values:
-        for w in wrange:
-            pipe.append(lfunc(val,pipe.popleft()))
-        data.append(pipe.popleft())
-        pipe.append(val)
-    
-    name = name or '%s(%s,window=%s)' % (func.__name__,self.name,window)
-    return self.clone(self.dates()[w1:], data, name = name)
+    rolling = lambda serie : list(getattr(RollingOrderedListOperation(serie,window),func)())
+    data = ny.array([rolling(serie) for serie in self.series()])
+    name = name or '%s(%s,window=%s)' % (func,self.name,window)
+    return self.clone(self.dates()[window:], data.transpose(), name = name)
     
 
 def asarray(iterable):
@@ -125,6 +113,13 @@ class TimeSeries(dynts.TimeSeries):
             h1[dt] = stack((h1.get(dt,lnan1),h2.get(dt,lnan2)))
         return h1.getts()
     
+    def serie(self, index):
+        return self._data[:,index]
+    
+    def series(self):
+        for c in range(self.count()):
+            yield self._data[:,c]
+    
     def log(self):
         pass
     
@@ -137,6 +132,6 @@ class TimeSeries(dynts.TimeSeries):
     def _rollapply(self, func, window = 20, **kwargs):
         fs = _functions.get(func,None)
         if fs:
-            return rollsingle(self, fs, window = window, **kwargs)
+            return rollsingle(self, func, window = window, **kwargs)
             
     
