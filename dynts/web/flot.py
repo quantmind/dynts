@@ -16,6 +16,7 @@ class MultiPlot(object):
     '''Class holding several plots. A plot can be a timeseries or xy-type.'''
     def __init__(self, flot = None):
         self.plots = []
+        self.info  = None
         self.add(flot)
         
     def add(self, flot):
@@ -24,6 +25,7 @@ class MultiPlot(object):
         
     def todict(self):
         return {'type': 'multiplot',
+                'info': self.info,
                 'plots': [plot.todict() for plot in self.plots]}
     
     def tojson(self):

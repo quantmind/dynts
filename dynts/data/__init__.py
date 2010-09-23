@@ -52,12 +52,12 @@ available.'''
             p  = providers.get(provider,None)
             if not p:
                 raise MissingDataProvider('data provider %s not available' % provider)
-            intervals = self.preprocess(ticker, start, end, field)
+            intervals = self.preprocess(ticker, start, end, field, provider)
             if intervals:
                 result = p.get(ticker, start, end, field)
             else:
                 result = None
-            result = self.onresult(symbol,result)
+            result = self.onresult(ticker, field, provider, result)
             data[symbol] = result
         return self.onfinishload(data)
     
@@ -138,7 +138,16 @@ the behaviour when the provider is not available.
 :attr:`dynts.conf.Settings.default_provider`.'''
         return settings.default_provider
     
-    def preprocess(self, ticker, start, end, field):
+    def getsymbol(self, ticker, field, provider):
+        '''Convert *ticker*, *field* and *provider* to symbol code.
+The inverse of :meth:`dynts.data.TimeSerieLoader.parse_symbol`.'''
+        c = self.separator
+        f = '' if not field else '%s%s' % (c,field)
+        d = provider == self.default_provider_for_ticker(ticker, field)
+        p = '' if d else '%s%s' % (c,provider)
+        return '%s%s%s' % (ticker,f,p)
+    
+    def preprocess(self, ticker, start, end, field, provider):
         '''Preprocess **hook**. This is **called before requesting data** to
 a dataprovider. Return a tuple of date intervals. By default return::
 
@@ -151,7 +160,7 @@ otherwise it will be called as many times as the number of intervals in the retu
 '''
         return [start, end],
     
-    def onresult(self, symbol, result):
+    def onresult(self, ticker, field, provider, result):
         '''Post-processing **hook** for result obtained from a data-provider.
 By default return result. It could be used to store data into a cache or database.'''
         return result

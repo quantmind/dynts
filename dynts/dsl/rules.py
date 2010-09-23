@@ -69,7 +69,7 @@ class rules(object):
         return t
 
     def t_ID(self, t):
-        r'[a-zA-Z_][a-zA-Z_0-9:]*'
+        r'[a-zA-Z_][a-zA-Z_0-9:@]*'
         res    = self.oper.get(t.value, None) # Check for reserved words (operations)
         if res == None:
             res = t.value.upper()

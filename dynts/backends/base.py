@@ -208,6 +208,10 @@ function.'''
         '''A :ref:`rolling function <rolling-function>` for max values'''
         return self.rollapply('min',**kwargs)
     
+    def rollmedian(self, **kwargs):
+        '''A :ref:`rolling function <rolling-function>` for median values'''
+        return self.rollapply('median',**kwargs)
+    
     def rollmean(self, **kwargs):
         '''A :ref:`rolling function <rolling-function>` for mean values'''
         return self.rollapply('mean',**kwargs)

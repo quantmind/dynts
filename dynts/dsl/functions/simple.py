@@ -21,20 +21,27 @@ class ScalarFunction(FunctionBase):
         if result:
             return result if len(result)>1 else result[0]
 
-class Mean(ScalarFunction):
+
+class Ma(ScalarFunction):
     """Moving average function"""
     def apply(self, ts, **kwargs):
         return ts.rollmean(**kwargs)
     
     
 class Max(ScalarFunction):
-    """Moving average function"""
+    """Moving max function"""
     def apply(self, ts, **kwargs):
         return ts.rollmax(**kwargs)
+
+
+class Med(ScalarFunction):
+    """Moving median function"""
+    def apply(self, ts, **kwargs):
+        return ts.rollmedian(**kwargs)    
     
     
 class Min(ScalarFunction):
-    """Moving average function"""
+    """Moving min function"""
     def apply(self, ts, **kwargs):
         return ts.rollmin(**kwargs)
     
