@@ -2,15 +2,19 @@ import unittest
 from itertools import izip
 
 import dynts
-from dynts.utils.populate import populate
-from dynts.utils.skiplist import RollingOrderedListOperation
+from dynts.utils import populate, skiplist, rollingOperation
 
 
 class RollingFunctionSkipList(unittest.TestCase):
     
+    def testSkipList(self):
+        data  = populate(size = 500)[:,0]
+        ol = skiplist(data = data)
+        reduce(lambda x,y: self.assertTrue(y>x),ol)
+        
     def testRollingOp(self):
         data  = populate(size = 500)[:,0]
-        roll  = RollingOrderedListOperation(data,20)
+        roll  = rollingOperation(data,20)
         rmin  = roll.min()
         rmax  = roll.max()
         rmed  = roll.median()

@@ -2,10 +2,11 @@ from datetime import date, timedelta
 from random import uniform, randint
 import numpy as ny
 
-from dynts import timeseries
-
 def_converter = lambda x: x
 def_generator = lambda x : uniform(0,1)
+
+__all__ = ['datepopulate','populate','randomts',
+           'randomwalk']
 
 class gdata(object):
     
@@ -37,6 +38,7 @@ def populate(size = 10, cols = 1, generator = None):
 
 def randomts(size = 100, cols = 1, start = None, delta = 1,
              generator = None, backend=None, name='randomts'):
+    from dynts import timeseries
     dates = datepopulate(size,start=start,delta=delta)
     data  = populate(size,cols=cols,generator=generator)
     return timeseries(name=name,backend=backend,date=dates,data=data)

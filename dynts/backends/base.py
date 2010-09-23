@@ -1,7 +1,7 @@
 from itertools import izip
 from collections import deque
 from dynts.exceptions import *
-from dynts.utils import wrappers
+from dynts.utils import laggeddates, ashash, asbtree
 
 
 Formatters = {}
@@ -57,12 +57,12 @@ class TimeSeries(object):
     def asbtree(self):
         '''Return an instance of :class:`dynts.utils.wrappers.asbtree`
 which exposes binary tree like functionalities of ``self``.'''
-        return wrappers.asbtree(self)
+        return asbtree(self)
     
     def ashash(self):
         '''Return an instance of :class:`dynts.utils.wrappers.ashash`
 which exposes hash-table like functionalities of ``self``.'''
-        return wrappers.ashash(self)
+        return ashash(self)
     
     def dateconvert(self, dte):
         return dte
@@ -126,7 +126,7 @@ function.'''
     
     def isconsistent(self):
         '''Check if the timeseries is consistent'''
-        for dt1,dt0 in self.lagdates():
+        for dt1,dt0 in laggeddates(self):
             if dt1 <= dt0:
                 return False
         return True

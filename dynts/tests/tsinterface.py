@@ -1,8 +1,9 @@
 import unittest
+from datetime import date
 from itertools import izip
 
 from dynts import timeseries
-from dynts.utils.populate import populate, datepopulate, randomts, date
+from dynts.utils import populate, datepopulate, randomts, cross
 from dynts.exceptions import *
 
 
@@ -24,16 +25,6 @@ class TestTS(unittest.TestCase):
             return ts,list(dates),list(data)
         else:
             return ts
-        
-    def _applyTest(self, fname):
-        ts  = self.getts()
-        val = getattr(ts,fname)()
-        for v in ts.values():
-            self.assertTrue(cross(tsmax) >= v)
-        ts = self.getts(cols = 2)
-        val = getattr(ts,fname)()
-        for v in ts.values():
-            self.assertTrue(tsmax >= v)
             
     def _rollingTest(self, func):
         ts = self.getts(cols = 2)
@@ -49,6 +40,7 @@ class TestTS(unittest.TestCase):
         c = 0
         for dt,v in mts30.items():
             tst = ts.clone(date[c:c+30],values[c:c+30])
+            self.assertEqual(dt,tst.end())
             tv = getattr(ts,func)()
             c += 1
             for a,b in izip(v,tv):
@@ -71,17 +63,24 @@ class TestTS(unittest.TestCase):
         self.assertAlmostEqual(f,1)
     
     def testMax(self):
-        self._applyTest('max')
-        ts = self.getts()
-        tsmax = ts.max()
+        ts  = self.getts()
+        val = cross(ts.max())
         for v in ts.values():
-            self.assertTrue(tsmax >= v)
+            self.assertTrue(val >= v)
+        ts = self.getts(cols = 2)
+        val = cross(ts.max())
+        for v in ts.values():
+            self.assertTrue(val >= v)
     
     def testMin(self):
-        ts = self.getts()
-        tsmin = ts.min()
+        ts  = self.getts()
+        val = cross(ts.min())
         for v in ts.values():
-            self.assertTrue(tsmin <= v)
+            self.assertTrue(val <= v)
+        ts = self.getts(cols = 2)
+        val = cross(ts.min())
+        for v in ts.values():
+            self.assertTrue(val <= v)
         
     def testDates(self):
         ts = self.getts()
@@ -110,7 +109,7 @@ class TestTS(unittest.TestCase):
         self._rollingTest('min')
         
     def testRollingMax(self):
-        self._rollingTest('max')    
+        self._rollingTest('max')
             
     def testBinaryTreeWrapper(self):
         '''Test included in documentation'''

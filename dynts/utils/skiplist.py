@@ -7,9 +7,7 @@ from math import log, ceil
 from collections import deque
 from itertools import islice
 
-isNaN = math.isnan
-NaN = float('nan')
-
+__all__ = ['skiplist','rollingOperation']
 
 class Node(object):
     __slots__ = 'value', 'next', 'width'
@@ -24,13 +22,20 @@ class End(object):
 NIL = Node(End(), [], [])               # Singleton terminator node
 
 
-class IndexableSkiplist:
+class skiplist:
     'Sorted collection supporting O(lg n) insertion, removal, and lookup by rank.'
 
-    def __init__(self, expected_size=100):
+    def __init__(self, expected_size=100, data = None):
+        if data is not None:
+            if hasattr(data,'__len__'):
+                expected_size = max(expected_size,len(data))
         self.size = 0
         self.maxlevels = int(1 + log(expected_size, 2))
         self.head = Node('HEAD', [NIL]*self.maxlevels, [1]*self.maxlevels)
+        if data is not None:
+            insert = self.insert
+            for value in data:
+                insert(value)
 
     def __len__(self):
         return self.size
@@ -99,32 +104,35 @@ class IndexableSkiplist:
             node = node.next[0]
 
 
-def smax(olist):
+def smax(olist,missing):
     if olist:
         return olist[len(olist)-1]
     else:
-        return NaN
+        return missing
 
-def smin(olist):
+def smin(olist,missing):
     if olist:
         return olist[0]
     else:
-        return NaN 
+        return missing
 
-def smedian(olist):
+def smedian(olist,missing):
     if olist:
         midpoint = len(olist) // 2
         return olist[midpoint]
     else:
-        return NaN
+        return missing
 
 
 
-class RollingOrderedListOperation(object):
+class rollingOperation(object):
     
     def __init__(self, iterable, window):
+        from dynts.conf import settings
         self.iterable = iterable
         self.window = window
+        self.missing = settings.missing_value
+        self.ismissing = settings.ismissing
         
     def min(self):
         return self.rolling(smin)
@@ -137,19 +145,21 @@ class RollingOrderedListOperation(object):
     
     def rolling(self, op):
         'Fast rolling operation with O(log n) updates where n is the window size'
+        missing   = self.missing
+        ismissing = self.ismissing
         window = self.window
         it = iter(self.iterable)
         queue = deque(islice(it, window))
-        skiplist = IndexableSkiplist(window)
+        ol    = skiplist(window)
         for elem in queue:
-            if not isNaN(elem):
-                skiplist.insert(elem)
-        yield op(skiplist)
+            if not ismissing(elem):
+                ol.insert(elem)
+        yield op(ol,missing)
         for newelem in it:
             oldelem = queue.popleft()
-            if not isNaN(oldelem):
-                skiplist.remove(oldelem)
+            if not ismissing(oldelem):
+                ol.remove(oldelem)
             queue.append(newelem)
-            if not isNaN(newelem):
-                skiplist.insert(newelem)
-            yield op(skiplist)
+            if not ismissing(newelem):
+                ol.insert(newelem)
+            yield op(ol,missing)

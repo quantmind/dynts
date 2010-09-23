@@ -7,8 +7,7 @@ from itertools import izip
 import numpy as ny
 
 import dynts
-from dynts.utils.iterators import laggeddates
-from dynts.utils.skiplist import RollingOrderedListOperation
+from dynts.utils import rollingOperation, laggeddates
 
 
 arraytype = ny.ndarray
@@ -23,10 +22,10 @@ _functions = {'min':min,
 
 def rollsingle(self, func, window = 20, name = None, **kwargs):
     '''Efficient rolling window calculation for min, max type functions'''
-    rolling = lambda serie : list(getattr(RollingOrderedListOperation(serie,window),func)())
+    rolling = lambda serie : list(getattr(rollingOperation(serie,window),func)())
     data = ny.array([rolling(serie) for serie in self.series()])
     name = name or '%s(%s,window=%s)' % (func,self.name,window)
-    return self.clone(self.dates()[window:], data.transpose(), name = name)
+    return self.clone(self.dates()[window-1:], data.transpose(), name = name)
     
 
 def asarray(iterable):

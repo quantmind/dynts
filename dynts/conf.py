@@ -1,4 +1,4 @@
-
+from math import isnan
 toupper = lambda x : str(x).upper()
 
 class Settings(object):
@@ -49,6 +49,7 @@ To change settings::
         self.proxies = {}
         self.symboltransform = toupper
         self.default_daycounter = 'ACT/365'
+        self.missing_value      = float('nan')
         
     @property
     def special_operators(self):
@@ -57,6 +58,9 @@ To change settings::
     def getdc(self):
         import ccy
         return ccy.getdc(self.default_daycounter)
+    
+    def ismissing(self, value):
+        return isnan(value)
     
         
         
