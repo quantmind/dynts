@@ -21,7 +21,11 @@ Mismatching dates
 
 In situations where an operation is performed on two timeseries it can not assumed that the same dates are present in both series.
 
-To allow for this there need to be suitable timeseries operators, which allow the user to specify the necessary settings. Where standard mathematical binary operators are used such as ( + - / *), suitable defaults will be assumed.
+To allow for this there need to be suitable timeseries operators, which allow the user to specify the necessary settings. Where standard mathematical binary operators are used such as: 
+
+	+ - / *
+	
+suitable defaults will be assumed.
 
 An example of a timeseries operators include::
     

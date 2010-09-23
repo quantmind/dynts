@@ -1,3 +1,6 @@
+#
+# NOT USED DIRECTLY - THIS MODULE IS IMPORTED BY dynts.tests
+#
 import unittest
 import dynts
 

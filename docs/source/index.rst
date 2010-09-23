@@ -39,6 +39,7 @@ Contents
    formatters
    internals/index
    web/index
+   changelog
 
 	
 Indices and tables

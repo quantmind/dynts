@@ -11,10 +11,13 @@ from test_datastructures import *
 import functions
 
 class TestMeanFunction(functions.SimpleFunctionTest):
-    function = 'mean'
+    function = 'ma'
 
 class TestMaxFunction(functions.SimpleFunctionTest):
     function = 'max'
+    
+class TestMedFunction(functions.SimpleFunctionTest):
+    function = 'med'
 
 class TestMinFunction(functions.SimpleFunctionTest):
     function = 'min'

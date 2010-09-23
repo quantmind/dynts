@@ -1,3 +1,6 @@
+#
+# NOT USED DIRECTLY - THIS CLASS IS IMPORTED IN dynts.tests.timeseries
+#
 import unittest
 from datetime import date
 from itertools import izip
