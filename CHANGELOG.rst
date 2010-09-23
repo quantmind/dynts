@@ -1,5 +1,5 @@
 
-dynts 0.1 - Development
+dynts 0.2 - Development
 ====================================
 * Development moved to github http://github.com/quantmind/dynts
 * Added skiplist python implementation.
