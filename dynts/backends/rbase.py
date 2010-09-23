@@ -2,6 +2,7 @@ from rpy2 import rinterface
 import numpy as ny
 
 import dynts
+from dynts.utils import ascolumn
 from dynts.utils.rutils import rpyobject, py2rdate, r2pydate, isoformat
 
 
@@ -36,10 +37,7 @@ class rts(dynts.TimeSeries,rpyobject):
         if date is None:
             ts = None
         else:
-            if not isinstance(data,ny.ndarray):
-                if not hasattr(data,'__len__'):
-                    data = list(data)
-                data = ny.asarray(data)
+            data = ascolumn(data)
             ts = self.factory(date, data, raw = raw)
         self._ts = ts
         
@@ -72,8 +70,8 @@ class rts(dynts.TimeSeries,rpyobject):
     def frequency(self):
         return self.rc('frequency')[0]
     
-    def _rollapply(self, func, window = None, align = 'center', **kwargs):
-        return self.rcts('roll%s' % func,window, align = align)
+    def _rollapply(self, func, window = None, **kwargs):
+        return self.rcts('roll%s' % func, window, **kwargs)
     
     def window(self, start, end):
         c = self.dateconvert
@@ -87,6 +85,7 @@ class rts(dynts.TimeSeries,rpyobject):
         name = kwargs.pop('name','')
         date = kwargs.pop('date',None)
         data = kwargs.pop('data',None)
+        kwargs.pop('bycolumn',None)
         ts  = cls(name=name,date=date,data=data)
         ts._ts = self.rc(command, *args, **kwargs)
         return ts

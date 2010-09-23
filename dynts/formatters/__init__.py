@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import cStringIO
 import csv
+from itertools import izip
 
 from dynts.exceptions import FormattingException
+from dynts.backends import istimeseries
+from dynts.utils import asarray
 
 default_converter = lambda x : x.isoformat()
 
@@ -26,7 +29,21 @@ def tocsv(ts, filename = None, **kwargs):
 
 
 def toflot(ts, **kwargs):
-    pass
+    '''Dump timeseries as a JSON string compatible with ``flot``'''
+    from dynts.web import flot
+    from dynts.conf import settings
+    res = flot.Flot()
+    result = flot.MultiPlot(res)
+    dates  = asarray(ts.dates())
+    missing = settings.ismissing
+    for name,serie in izip(ts.names(),ts.series()):
+        data = []
+        for dt,val in izip(dates,serie):
+            if not missing(val):
+                data.append([flot.pydate2flot(dt),val])
+        serie = flot.Serie(label = name, data = data)
+        res.add(serie)
+    return result
 
 
 def toxls(ts, filename = None, title = None, raw = False, **kwargs):

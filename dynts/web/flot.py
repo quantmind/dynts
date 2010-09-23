@@ -13,7 +13,7 @@ class JsonPlotBase(object):
     
 
 class MultiPlot(object):
-    
+    '''Class holding several plots. A plot can be a timeseries or xy-type.'''
     def __init__(self, flot = None):
         self.plots = []
         self.add(flot)
@@ -31,8 +31,11 @@ class MultiPlot(object):
     
 
 class Flot(object):
-    
+    '''A single plot'''
+    allowed_types = ['xy','timeseries']
     def __init__(self, name = '', type = 'timeseries'):
+        if type not in self.allowed_types:
+            type = 'xy'
         self.name   = name
         self.type   = type
         self.series = []

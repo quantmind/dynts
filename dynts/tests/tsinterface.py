@@ -3,7 +3,7 @@ from datetime import date
 from itertools import izip
 
 from dynts import timeseries
-from dynts.utils import populate, datepopulate, randomts, cross
+from dynts.utils import populate, datepopulate, randomts, cross, asarray
 from dynts.exceptions import *
 
 
@@ -36,12 +36,13 @@ class TestTS(unittest.TestCase):
         self.assertEqual(mts30.count(),2)
         self.assertEqual(mts60.count(),2)
         values = ts.values()
-        date = ts.dates()
+        v30 = mts30.values()
+        date   = asarray(ts.dates())
         c = 0
         for dt,v in mts30.items():
             tst = ts.clone(date[c:c+30],values[c:c+30])
             self.assertEqual(dt,tst.end())
-            tv = getattr(ts,func)()
+            tv = getattr(tst,func)()
             c += 1
             for a,b in izip(v,tv):
                 self.assertAlmostEqual(a,b)

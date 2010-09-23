@@ -7,7 +7,7 @@ from itertools import izip
 import numpy as ny
 
 import dynts
-from dynts.utils import rollingOperation, laggeddates
+from dynts.utils import rollingOperation, laggeddates, asarray
 
 
 arraytype = ny.ndarray
@@ -26,15 +26,6 @@ def rollsingle(self, func, window = 20, name = None, **kwargs):
     data = ny.array([rolling(serie) for serie in self.series()])
     name = name or '%s(%s,window=%s)' % (func,self.name,window)
     return self.clone(self.dates()[window-1:], data.transpose(), name = name)
-    
-
-def asarray(iterable):
-    if isinstance(iterable,arraytype):
-        return iterable
-    else:
-        if not hasattr(iterable,'__len__'):
-            iterable = list(iterable)
-        return ny.array(iterable)
 
 
 def days(d1,d0):
@@ -111,13 +102,6 @@ class TimeSeries(dynts.TimeSeries):
         for dt in alldates:
             h1[dt] = stack((h1.get(dt,lnan1),h2.get(dt,lnan2)))
         return h1.getts()
-    
-    def serie(self, index):
-        return self._data[:,index]
-    
-    def series(self):
-        for c in range(self.count()):
-            yield self._data[:,c]
     
     def log(self):
         pass

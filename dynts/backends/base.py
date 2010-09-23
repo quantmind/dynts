@@ -1,7 +1,7 @@
 from itertools import izip
 from collections import deque
 from dynts.exceptions import *
-from dynts.utils import laggeddates, ashash, asbtree
+from dynts.utils import laggeddates, ashash, asbtree, asarray
 
 
 Formatters = {}
@@ -72,15 +72,15 @@ which exposes hash-table like functionalities of ``self``.'''
     
     def max(self):
         '''Max value'''
-        return self.apply('max')[0]
+        return asarray(self.apply('max')[0])
     
     def min(self):
         '''Max value'''
-        return self.apply('min')[0]
+        return asarray(self.apply('min')[0])
     
     def mean(self):
         '''Mean value'''
-        return self.apply('mean')[0]
+        return asarray(self.apply('mean')[0])
     
     def returns(self, k = 1):
         '''Calculate returns as delta(log(self))'''
@@ -91,6 +91,11 @@ which exposes hash-table like functionalities of ``self``.'''
         c = self.dateinverse
         for key in self.keys():
             yield c(key)
+            
+    def keys(self):
+        '''Returns an iterable over ``raw`` keys. The keys may be different from dates
+for same backend implementations.'''
+        raise NotImplementedError
             
     def values(self):
         '''Returns a ``numpy.ndarray`` containing the values of the timeseries.
@@ -107,7 +112,14 @@ function.'''
             yield d,v
             
     def series(self):
-        raise NotImplementedError
+        '''geneator of timeseries series'''
+        data = self.values()
+        for c in range(self.count()):
+            yield data[:,c]
+            
+    def serie(self, index):
+        '''Get serie data by column *index*.'''
+        return self.values()[:,index]
     
     def display(self):
         '''Nicely display self on the shell. Useful during prototyping and development.'''
@@ -152,9 +164,6 @@ function.'''
     def __getitem__(self, i):
         raise NotImplementedError
     
-    def keys(self):
-        raise NotImplementedError
-    
     def colnames(self):
         raise NotImplementedError
     
@@ -176,11 +185,20 @@ function.'''
     def apply(self, func, **kwargs):
         return self._rollapply(func, window = len(self), **kwargs)
     
-    def rollapply(self, func, window = 20, **kwargs):
-        '''A generic :ref:`rolling function <rolling-function>` for function *func*.'''
+    def rollapply(self, func, window = 20,
+                  align = 'right', bycolumn = True,  **kwargs):
+        '''A generic :ref:`rolling function <rolling-function>` for function *func*.
+
+* *func* string indicating function, such as ``min``, ``max``, ``std`` and so forth
+* *window* number of point per group.
+* *align* string specifying whether the index of the result should be ``left`` or
+  ``right`` (default) or ``centered`` aligned compared to the rolling window of observations.
+* *bycolumn* if ``True`` each *func* will be applied to each column separately.'''
         window = window or len(self)
         self.precondition(window<=len(self) and window > 0,DyntsOutOfBound)
-        return self._rollapply(func, window = window, **kwargs)
+        return self._rollapply(func, window = window,
+                               align = align,
+                               bycolumn = bycolumn, **kwargs)
     
     def rollmax(self, **kwargs):
         '''A :ref:`rolling function <rolling-function>` for max values'''

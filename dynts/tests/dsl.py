@@ -26,11 +26,12 @@ class TestDsl(unittest.TestCase):
         result = dynts.evaluate('2*GOOG,GOOG')
         self.assertEqual(len(result.data),1)
         self.assertEqual(result.expression,dynts.parse('2*GOOG,GOOG'))
-        data = result.unwind()
-        self.assertEqual(len(data),2)
-        ts1 = data[0]
-        ts2 = data[1]
-        for v1,v2 in izip(ts1.values(),ts2.values()):
+        data = result.ts()
+        self.assertTrue(dynts.istimeseries(data))
+        self.assertEqual(data.count(),2)
+        ts1 = data.serie(0)
+        ts2 = data.serie(1)
+        for v1,v2 in izip(ts1,ts2):
             self.assertAlmostEqual(v1,2.*v2)
         
 

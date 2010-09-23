@@ -4,7 +4,7 @@ dynts 0.1 - Development
 * Development moved to github http://github.com/quantmind/dynts
 * Added skiplist python implementation.
 * Added ccy_ to dependencies.
-* **28 tests**.
+* **51 tests**.
 
 
 dynts 0.1.a2  - 2010 September 12

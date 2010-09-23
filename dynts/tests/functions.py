@@ -11,7 +11,8 @@ class SimpleFunctionTest(unittest.TestCase):
         result = dynts.evaluate(expression)
         self.assertEqual(str(result),expression)
         self.assertEqual(len(result.data),1)
-        data = result.unwind()
+        data = result.ts()
+        self.assertTrue(dynts.istimeseries(data))
         self.assertEqual(data.count(),1)
         
     def testWindowParameter(self):
@@ -21,6 +22,7 @@ class SimpleFunctionTest(unittest.TestCase):
         symbols = result.expression.symbols()
         self.assertEqual(len(symbols),1)
         self.assertEqual(len(result.data),1)
-        data = result.unwind()
-        self.assertEqual(len(data),2)
+        data = result.ts()
+        self.assertTrue(dynts.istimeseries(data))
+        self.assertEqual(data.count(),2)
         

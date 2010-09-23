@@ -1,5 +1,6 @@
 from dynts.dsl.grammar import *
 from dynts.exceptions import DyntsException
+from dynts.backends import istimeseries
 from dynts.dsl.registry import FunctionBase, function_registry
 
 
@@ -33,31 +34,45 @@ class dslresult(object):
     def __str__(self):
         return self.__repr__()
     
-    def unwind(self, format = None):
-        unwind = object()
-        ts = self.expression.unwind(self.data,unwind)
-        if format is None:
-            return ts
-        elif format.lower() == 'flot':
-            return self.toflot(ts)
+    def unwind(self):
+        if not hasattr(self,'_ts'):
+            self._unwind()
+        return self
+    
+    def ts(self):
+        self.unwind()
+        return self._ts
+    
+    def xy(self):
+        self.unwind()
+        return self._xy
+        
+    def _unwind(self):    
+        res = self.expression.unwind(self.data,object())
+        self._xy = None
+        if istimeseries(res):
+            self._ts = res
+        elif res and isinstance(res,list):
+            ts = None
+            for r in res:
+                if istimeseries(r):
+                    if ts is None:
+                        ts = r
+                    else:
+                        ts = ts.merge(r)
+            self._ts = ts
         else:
-            return ts
+            self._ts = None
+            
+    def toflot(self):
+        ts = self.ts()
+        xy = self.xy()
+        if ts:
+            flot = ts.dump('json')
+        else:
+            flot = None
+        if xy:
+            pass
+        return flot
+            
         
-    def toflot(self, ts):
-        from dynts.web import flot
-        res = flot.Flot()
-        result = flot.MultiPlot(res)
-        if not isinstance(ts,list):
-            ts = [ts]
-        for serie in ts:
-            data = []
-            for dt,val in serie.items():
-                data.append([flot.pydate2flot(dt),val])
-            serie = flot.Serie(label = serie.name, data = data)
-            res.add(serie)
-        return result
-        
-        
-    
-    
-    
