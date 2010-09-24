@@ -20,19 +20,38 @@ def safetodate(dte):
         return None
 
 
+class PreProcessData(object):
+    '''data preprocess holder'''
+    def __init__(self, intervals = None, result = None):
+        self.intervals = intervals
+        self.result    = result
+        
+
 class TimeSerieLoader(object):
     '''Cordinates the loading of timeseries data into :class:`dynts.dsl.Symbol`.
 This class can be overritten by a custom one if required. There are three **hooks**
 which can be used to customized its behaviour:
-:func:`dynts.data.TimeSerieLoader.preprocess`,
-:func:`dynts.data.TimeSerieLoader.onresult` and
-:func:`dynts.data.TimeSerieLoader.onfinishload`.
+
+* :func:`dynts.data.TimeSerieLoader.preprocess`
+* :func:`dynts.data.TimeSerieLoader.onresult`
+* :func:`dynts.data.TimeSerieLoader.onfinishload`
 
 .. attribute:: separator
     
     character for separating ticker, field and vendor. Default ``:``'''
 
     separator = ':'
+    preprocessdata = PreProcessData
+    '''Class holding data returned by the :meth:`dynts.data.TimeSerieLoader.preprocess` method.
+    It contains two attributes:
+    
+    * ``intervals`` ``None`` or a tuple of two-elements tuples.
+    * ``result`` ``None`` or any intermediate result.
+    
+    If ``intervals`` is ``None`` or an empty container, the
+    :func:`dynts.data.DataProvider.load` method won't be called, and the ``result``
+    attribute will be passed to the :meth:`dynts.data.TimeSerieLoader.onresult` method.
+    '''
     
     def load(self, providers, symbols, start, end, provider = None):
         '''Load symbols data.
@@ -43,7 +62,35 @@ which can be used to customized its behaviour:
 * *end* end date.
 
 There is no need to override this function, just use one the three hooks
-available.'''
+available. This is the body of the function::
+    
+    # Preconditioning on dates
+    start, end = self.dates(start, end)
+    data = {}
+    for symbol in symbols:
+        # Get ticker, field and provider
+        ticker, field, provider = self.parse_symbol(symbol)
+        p  = providers.get(provider,None)
+        if not p:
+            raise MissingDataProvider('data provider %s not available' % provider)
+        pre = self.preprocess(ticker, start, end, field, provider)
+        if pre.intervals:
+            result = None
+            for st,en in pre.intervals:
+                res = p.load(ticker, st, en, field)
+                if result is None:
+                    result = res
+                else:
+                    result.update(res)
+        else:
+            result = pre.result
+        # onresult hook
+        result = self.onresult(ticker, field, provider, result)
+        data[symbol] = result
+    # last hook
+    return self.onfinishload(data)
+'''
+        # Preconditioning on dates
         start, end = self.dates(start, end)
         data = {}
         for symbol in symbols:
@@ -52,13 +99,21 @@ available.'''
             p  = providers.get(provider,None)
             if not p:
                 raise MissingDataProvider('data provider %s not available' % provider)
-            intervals = self.preprocess(ticker, start, end, field, provider)
-            if intervals:
-                result = p.get(ticker, start, end, field)
-            else:
+            pre = self.preprocess(ticker, start, end, field, provider)
+            if pre.intervals:
                 result = None
+                for st,en in pre.intervals:
+                    res = p.load(ticker, st, en, field)
+                    if result is None:
+                        result = res
+                    else:
+                        result.update(res)
+            else:
+                result = pre.result
+            # onresult hook
             result = self.onresult(ticker, field, provider, result)
             data[symbol] = result
+        # last hook
         return self.onfinishload(data)
     
     def dates(self, start, end):
@@ -148,21 +203,29 @@ The inverse of :meth:`dynts.data.TimeSerieLoader.parse_symbol`.'''
         return '%s%s%s' % (ticker,f,p)
     
     def preprocess(self, ticker, start, end, field, provider):
-        '''Preprocess **hook**. This is **called before requesting data** to
-a dataprovider. Return a tuple of date intervals. By default return::
+        '''Preprocess **hook**. This is first loading hook and it is
+**called before requesting data** from a dataprovider.
+It must return an instance of :attr:`TimeSerieLoader.preprocessdata`.
+By default it returns::
 
-    ([start,end],)
+    self.preprocessdata(intervals = ((start,end),))
     
-It could be overritten to modify the intervals. If the return is ``None`` or 
-an empty container, the :func:`dynts.data.DataProvider.get` method won't be called,
+It could be overritten to modify the intervals. If the intervals is ``None`` or 
+an empty container, the :func:`dynts.data.DataProvider.load` method won't be called,
 otherwise it will be called as many times as the number of intervals in the return tuple
 (by default once).
 '''
-        return [start, end],
+        return self.preprocessdata(intervals = ((start, end),))
     
     def onresult(self, ticker, field, provider, result):
-        '''Post-processing **hook** for result obtained from a data-provider.
-By default return result. It could be used to store data into a cache or database.'''
+        '''Post-processing **hook** for results returned by
+calls to :func:`dynts.data.DataProvider.load`, or obtained
+from the :meth:`dynts.data.TimeSerieLoader.preprocess` method.
+By default return ``result``::
+    
+    return result
+    
+It could be used to store data into a cache or database.'''
         return result
     
     def onfinishload(self, data):

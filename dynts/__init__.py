@@ -74,3 +74,8 @@ def runtests():
     suite  = loader.loadTestsFromModule(tests)
     runner = unittest.TextTestRunner()
     runner.run(suite)
+    
+def runbench():
+    add2path()
+    from dynts.bench import runbench
+    runbench()

@@ -38,7 +38,7 @@ class TestDataProvider(unittest.TestCase):
     def testCustomLoader(self):
         from dynts.conf import settings
         settings.default_loader = CustomLoader
-        ts = dynts.evaluate('BLT:google').unwind()
+        dynts.evaluate('BLT:google').unwind()
         data = CustomLoader.data
         self.assertTrue(data)
         self.assertTrue('BLT:GOOGLE' in data)

@@ -11,9 +11,10 @@ class DataProvider(object):
     def __repr__(self):
         return self.code + ' financial data provider'
     
-    def get(self, ticker, startdate, enddate, field = None):
-        '''This is the function to implement. It is not called directly but by the
-:class:`dynts.data.TimeSerieLoader`.
+    def load(self, ticker, startdate, enddate, field = None):
+        '''This is the function to implement. It loads the actual data from the data rovider.
+This function is not called directly, instead it is called by the 
+:meth:`dynts.data.TimeSerieLoader.load`.
         '''
         raise NotImplementedError
     
