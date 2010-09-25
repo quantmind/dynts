@@ -1,5 +1,5 @@
 
-dynts 0.2 - Development
+Version 0.2 - 2010 September 24
 ====================================
 * Development moved to github http://github.com/quantmind/dynts
 * Added skiplist python implementation.
@@ -8,7 +8,7 @@ dynts 0.2 - Development
 * **53 tests**.
 
 
-dynts 0.1.a2  - 2010 September 12
+Version 0.1.a2  - 2010 September 12
 ====================================
 * First release to PyPi in pre-alpha.
  
