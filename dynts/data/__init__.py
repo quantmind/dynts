@@ -1,3 +1,4 @@
+import logging
 from datetime import date, timedelta
 
 from dynts.conf import settings
@@ -7,6 +8,10 @@ from ccy import todate
 
 from gy import DataProvider, google, yahoo
 
+
+class Silence(logging.Handler):
+    def emit(self, record):
+        pass
 
 class MissingDataProvider(Exception):
     '''Data provider is not available'''
@@ -53,42 +58,17 @@ which can be used to customized its behaviour:
     attribute will be passed to the :meth:`dynts.data.TimeSerieLoader.onresult` method.
     '''
     
-    def load(self, providers, symbols, start, end, provider = None):
+    def load(self, providers, symbols, start, end, logger):
         '''Load symbols data.
         
 * *providers* Dictionary of registered data providers.
 * *symbols* list of symbols to load
 * *start* start date
 * *end* end date.
+* *logger* instance of :class:`logging.Logger`.
 
 There is no need to override this function, just use one the three hooks
-available. This is the body of the function::
-    
-    # Preconditioning on dates
-    start, end = self.dates(start, end)
-    data = {}
-    for symbol in symbols:
-        # Get ticker, field and provider
-        ticker, field, provider = self.parse_symbol(symbol)
-        p  = providers.get(provider,None)
-        if not p:
-            raise MissingDataProvider('data provider %s not available' % provider)
-        pre = self.preprocess(ticker, start, end, field, provider)
-        if pre.intervals:
-            result = None
-            for st,en in pre.intervals:
-                res = p.load(ticker, st, en, field)
-                if result is None:
-                    result = res
-                else:
-                    result.update(res)
-        else:
-            result = pre.result
-        # onresult hook
-        result = self.onresult(ticker, field, provider, result)
-        data[symbol] = result
-    # last hook
-    return self.onfinishload(data)
+available.
 '''
         # Preconditioning on dates
         start, end = self.dates(start, end)
@@ -99,11 +79,12 @@ available. This is the body of the function::
             p  = providers.get(provider,None)
             if not p:
                 raise MissingDataProvider('data provider %s not available' % provider)
-            pre = self.preprocess(ticker, start, end, field, provider)
+            pre = self.preprocess(ticker, start, end, field, p, logger)
             if pre.intervals:
                 result = None
                 for st,en in pre.intervals:
-                    res = p.load(ticker, st, en, field)
+                    logger.debug('Loading %s from %s. From %s to %s' % (ticker,provider,st,en))
+                    res = p.load(ticker, st, en, field, logger)
                     if result is None:
                         result = res
                     else:
@@ -111,10 +92,10 @@ available. This is the body of the function::
             else:
                 result = pre.result
             # onresult hook
-            result = self.onresult(ticker, field, provider, result)
+            result = self.onresult(ticker, field, p, result, logger)
             data[symbol] = result
         # last hook
-        return self.onfinishload(data)
+        return self.onfinishload(data, logger)
     
     def dates(self, start, end):
         '''Pre-conditioning on dates. This function makes sure the *start*
@@ -202,7 +183,7 @@ The inverse of :meth:`dynts.data.TimeSerieLoader.parse_symbol`.'''
         p = '' if d else '%s%s' % (c,provider)
         return '%s%s%s' % (ticker,f,p)
     
-    def preprocess(self, ticker, start, end, field, provider):
+    def preprocess(self, ticker, start, end, field, provider, logger):
         '''Preprocess **hook**. This is first loading hook and it is
 **called before requesting data** from a dataprovider.
 It must return an instance of :attr:`TimeSerieLoader.preprocessdata`.
@@ -217,7 +198,7 @@ otherwise it will be called as many times as the number of intervals in the retu
 '''
         return self.preprocessdata(intervals = ((start, end),))
     
-    def onresult(self, ticker, field, provider, result):
+    def onresult(self, ticker, field, provider, result, logger):
         '''Post-processing **hook** for results returned by
 calls to :func:`dynts.data.DataProvider.load`, or obtained
 from the :meth:`dynts.data.TimeSerieLoader.preprocess` method.
@@ -228,7 +209,7 @@ By default return ``result``::
 It could be used to store data into a cache or database.'''
         return result
     
-    def onfinishload(self, data):
+    def onfinishload(self, data, logger):
         '''Another post-processing **hook** invoked when the loading is finished.
 By default retun *data*.'''
         return data
@@ -237,11 +218,12 @@ By default retun *data*.'''
 class DataProviders(dict):
     proxies = {}
         
-    def load(self, symbols, start = None, end = None, loader = None):
+    def load(self, symbols, start = None, end = None, loader = None, logger = None):
         loader = loader or settings.default_loader or TimeSerieLoader
+        logger = self.get_logger(logger)
         if isinstance(loader,type):
             loader = loader()
-        return loader.load(self,symbols,start,end)
+        return loader.load(self,symbols,start,end,logger)
     
     def register(self, provider):
         '''Register a new data provider. *provider* must be an instance of
@@ -259,6 +241,13 @@ class DataProviders(dict):
             provider = provider.code
         return self.pop(str(provider).upper(),None)
         
+    def get_logger(self, logger):
+        if logger:
+            return logger
+        logger = logging.getLogger('dynts.data')
+        if not logger.handlers:
+            logger.addHandler(Silence())
+        return logger
 
 providers = DataProviders()
 register = providers.register

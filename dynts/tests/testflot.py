@@ -6,7 +6,7 @@ from dynts.utils.anyjson import json
 class TestFlot(unittest.TestCase):
     
     def testFlot1(self):
-        ts = dynts.evaluate('YHOO,GOOG').toflot()
+        ts = dynts.evaluate('YHOO,GOOG').dump('flot')
         dts = ts.todict()
         self.assertEqual(dts['type'],'multiplot')
         self.assertEqual(len(dts['plots']),1)

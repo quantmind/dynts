@@ -11,10 +11,24 @@ class DataProvider(object):
     def __repr__(self):
         return self.code + ' financial data provider'
     
-    def load(self, ticker, startdate, enddate, field = None):
+    def load(self, ticker, startdate, enddate, field, logger):
         '''This is the function to implement. It loads the actual data from the data rovider.
 This function is not called directly, instead it is called by the 
 :meth:`dynts.data.TimeSerieLoader.load`.
+
+* *ticker* string id for the symbol to load (the ticker).
+* *startdate* and *enddate* interval to load.
+* *field* ``None``, a string or alist of string. Fiels to load.
+    If ``None`` the default field for the provider should load.
+    
+It should return either an instance of :class:`dynts.TimeSeries` or
+a dictionary of the form::
+
+    {'date': [list of dates],
+     'field1': [list of values for field1],
+     ...
+     'fieldN': [list of values for field1N]}
+     
         '''
         raise NotImplementedError
     

@@ -39,9 +39,8 @@ Dynts is currently shipped with two providers:
 To check for registered providers::
 
 	>>> from dynts.data import providers
-	>>> providers
 	>>> providers.keys()
-	['google','yahoo']
+	['GOOGLE', 'YAHOO']
 	
 
 Registering
@@ -52,7 +51,7 @@ Let's say we create a new provider along these lines::
 	
 	class MyCustomProvider(DataProvider):
 	
-	    def get(ticker, startdate, enddate, field=None):
+	    def load(ticker, startdate, enddate, fields, logger):
 	    	...
 	
 Registration is obtained simply::
@@ -60,7 +59,7 @@ Registration is obtained simply::
 	>>> from dynts.data import register
 	>>> register(MyCustomProvider)
 	>>> providers.keys()
-	['mycustomprovider','google','yahoo']
+	['MYCUSTOMPROVIDER', 'GOOGLE', 'YAHOO']
 
 	 
 	 

@@ -1,4 +1,9 @@
 
+Development
+======================
+* Added logging parameter in :func:`dynts.evaluate`.
+* Formatters are instances rather than functions.
+
 Version 0.2 - 2010 September 24
 ====================================
 * Development moved to github http://github.com/quantmind/dynts

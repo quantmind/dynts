@@ -5,3 +5,4 @@ from wrappers import *
 from skiplist import *
 from populate import *
 from section import *
+from encoding import *

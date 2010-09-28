@@ -1,10 +1,22 @@
 from itertools import izip
 from collections import deque
+from UserDict import UserDict
+
 from dynts.exceptions import *
 from dynts.utils import laggeddates, ashash, asbtree, asarray
 
 
-Formatters = {}
+
+class FormatterDict(UserDict):
+    
+    def oftype(self, typ):
+        '''Return a generator of formatters codes of type typ'''
+        for key, val in self.items():
+            if val.type == typ:
+                yield key
+
+Formatters = FormatterDict()
+
 
 class TimeSeries(object):
     '''Interface class for timeseries back-ends.

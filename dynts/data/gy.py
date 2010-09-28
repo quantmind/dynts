@@ -45,7 +45,7 @@ class WebCsv(DataProvider):
     def hystory_url(self, ticker, startdate, enddate, field = None):
         raise NotImplementedError
         
-    def load(self, ticker, startdate, enddate, field = None):
+    def load(self, ticker, startdate, enddate, field, logger):
         data = self.rowdata(ticker, startdate, enddate)
         if not data:
             return

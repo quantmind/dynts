@@ -1,9 +1,9 @@
 /* 
- * Econometric Plot Plugin
+ * Econometric Ploting Plugin for jQuery
  * 
  * version: 0.1
  * 
- * @requires jQuery v1.2.2 or later
+ * @requires jQuery v1.2.2 or Later
  * @requires flot
  *
  * Dual licensed under the MIT and GPL licenses:

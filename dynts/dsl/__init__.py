@@ -2,6 +2,7 @@ from dynts.dsl.grammar import *
 from dynts.exceptions import DyntsException
 from dynts.backends import istimeseries
 from dynts.dsl.registry import FunctionBase, function_registry
+from dynts.utils import smart_str
 
 
 def parse(timeseries_expression, method = None, functions = None):
@@ -12,7 +13,7 @@ If succesful, it returns an instance of :class:`dynts.dsl.Expr`.'''
     functions = functions if functions is not None else function_registry
     ru = rules(functions)
     ru.build()
-    ru.input(str(timeseries_expression).lower())
+    ru.input(smart_str(timeseries_expression).lower())
     tokens     = ru.tokens
     precedence = ru.precedence
     yacc       = yacc.yacc(method = method or 'SLR')
@@ -64,15 +65,15 @@ class dslresult(object):
         else:
             self._ts = None
             
-    def toflot(self):
+    def dump(self, format):
         ts = self.ts()
         xy = self.xy()
         if ts:
-            flot = ts.dump('json')
+            ts = ts.dump(format)
         else:
-            flot = None
+            ts = None
         if xy:
             pass
-        return flot
+        return ts
             
         

@@ -21,13 +21,13 @@ from backends import timeseries, TimeSeries, istimeseries, Formatters, BACKENDS
 from dsl import parse, dslresult, function_registry, functions
 from data import providers
 import formatters
-Formatters['json'] = formatters.toflot
-Formatters['csv'] = formatters.tocsv
-Formatters['xls'] = formatters.toxls
-Formatters['plot'] = formatters.toplot
+Formatters['flot'] = formatters.ToFlot()
+Formatters['csv']  = formatters.ToCsv()
+Formatters['xls']  = formatters.ToXls()
+Formatters['plot'] = formatters.ToPlot()
 
 
-def evaluate(expression, start = None, end = None, loader = None):
+def evaluate(expression, start = None, end = None, loader = None, logger = None):
     '''Evaluate expression *e*. This and :func:`dynts.parse`
 represent the main entry point of the library.
     
@@ -36,6 +36,7 @@ represent the main entry point of the library.
 * *start* start date or ``None``.
 * *end* end date or ``None``.
 * *loader* Optional :class:`dynts.data.TimeSerieLoader` class or instance.
+* *logger* Python logging class or ``None``. Used if you required logging.
 
 *expression* is parsed and the :class:`dynts.expr.Symbol` are sent to the
 :class:`dynts.data.TimeSerieLoader` instance for retrieving actual timeseries data.
@@ -52,9 +53,8 @@ Typical usage::
     if isinstance(expression,basestring):
         expression = parse(expression)
     symbols = expression.symbols()
-    data = providers.load(symbols, start, end, loader = loader)
-    return dslresult(expression,data)
-    
+    data = providers.load(symbols, start, end, loader = loader, logger = logger)
+    return dslresult(expression,data)    
 
 
 ################### For testings
