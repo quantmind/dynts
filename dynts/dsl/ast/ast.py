@@ -19,6 +19,6 @@ is defined as::
     def info(self):
         return '%s%s' % (self.func,super(Function,self).info())
     
-    def _unwind(self, values, unwind, **kwargs):
-        args,kwargs = super(Function,self)._unwind(values, unwind, **kwargs)
+    def _unwind(self, values, backend, **kwargs):
+        args,kwargs = super(Function,self)._unwind(values, backend, **kwargs)
         return self.func(args,**kwargs)

@@ -18,7 +18,7 @@ __homepage__ = "http://github.com/quantmind/dynts/"
 
 from dynts.exceptions import *
 from backends import timeseries, TimeSeries, istimeseries, Formatters, BACKENDS
-from dsl import parse, dslresult, function_registry, functions
+from dsl import parse, merge, dslresult, function_registry, functions
 from data import providers
 import formatters
 Formatters['flot'] = formatters.ToFlot()
@@ -27,7 +27,8 @@ Formatters['xls']  = formatters.ToXls()
 Formatters['plot'] = formatters.ToPlot()
 
 
-def evaluate(expression, start = None, end = None, loader = None, logger = None):
+def evaluate(expression, start = None, end = None,
+             loader = None, logger = None, backend = None):
     '''Evaluate expression *e*. This and :func:`dynts.parse`
 represent the main entry point of the library.
     
@@ -37,6 +38,7 @@ represent the main entry point of the library.
 * *end* end date or ``None``.
 * *loader* Optional :class:`dynts.data.TimeSerieLoader` class or instance.
 * *logger* Python logging class or ``None``. Used if you required logging.
+* *backend* :class:`dynts.TimeSeries` backend name or ``None``.
 
 *expression* is parsed and the :class:`dynts.expr.Symbol` are sent to the
 :class:`dynts.data.TimeSerieLoader` instance for retrieving actual timeseries data.
@@ -53,8 +55,14 @@ Typical usage::
     if isinstance(expression,basestring):
         expression = parse(expression)
     symbols = expression.symbols()
-    data = providers.load(symbols, start, end, loader = loader, logger = logger)
-    return dslresult(expression,data)    
+    data = providers.load(symbols, start, end, loader = loader,
+                          logger = logger, backend = backend)
+    return dslresult(expression, data, backend = backend)
+
+
+def tsname(*names):
+    from dynts.conf import settings
+    return reduce(lambda x,y: '%s%s%s' % (x,settings.splittingnames,y), names)
 
 
 ################### For testings

@@ -3,7 +3,9 @@ class DyntsException(Exception):
     '''Base class of exceptions raised by ``dynts``'''
     pass
 
-class InavlidBackEnd(DyntsException):
+class InvalidBackEnd(DyntsException):
+    '''A :class:`DyntsException` exception raised when
+an invalid :class:`dynts.TimeSeries` bcakend name is given.'''
     pass
 
 class MissingPackage(DyntsException):

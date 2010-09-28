@@ -13,7 +13,7 @@ istimeseries = lambda value : isinstance(value,TimeSeries)
 
 def timeseries(name = '', backend = None, **kwargs):
     '''Create a new :class:`dynts.TimeSeries` object.'''
-    from dynts import InavlidBackEnd
+    from dynts import InvalidBackEnd
     backend = backend or settings.backend
     bname = BACKENDS.get(backend,None)
     if bname:
@@ -25,5 +25,5 @@ def timeseries(name = '', backend = None, **kwargs):
     try:
         factory = getattr(module, 'TimeSeries')
     except AttributeError:
-        raise InavlidBackEnd('Could not find a TimeSeries class in module %s' % bmodule)
+        raise InvalidBackEnd('Could not find a TimeSeries class in module %s' % bmodule)
     return factory(name = name, **kwargs)

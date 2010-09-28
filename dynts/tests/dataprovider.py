@@ -11,7 +11,7 @@ class CustomProvider(DataProvider):
 class CustomLoader(TimeSerieLoader):
     data = {}
     
-    def onresult(self, ticker, field, provider, result, logger):
+    def onresult(self, ticker, field, provider, result, logger, backend):
         '''Store result in the class data dictionary'''
         symbol = self.getsymbol(ticker, field, provider.code)
         self.data[symbol] = result

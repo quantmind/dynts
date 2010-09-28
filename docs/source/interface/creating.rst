@@ -36,6 +36,20 @@ Lets get a timeserie with some data::
 	480.634
 	
 
+.. _merging
+
+Merging TimeSeries
+===========================
+
+To merge an iterable over timeseries::
+
+	import dynts
+	ts = dynts.merge(tseries)
+
+
+.. autofunction:: dynts.merge
+
+
 .. _rolling-function:
 
 Rolling functions

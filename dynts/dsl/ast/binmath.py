@@ -11,9 +11,9 @@ class BinMathOp(BinOp):
         else:
             return self.complexoper(le,ri)
     
-    def _unwind(self, values, unwind, full = False, **kwargs):
-        le = self.left.unwind(values, unwind, **kwargs)
-        ri = self.right.unwind(values, unwind, **kwargs)
+    def _unwind(self, values, backend, full = False, **kwargs):
+        le = self.left.unwind(values, backend, **kwargs)
+        ri = self.right.unwind(values, backend, **kwargs)
         return self.dooper(le,ri)
     
     def lineardecomp(self):

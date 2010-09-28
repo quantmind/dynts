@@ -1,4 +1,5 @@
 from dynts.dsl.grammar import *
+from dynts.conf import settings
 from dynts.exceptions import DyntsException
 from dynts.backends import istimeseries
 from dynts.dsl.registry import FunctionBase, function_registry
@@ -19,12 +20,21 @@ If succesful, it returns an instance of :class:`dynts.dsl.Expr`.'''
     yacc       = yacc.yacc(method = method or 'SLR')
     return yacc.parse(lexer = ru.lexer)
 
+
+def merge(series):
+    '''Merge timeseries. *series* must be an iterable over
+timeseries.'''
+    series = iter(series)
+    ts = series.next()
+    return ts.merge(series)
+
     
 class dslresult(object):
     
-    def __init__(self, expression, data):
+    def __init__(self, expression, data, backend = None):
         self.expression = expression
         self.data = data
+        self.backend = backend or settings.backend
         
     def __unicode__(self):
         return u'%s' % self.expression
@@ -49,19 +59,12 @@ class dslresult(object):
         return self._xy
         
     def _unwind(self):    
-        res = self.expression.unwind(self.data,object())
+        res = self.expression.unwind(self.data,self.backend)
         self._xy = None
         if istimeseries(res):
             self._ts = res
         elif res and isinstance(res,list):
-            ts = None
-            for r in res:
-                if istimeseries(r):
-                    if ts is None:
-                        ts = r
-                    else:
-                        ts = ts.merge(r)
-            self._ts = ts
+            self._ts = merge(res)
         else:
             self._ts = None
             

@@ -41,6 +41,7 @@ To change settings::
     '''
     def __init__(self):
         self.backend = 'zoo'
+        self.splittingnames     = '__'
         self.concat_operator    = ','
         self.separator_operator = '|'
         self.default_provider   = 'YAHOO'

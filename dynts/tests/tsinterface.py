@@ -5,7 +5,7 @@ import unittest
 from datetime import date
 from itertools import izip
 
-from dynts import timeseries
+from dynts import timeseries, evaluate, tsname
 from dynts.utils import populate, datepopulate, randomts, cross, asarray
 from dynts.exceptions import *
 
@@ -139,7 +139,7 @@ class TestTS(unittest.TestCase):
         self.assertTrue(dts.isconsistent())
         
     def testCSVformatter(self):
-        ts = randomts(name = "serie1,serie2",
+        ts = randomts(name = tsname("serie1","serie2"),
                       cols = 2, start = date(2010,1,1), size = 50)
         self.assertEqual(ts.names(),['serie1','serie2'])
         csv = ts.dump('csv')
@@ -172,4 +172,12 @@ class TestTS(unittest.TestCase):
         else:
             plot = ts.dump('plot')
             self.assertTrue(plot)
+        
+    def testDslNames(self):
+        res = evaluate('amzn:yahoo,min(amzn:yahoo)', backend = self.backend)
+        self.assertEqual(str(res.expression),'AMZN:YAHOO,min(AMZN:YAHOO)')
+        self.assertEqual(len(res.data),1)
+        ts = res.ts()
+        self.assertEqual(ts.count(),2)
+        self.assertEqual(ts.names(),['AMZN:YAHOO','min(AMZN:YAHOO,window=20)'])
         

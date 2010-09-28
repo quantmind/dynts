@@ -1,14 +1,10 @@
 .. _utilities:
 
-.. module:: utils
+.. module:: dynts.utils
 
 ==========================
 Utilities
 ==========================
-
-
-
-.. module:: dynts.utils.wrappers
 
 Timeseries wrappers
 ============================
@@ -17,7 +13,7 @@ Timeseries wrappers
 As Binary Tree
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: dynts.utils.wrappers.asbtree
+.. autoclass:: dynts.utils.asbtree
    :members:
    :member-order: bysource
    
@@ -26,7 +22,7 @@ As Binary Tree
 As Hash Table
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: dynts.utils.wrappers.ashash
+.. autoclass:: dynts.utils.ashash
    :members:
    :member-order: bysource
    

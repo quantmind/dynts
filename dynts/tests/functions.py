@@ -29,3 +29,13 @@ class SimpleFunctionTest(unittest.TestCase):
         self.assertTrue(dynts.istimeseries(data))
         self.assertEqual(data.count(),2)
         
+    def testTwoSeries(self):
+        e = '%s(GOOG,YHOO)' % self.function
+        result = dynts.evaluate(e)
+        symbols = result.expression.symbols()
+        self.assertEqual(len(symbols),2)
+        self.assertEqual(len(result.data),2)
+        data = result.ts()
+        self.assertTrue(dynts.istimeseries(data))
+        self.assertEqual(data.count(),2)
+        

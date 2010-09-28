@@ -2,6 +2,7 @@ from bisect import bisect_left, bisect_right
 
 from numpy import ndarray, array
 
+from dynts.conf import settings
 from dynts.exceptions import *
 
 
@@ -10,6 +11,7 @@ class TimeSerieWrap(object):
     def __init__(self, ts, **kwargs):
         self.ts = ts
         self.modified = False
+        self.names = ts.names()
         self.wrap(**kwargs)
         
     def wrap(self, **kwargs):
@@ -136,10 +138,11 @@ an :class:`dynts.exceptions.DateNotFound`.'''
             
     def getts(self):
         if self.modified:
+            name   = settings.splittingnames.join(self.names)
             hash   = self.hash
             dates  = sorted(self.keys())
             values = (hash[dt] for dt in dates)
-            return self.ts.clone(date = dates, data = values)
+            return self.ts.clone(name = name, date = dates, data = values)
         else:
             return self.ts
     

@@ -62,9 +62,11 @@ class rules(object):
         r'([0-9]+\.?[0-9]*|\.[0-9]+)([eE](\+|-)?[0-9]+)?'
         #r'\d+'
         try:
-            t.value = float(t.value)
+            v = float(t.value)
+            iv = int(v)
+            t.value = iv if iv == v else v
         except ValueError:
-            print "Number %s is too large!" % t.value
+            print("Number %s is too large!" % t.value)
             t.value = 0
         return t
 

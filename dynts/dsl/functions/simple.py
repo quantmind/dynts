@@ -16,7 +16,8 @@ class ScalarFunction(FunctionBase):
     def __call__(self, args, window = 20, **kwargs):
         result = []
         for arg in args:
-            ts = self.apply(arg, window = window, **kwargs)
+            name = '%s(%s,window=%s)' % (self.name,arg,window)
+            ts = self.apply(arg, window = window, name = name, **kwargs)
             result.append(ts)
         if result:
             return result if len(result)>1 else result[0]

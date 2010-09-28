@@ -11,7 +11,7 @@ class DataProvider(object):
     def __repr__(self):
         return self.code + ' financial data provider'
     
-    def load(self, ticker, startdate, enddate, field, logger):
+    def load(self, ticker, startdate, enddate, field, logger, backend):
         '''This is the function to implement. It loads the actual data from the data rovider.
 This function is not called directly, instead it is called by the 
 :meth:`dynts.data.TimeSerieLoader.load`.
@@ -28,7 +28,9 @@ a dictionary of the form::
      'field1': [list of values for field1],
      ...
      'fieldN': [list of values for field1N]}
-     
+
+* *logger* instance of :class:logging.Logger.
+* **backend* :class:`dynts.TimeSeries` backend name.
         '''
         raise NotImplementedError
     

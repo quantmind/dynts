@@ -22,6 +22,14 @@ class TestDsl(unittest.TestCase):
         self.assertEqual(names[0],str(res.left))
         self.assertEqual(names[1],str(res.right))
         
+    def testTwoTimeSeries(self):
+        '''Get a timeseries and a function and check for consistency'''
+        res = dynts.parse('gs:yahoo,min(gs:yahoo,window=30)')
+        self.assertEqual(res.symbols(),['GS:YAHOO'])
+        self.assertEqual(len(res),2)
+        self.assertEqual(str(res[0]),'GS:YAHOO')
+        self.assertEqual(str(res[1]),'min(GS:YAHOO,window=30)')
+        
     def testDataProvider(self):
         result = dynts.evaluate('2*GOOG,GOOG')
         self.assertEqual(len(result.data),1)

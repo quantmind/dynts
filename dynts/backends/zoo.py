@@ -2,6 +2,7 @@ from itertools import izip
 from rpy2.robjects import IntVector
 
 import dynts
+from dynts.conf import settings
 from dynts.backends.rbase import rts
 
  
@@ -47,7 +48,17 @@ class TimeSeries(rts):
     def end(self):
         return self.dateinverse(self.rc('end')[0])
     
-    def merge(self, ts, all = True):
+    def _mergesingle(self, ts, all = True):
         ts = tozoo(ts)
-        return self.rcts('merge', ts._ts, all = all)
+        name = settings.splittingnames.join(self.names() + ts.names())
+        return self.rcts('merge', ts._ts, all = all, name = name)
+    
+    def merge(self, ts, all = True):
+        if dynts.istimeseries(ts):
+            return self._mergesingle(ts, all = all)
+        else:
+            rs = self
+            for t in ts:
+                rs = rs._mergesingle(t, all = all)
+            return rs
     

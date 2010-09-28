@@ -43,7 +43,10 @@ class TimeSeries(dynts.TimeSeries):
             self._data = None
         else:
             self._date = asarray(date)
-            self._data = asarray(data)
+            data = asarray(data)
+            if len(data.shape) == 1:
+                data = data.reshape(len(data),1)
+            self._data = data
     
     @property
     def shape(self):
@@ -92,16 +95,21 @@ class TimeSeries(dynts.TimeSeries):
         return self.clone(self._date[i1:i2+1],
                           self._data[i1:i2+1])
     
-    def merge(self, ts, fill = float("nan"), **kwargs):
-        h1 = self.ashash()
-        h2 = ts.ashash()
-        alldates = set(self.dates()).union(ts.dates())
-        lnan1 = ny.array([fill]*self.count())
-        lnan2 = ny.array([fill]*ts.count())
+    def merge(self, tserie, fill = float("nan"), **kwargs):
+        if dynts.istimeseries(tserie):
+            tserie = [tserie]
+        alldates = set(self.dates())
+        hash     = self.ashash()
+        thashes  = [(hash,ny.array([fill]*self.count()))]
+        for ts in tserie:
+            alldates = alldates.union(ts.dates())
+            hash.names.extend(ts.names())
+            thashes.append((ts.ashash(),ny.array([fill]*ts.count())))
         stack = ny.hstack
+        mdt = lambda dt: stack((h.get(dt,ln) for h,ln in thashes))
         for dt in alldates:
-            h1[dt] = stack((h1.get(dt,lnan1),h2.get(dt,lnan2)))
-        return h1.getts()
+            hash[dt] = mdt(dt)
+        return hash.getts()
     
     def log(self):
         pass

@@ -13,6 +13,7 @@ class Expr(object):
     '''Base class for abstract syntax nodes
     '''    
     def count(self):
+        '''Number of nodes'''
         return 1
     
     def __unicode__(self):
@@ -35,34 +36,23 @@ class Expr(object):
         return isinstance(other, Expr) and str(other) == str(self)
     
     def symbols(self):
-        '''Return a list of :ref:`Symbol <dsl-symbol>` instances.'''
+        '''Return a list of :class:`dynts.dsl.Symbol` instances.'''
         return None
     
     def variables(self):
-        '''Return a list of :ref:`Variable <dsl-symbol>` instances.'''
         return None
     
     def removeduplicates(self, entries = None):
         return None
     
-    def json(self, values, unwind):
-        ts = self.unwind(values, unwind)
-        return ts.json()
-        
-    def apply(self, values):
-        ts = self.unwind(values)
-        return ts.apply()
-    
-    def unwind(self, values, unwind, **kwargs):
+    def unwind(self, values, backend, **kwargs):
+        '''Unwind expression by applying *values* to the abstract nodes'''
         if not hasattr(self, "_unwind_value"):
-            self._unwind_value = self._unwind(values, unwind, **kwargs)
+            self._unwind_value = self._unwind(values, backend, **kwargs)
         return self._unwind_value
     
-    def _unwind(self, values, unwind, **kwargs):
+    def _unwind(self, values, backend, **kwargs):
         raise NotImplementedError("Unwind method missing for %s" % self)
-    
-    def lineardecomp(self):
-        return None
     
 
 class BaseExpression(Expr):
@@ -105,7 +95,7 @@ class Number(BaseExpression):
     def __init__(self,value):
         super(Number,self).__init__(value)
         
-    def _unwind(self, values, unwind, **kwargs):
+    def _unwind(self, values, backend, **kwargs):
         return self.value
 
 
@@ -117,7 +107,7 @@ class String(BaseExpression):
     def __init__(self,value):
         super(String,self).__init__(str(value))
         
-    def _unwind(self, values, unwind, **kwargs):
+    def _unwind(self, values, backend, **kwargs):
         return unwind.stringData(self.value)
 
 
@@ -138,13 +128,16 @@ class Symbol(BaseExpression):
     def symbols(self):
         return [str(self)]
     
-    def _unwind(self, values, unwind, **kwargs):
+    def _unwind(self, values, backend, **kwargs):
         sdata = values[str(self)]
         if istimeseries(sdata):
             return sdata
         else:
-            ts = timeseries(self, date = sdata['date'], data = sdata['value'])
-            values[str(self)] = ts
+            ts = timeseries(name = str(self),
+                            date = sdata['date'],
+                            data = sdata['value'],
+                            backend = backend)
+            values[ts.name] = ts
             return ts
     
     def lineardecomp(self):
@@ -235,10 +228,10 @@ class ConcatenationOp(ConcatOp):
     def __init__(self,left,right):
         super(ConcatenationOp,self).__init__(left, right, settings.concat_operator)
         
-    def _unwind(self, values, unwind, sametype = True, **kwargs):
+    def _unwind(self, values, backend, sametype = True, **kwargs):
         result = []
         for child in self:
-            result.append(child.unwind(values, unwind))
+            result.append(child.unwind(values, backend))
         return result
     
     
@@ -247,10 +240,10 @@ class SplittingOp(ConcatOp):
     def __init__(self,left,right):
         super(SplittingOp,self).__init__(left, right, settings.separator_operator)
         
-    def _unwind(self, values, unwind, **kwargs):
+    def _unwind(self, values, backend, **kwargs):
         ts = unwind.listData(label = str(self))            
         for c in self:
-            v = c.unwind(values, unwind)
+            v = c.unwind(values, backend)
             ts.append(v)
         return ts
 
@@ -289,8 +282,8 @@ The left hand side is **never** a symbol.
             left = Parameter(left.value)
         super(EqualOp,self).__init__(left,right,"=")
         
-    def _unwind(self, values, unwind, **kwargs):
-        data = self.right.unwind(values, unwind, **kwargs)
+    def _unwind(self, values, backend, **kwargs):
+        data = self.right.unwind(values, backend, **kwargs)
         return {str(self.left):data}
  
  

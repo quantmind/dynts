@@ -3,6 +3,7 @@ from collections import deque
 from UserDict import UserDict
 
 from dynts.exceptions import *
+from dynts.conf import settings
 from dynts.utils import laggeddates, ashash, asbtree, asarray
 
 
@@ -49,7 +50,7 @@ class TimeSeries(object):
     def names(self):
         '''List of names for each timeseries'''
         N = self.count()
-        names = self.name.split(',')[:N]
+        names = self.name.split(settings.splittingnames)[:N]
         n = 0
         while len(names) < N:
             n += 1
