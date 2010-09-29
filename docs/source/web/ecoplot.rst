@@ -33,6 +33,24 @@ It is as easy as this::
 	
 
 
+Toolbar
+=================
+
+The toolbar is an array of toolbar items::
+	
+	var toolbar = [item1,...,itemN];
+	
+
+where a toolbar items is an object, for example::
+
+	item = {
+	    classname: 'zoomout',
+	    title: "Zoom Out",
+	    icon: "ui-icon-zoomout",
+	    decorate: function(b,el) {...}
+    }
+	
+
 .. _jQuery: http://jquery.com/
 .. _flot: http://code.google.com/p/flot/
 

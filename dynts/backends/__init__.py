@@ -1,6 +1,6 @@
 from dynts.utils import import_module
 from dynts.conf import settings
-from base import TimeSeries, Formatters
+from base import TimeSeries, Formatters, xydata
 
 BACKENDS = {
     'zoo': 'zoo',
@@ -9,6 +9,7 @@ BACKENDS = {
 }
 
 istimeseries = lambda value : isinstance(value,TimeSeries)
+isxy = lambda value : isinstance(value,xydata)
 
 
 def timeseries(name = '', backend = None, **kwargs):

@@ -1,17 +1,30 @@
 
-div.econometric-plot {float: left; width: 99%;}
-div.econometric-plot .menu {width: 100%; float: left; clear: right;}
-div.econometric-plot .main {width: 100%; float: left;}
-div.econometric-plot .canvas-container {padding: 10px 10px; width: auto; float: none; display: block;}
+.econometric-plot {float: left; width: 99%;}
+.econometric-plot .menu,
+.econometric-plot .body {
+	width: 100%;
+	float: left;
+}
+.econometric-plot .main {
+	width: 100%;
+	height: 100%;
+	float: left;
+}
+.econometric-plot .secondary {
+	float: right;
+	height: 100%;
+}
+.econometric-plot .canvas-container {
+	float: none;
+	margin: auto;
+	width: auto;
+	display: block;
+}
 /*div.econometric-plot-canvas {width: 100%; overflow: hidden;}*/
 div.econometric-plot .uppermenu {height: 34px; line-height:34px; float: left; width:100%;}
-div.econometric-plot .lowermenu {height: 34px; line-height:34px; float: left; width:100%;}
-div.econometric-plot .uppermenu input {height: 20px; margin-top: 6px;
-									width: 97%; margin-left:0.99%;}
-div.econometric-plot .dateholder {float: left; width: auto;
-							   margin-left: 10px;
-							   line-height: 34px;
-							   font-weight: bold}
+div.econometric-plot .lowermenu {float: left; width:100%;}
+div.econometric-plot .uppermenu input {height: 20px; margin: 4px 10px; width: 97%;}
+div.econometric-plot .dateholder {line-height: 34px; font-weight: bold}
 div.econometric-plot .nav-menu {float: left; width: auto; margin-left: 10px;}
 div.econometric-plot .nav-menu ul {float: left; width: auto; list-style-type: none;}
 div.econometric-plot .nav-menu li {float: left; list-style-type: none;
@@ -20,7 +33,7 @@ div.econometric-plot .nav-menu ul li:hover {background: rgb(224,224,224);}
 div.econometric-plot .nav-menu ul li.clicked {background: rgb(154,154,154);}
 div.econometric-plot .nav-menu ul li a {display: block;
 									 line-height: 34px;
-									 height: 34px;
+									 height: 28px;
 									 padding: 0 3px;
 									 background-repeat: no-repeat;
 									 background-position: center;
@@ -28,14 +41,42 @@ div.econometric-plot .nav-menu ul li a {display: block;
 									 cursor: pointer;
 									 border: 1px outset rgb(114,114,114);}
 
-a.zoom-out   {background-image: url(img/zoom_out.png);}
-a.reload     {background-image: url(img/arrow_rotate_clockwise.png);}
-a.edit-chart {background-image: url(img/chart_line_edit.png);}
+.econometric-plot .menu-item {float: left;}
+.econometric-plot .ts-input-date {max-width: 100px;}
 
-.loader      {background-image: url(img/ajax-loader.gif);
-			  background-repeat: no-repeat;
-			  background-position: center;
-			  height: 34px; width: 34px; display: block;
-			  float:right; margin-right: 2%;}
+.econometric-plot .loader  {
+	display: none;
+	background-image: url(img/ajax-loader.gif);
+	background-repeat: no-repeat;
+	background-position: center;
+	height: 34px; width: 34px;
+	float:right; margin-right: 2%;
+}
+
+.econometric-plot .secondary .pannel {
+	display: none;
+	width: 94%;
+	height: 94%;
+	margin: 3% auto;
+}
 			  
 .dataErrorMessage {color: rgb(179,0,0); font-weight: bold;}
+
+/* Margins & Paddings */
+.econometric-plot .lowermenu {padding: 2px 0;} 
+.econometric-plot label {margin-right: 10px;}
+.econometric-plot label.middle {margin: 0 5px;}
+.econometric-plot input {padding: 2px 5px;}
+.econometric-plot .menu-item {
+	margin-left: 10px;
+}
+.econometric-plot .menu-item.command {
+	margin: 0 10px;
+}
+
+.econometric-plot .body.with-pannel .main {
+	width: 75%;
+}
+.econometric-plot .body.with-pannel .secondary {
+	width: 25%;
+}

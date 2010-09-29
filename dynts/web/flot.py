@@ -35,7 +35,7 @@ class MultiPlot(object):
 class Flot(object):
     '''A single plot'''
     allowed_types = ['xy','timeseries']
-    def __init__(self, name = '', type = 'timeseries'):
+    def __init__(self, name = '', type = None):
         if type not in self.allowed_types:
             type = 'xy'
         self.name   = name

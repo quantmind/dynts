@@ -1,8 +1,20 @@
 div.econometric-plot {
 	border: 1px solid rgb(145,145,145);
 	background: #fff;
+	color: #424242;
 }
+div.econometric-plot input {border: 1px solid #BCBCBC;}
 div.econometric-plot .uppermenu {background: url(../img/sprite.png) repeat-x;
 							     border-bottom: 1px solid rgb(145,145,145);}
 div.econometric-plot .lowermenu {background: url(../img/sprite.png) repeat-x;
 							     border-bottom: 1px solid rgb(145,145,145);}
+div.econometric-plot-tooltip {
+	background: #9CC4E4;
+	border: 1px solid #1B325F;
+	padding: 2px;
+	opacity: 0.7;
+}
+.econometric-plot .pannel {
+	border: 1px solid rgb(145,145,145);
+	background: rgb(240,240,240);
+}

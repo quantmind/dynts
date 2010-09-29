@@ -1,25 +1,11 @@
 from itertools import izip
-from collections import deque
-from UserDict import UserDict
 
-from dynts.exceptions import *
 from dynts.conf import settings
 from dynts.utils import laggeddates, ashash, asbtree, asarray
+from dynts.backends.xy import *
 
 
-
-class FormatterDict(UserDict):
-    
-    def oftype(self, typ):
-        '''Return a generator of formatters codes of type typ'''
-        for key, val in self.items():
-            if val.type == typ:
-                yield key
-
-Formatters = FormatterDict()
-
-
-class TimeSeries(object):
+class TimeSeries(DyntsBase):
     '''Interface class for timeseries back-ends.
     
     .. attribute:: type
@@ -33,32 +19,8 @@ class TimeSeries(object):
     type = None
     
     def __init__(self, name = '', date = None, data = None):
-        self.name    = str(name)
+        super(TimeSeries,self).__init__(name)
         self.make(date,data)
-        
-    def __repr__(self):
-        d = self.description()
-        b = '%s:%s' % (self.__class__.__name__,self.__class__.type)
-        if d:
-            return '%s:%s' % (b,d)
-        else:
-            return b
-    
-    def __str__(self):
-        return self.description()
-    
-    def names(self):
-        '''List of names for each timeseries'''
-        N = self.count()
-        names = self.name.split(settings.splittingnames)[:N]
-        n = 0
-        while len(names) < N:
-            n += 1
-            names.append('unnamed%s' % n)
-        return names        
-        
-    def description(self):
-        return self.name
     
     def __len__(self):
         return self.shape[0]
@@ -138,16 +100,6 @@ function.'''
         '''Nicely display self on the shell. Useful during prototyping and development.'''
         for d,v in self.items():
             print('%s: %s' % (d,v))
-            
-    def dump(self, format = None, **kwargs):
-        '''Dump the timeseries using a specific :ref:`format <formatters>`.'''
-        formatter = Formatters.get(format,None)
-        if not format:
-            return self.display()
-        elif not formatter:
-            raise FormattingException('Formatter %s not available' % format)
-        else:
-            return formatter(self,**kwargs)
     
     def isconsistent(self):
         '''Check if the timeseries is consistent'''

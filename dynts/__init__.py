@@ -17,7 +17,7 @@ __homepage__ = "http://github.com/quantmind/dynts/"
 
 
 from dynts.exceptions import *
-from backends import timeseries, TimeSeries, istimeseries, Formatters, BACKENDS
+from backends import timeseries, xydata, TimeSeries, istimeseries, Formatters, BACKENDS
 from dsl import parse, merge, dslresult, function_registry, functions
 from data import providers
 import formatters

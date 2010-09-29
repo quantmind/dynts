@@ -1,7 +1,7 @@
 from dynts.dsl.grammar import *
 from dynts.conf import settings
 from dynts.exceptions import DyntsException
-from dynts.backends import istimeseries
+from dynts.backends import istimeseries, isxy
 from dynts.dsl.registry import FunctionBase, function_registry
 from dynts.utils import smart_str
 
@@ -60,13 +60,24 @@ class dslresult(object):
         
     def _unwind(self):    
         res = self.expression.unwind(self.data,self.backend)
+        self._ts = None
         self._xy = None
         if istimeseries(res):
             self._ts = res
         elif res and isinstance(res,list):
-            self._ts = merge(res)
-        else:
-            self._ts = None
+            tss = []
+            xys = []
+            for v in res:
+                if istimeseries(v):
+                    tss.append(v)
+                elif isxy(v):
+                    xys.append(v)
+            if tss:
+                self._ts = merge(tss)
+            if xys:
+                self._xy = xys
+        elif isxy(res):
+            self._xy = res
             
     def dump(self, format):
         ts = self.ts()
@@ -76,7 +87,10 @@ class dslresult(object):
         else:
             ts = None
         if xy:
-            pass
+            if isxy(xy):
+                xy = [xy]
+            for el in xy:
+                ts = el.dump(format, container = ts)
         return ts
             
         

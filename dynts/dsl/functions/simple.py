@@ -6,10 +6,12 @@ class Delta(FunctionBase):
     def __call__(self, data, step = 1):
         pass
     
+    
 class Log(FunctionBase):
     def __call__(self, data, step = 1):
         for k,v in data:
             yield k,log(v)
+
 
 class ScalarFunction(FunctionBase):
     abstract = True

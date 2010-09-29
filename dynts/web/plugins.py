@@ -26,7 +26,8 @@ __ http://packages.python.org/djpcms/'''
             'all': ('dynts/ecoplot/ecoplot.css', skin)
         }
         js = ['dynts/flot/excanvas.min.js',
-              'dynts/flot/jquery.flot.js',
+              'dynts/flot/jquery.flot.min.js',
+              'dynts/flot/jquery.flot.selection.min.js',
               'dynts/ecoplot/ecoplot.js',
               'dynts/decorator.js']
     

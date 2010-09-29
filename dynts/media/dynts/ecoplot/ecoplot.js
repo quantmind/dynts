@@ -24,6 +24,7 @@ $.extend({
 	ecoplot: new function() {
 		var extraTools     = {};
 		var events         = {};
+		var menubar		   = {};
 		var debug		   = false;
 		
 		var default_command_line = {
@@ -34,13 +35,78 @@ $.extend({
 		    periodlabel: 'Period'
 		};
 		
+		var render = function(canvas) {
+			if(canvas && canvas.render)  {
+				canvas.render();
+			}
+		}
+		var showPannel = function(p,el) {
+			$('.secondary .pannel').hide();
+			el.options.elems.body.addClass('with-pannel');
+			if(p) {
+				p.show();
+			}
+			render(el.options.elems.canvas);
+		}
+		var hidePannel = function(p,el) {
+			$('.secondary .pannel').hide();
+			el.options.elems.body.removeClass('with-pannel');
+			render(el.options.elems.canvas);
+		}
+		
+		var default_toolbar = [
+		        {
+					classname: 'zoomout',
+					title: "Zoom Out",
+					icon: "ui-icon-zoomout",
+					decorate: function(b,el) {
+			        	var elems = el.options.elems;
+						b.click(function(e) {
+							var pl = elems.canvas;
+							if(pl) {
+								pl.render();
+							}
+						});
+		        	}
+				},
+				{
+					classname: 'reload',
+					title: "Refresh data",
+					icon: "ui-icon-refresh",
+					decorate: function(b,el) {
+						var $this = $(el);
+						b.click(function(e) {
+							$this.trigger('pre-reload',[this, $this]);
+							$.ecoplot.loadData($this);
+						});
+					}
+				},
+				{
+					classname: 'options',
+					title: "Edit plotting options",
+					icon: "ui-icon-image",
+					type: "checkbox",
+					decorate: function(b,el) {
+						var options = el.options.elems.options;
+						b.toggle(
+								function() {showPannel(options,el);},
+								function() {hidePannel(options,el);}
+						);
+					}
+				}
+				]
+		
 		this.defaults = {
 			show:			true,
 			responcetype:   'json',
 			requestMethod:  'get',
 			elems:			{},
+			dates:			{show: true, label: 'Period', format: "d M yy", cn: "ts-input-date"},
+			command:		{show: true, entry: null},
+			toolbar:		default_toolbar,
 			commandline:	default_command_line,
 			requestParams: 	{},
+			show_tooltip:	true,
 		    date_format: 	"d M yy",
 		    autoload:		true,
 		    load_url:		null,
@@ -51,7 +117,7 @@ $.extend({
 		    paginate:		null,
 		    infoPanel:		'ecoplot-info',
 		    defaultFade:	300,
-		    actions:		 ['zoom', 'reload', 'datepicker'],
+		    actions:		 ['zoom', 'datepicker', 'tooltip'],
 		    default_month_interval: 12,
 		    classname:		 'ts-plot-module',
 		    errorClass:		 'dataErrorMessage',
@@ -77,7 +143,7 @@ $.extend({
 		function log(s) {
 			if(debug) {
 				if (typeof console != "undefined" && typeof console.debug != "undefined") {
-					console.log(s);
+					console.log('$.ecoplot: '+ s);
 				} else {
 					//alert(s);
 				}
@@ -113,28 +179,29 @@ $.extend({
 		}
 		
 		function _set_default_dates($this)  {
-			var options = $this.options;
+			var options = $this[0].options;
 	    	var td = new Date();
 	    	var v2 = $.datepicker.formatDate(options.date_format, td);
 	    	td.setMonth(td.getMonth() - options.default_month_interval);
 	    	var v1 = $.datepicker.formatDate(options.date_format, td);
-	    	var elems = options.elems;
+	    	var elems = options.dates;
 	    	if(elems) {
 	    		elems.start.val(v1);
 	    		elems.end.val(v2);
 	    	}
 	    }
 		
+		/**
+		 * Register ecoplot events
+		 */
 		function _registerEvents($this) {
-			var elems = $this.options.elems;
+			var elems = $this[0].options.elems;
 			
 			$(window).resize(function() {
-	        	if(elems.canvas && elems.canvas.render)  {
-	        		elems.canvas.render();
-	        	}
+				render(elems.canvas);
 	        });
 			
-			var actions = $this.options.actions;
+			var actions = $this[0].options.actions;
 			$.each(actions, function(i,v) {
 				var eve = events[v];
 				if(eve) {
@@ -145,12 +212,12 @@ $.extend({
     	}
 		
 		function _get_data($this)  {
-			var elems = $this.options.elems;
-			var ticker = elems.commandline.val()
+			var opt = $this[0].options;
+			var ticker = opt.elems.commandline.val()
 			if(!ticker) {return null;}
 			return {
-				start:elems.start.val(),
-				end:elems.end.val(),
+				start: opt.dates.start.val(),
+				end: opt.dates.end.val(),
 				period:'',
 				command:ticker
 			};
@@ -161,19 +228,15 @@ $.extend({
 		 * @param data, Array of plot objects
 		 */
 		function _set_new_canavases($this,data) {
-			var options = $this.options;
+			var options = $this[0].options;
 			var elems   = options.elems;
 			var outer     = $('<div></div>');
 			var container = elems.canvas_cont;
 			var c         = container.children();
 			c.fadeOut(options.defaultFade).remove();
-			//var wrap = $('<div></div>').css({'width':'100%','overflow':'hidden'}).appendTo(container);
 			var outer = $('<div></div>').appendTo(container);
 			var newcanvases = [];
 			var datac,typ;
-			
-			var height = $this.height();
-			$this.height(height);
 			
 			function _add(el_, data_) {
 				el_.addClass(options.canvasClass);
@@ -184,7 +247,7 @@ $.extend({
 					var zoptions;
 					if(opts) {zoptions = $.extend(true, {}, this.options, opts);}
 					else {zoptions = this.options;}
-					this.elem.height(options.height);
+					this.elem.height(container.height());
 					this.flot = $.plot(this.elem, this.series, zoptions);
 					return this;
 				}
@@ -202,9 +265,7 @@ $.extend({
 			}
 			
 			if(data) {
-				var width;
 				if(data.length == 1) {
-					width = outer.width();
 					_add(outer,data[0]);
 				}
 				else {
@@ -225,11 +286,7 @@ $.extend({
 				elems.canvas = null;
 			}
 			elems.canvases = newcanvases;
-			$this.height('auto');
-			
-			if(elems.canvas) {
-				elems.canvas.render();
-			}
+			render(elems.canvas);
 		}
 		
 		/**
@@ -240,8 +297,8 @@ $.extend({
 		 * }
 		 */
 		function _finaliseLoad($this,data) {
-			var options = $this.options
-			var elems = $this.options.elems;
+			var options = $this[0].options
+			var elems = options.elems;
 			if(elems.info) {
 				elems.info.html("");
 			}
@@ -263,7 +320,7 @@ $.extend({
 		}
 		
 		function _request($this)  {
-	 		var options  = $this.options;
+	 		var options  = $this[0].options;
 	 		if(!options.load_url)  {return;}
 	 		var dataplot = _get_data($this);
 	 		if(!dataplot) {return;}
@@ -309,10 +366,10 @@ $.extend({
 		 * Constructor
 		 */
 		function _construct(options_) {
-			var options = _parseOptions(options_, $.ecoplot.defaults);
-			return this.each(function() {
-				var $this = $(this);
-				$this.options = options;
+			return this.each(function(i) {
+				var options = _parseOptions(options_, $.ecoplot.defaults);
+				var $this = $(this).attr({'id':options.classname+"_"+i});
+				this.options = options;
 				$this.hide().html("");
 				
 				// Pagination
@@ -328,9 +385,8 @@ $.extend({
 				if(options.autoload) {
 					$.ecoplot.loadData($this);
 				}
-				if(options.show) {
-					$this.fadeIn(options.defaultFade);
-				}
+				$this.fadeIn(options.defaultFade);
+				options.height($this);
 			});
 		}
 		
@@ -346,6 +402,16 @@ $.extend({
 		this.debug		   		= function(){return debug;};
 		this.setdebug	   		= function(v){debug = v;};
 		this.log			 	= log;
+		
+		this.addMenu = function(menu) {
+			menubar[menu.name] = menu;
+		}
+		this.getmenu = function(name,$this) {
+			var menu = menubar[name];
+			if(menu) {
+				return menu.create($this[0]);
+			}
+		}
 	}
 });
 
@@ -363,83 +429,50 @@ var ecop = $.ecoplot;
 ///////////////////////////////////////////////////
 //	SOME ACTIONS
 ///////////////////////////////////////////////////
-ecop.addEvent({
+$.ecoplot.addEvent({
 	id: 'zoom',
 	className: 'zoom-out',
 	register: function($this) {
 		var comm;
-		var options = $this.options;
-		var menu    = options.elems.actionsmenu;
-		if(menu) {
-			
-			var el = $(document.createElement("a"))
-					.attr({'title':'Zoom out'})
-					.addClass(this.className);
-			menu.append($(document.createElement("li")).append(el));
-			el.click(function(e) {
-				var pl = options.elems.canvas;
-				if(pl) {
-					pl.render();
-				}
-			});
-			
-			$this.bind("plotselected", function (event, ranges) {
-				var pl = options.elems.canvas;
-				if(!pl) {
-					return;
-				}
-	    		function checkax(ax)  {
-	    			if(ax.to - ax.from < 0.00001)  {
-	    				ax.to = ax.from + 0.00001;
-	    			}
-	    			return {min: ax.from, max: ax.to};
-	    		}
-	    		var ax = pl.flot.getAxes();
-	    		var opts = {};
-	    		if(ax.xaxis.used)  {
-	    			opts.xaxis = checkax(ranges.xaxis);
-	    		}
-	    		if(ax.yaxis.used)  {
-	    			opts.yaxis = checkax(ranges.yaxis);
-	    		}
-	    		if(ax.x2axis.used)  {
-	    			opts.x2axis = checkax(ranges.x2axis);
-	    		}
-	    		if(ax.y2axis.used)  {
-	    			opts.y2axis = checkax(ranges.y2axis);
-	    		}
-	            // do the zooming
-	            pl.render(opts);
-	            // don't fire event on the overview to prevent eternal loop
-	            //overview.setSelection(ranges, true);
-	    	});
-		}
+		var options = $this[0].options;
+		$this.bind("plotselected", function (event, ranges) {
+			var pl = options.elems.canvas;
+			if(!pl) {
+				return;
+			}
+    		function checkax(ax)  {
+    			if(ax.to - ax.from < 0.00001)  {
+    				ax.to = ax.from + 0.00001;
+    			}
+    			return {min: ax.from, max: ax.to};
+    		}
+    		var ax = pl.flot.getAxes();
+    		var opts = {};
+    		if(ax.xaxis.used)  {
+    			opts.xaxis = checkax(ranges.xaxis);
+    		}
+    		if(ax.yaxis.used)  {
+    			opts.yaxis = checkax(ranges.yaxis);
+    		}
+    		if(ax.x2axis.used)  {
+    			opts.x2axis = checkax(ranges.x2axis);
+    		}
+    		if(ax.y2axis.used)  {
+    			opts.y2axis = checkax(ranges.y2axis);
+    		}
+            // do the zooming
+            pl.render(opts);
+            // don't fire event on the overview to prevent eternal loop
+            //overview.setSelection(ranges, true);
+    	});
 	}
 });
 
-ecop.addEvent({
-	id: 'reload',
-	className: 'reload',
-	register: function($this) {
-		var comm;
-		var menu = $this.options.elems.actionsmenu;
-		if(menu) {
-			var el = $(document.createElement("a"))
-					.attr({'title':'Reload data'})
-					.addClass(this.className);
-			menu.append($(document.createElement("li")).append(el));
-			el.click(function(e) {
-				$this.trigger('pre-reload',[this, $this]);
-				$.ecoplot.loadData($this);
-			});
-		}
-	}
-});
 
 ecop.addEvent({
 	id: 'datepicker',
 	register: function($this) {
-	var options = $this.options;
+		var options = $this[0].options;
 		$('.'+options.inputDateClass,$this).datepicker({
 			defaultDate: +0,
 			showStatus: true,
@@ -456,85 +489,180 @@ ecop.addEvent({
 });
 
 
+ecop.addEvent({
+	id: 'tooltip',
+	register: function($this) {
+		var options = $this[0].options;
+		var cl = 'econometric-plot-tooltip';
+		function showTooltip(x, y, contents) {
+	        $('<div class="'+cl+'">' + contents + '</div>').css( {
+	            position: 'absolute',
+	            display: 'none',
+	            top: y + 5,
+	            left: x + 5,
+	        }).appendTo("body").fadeIn(200);
+	    }
+		
+		$this.bind("plothover", function (event, pos, item) {
+	        $("#x").text(pos.x.toFixed(2));
+	        $("#y").text(pos.y.toFixed(2));
+
+	        if(options.show_tooltip) {
+	            if (item) {
+	                if (previousPoint != item.datapoint) {
+	                    previousPoint = item.datapoint;
+	                    
+	                    $("."+cl).remove();
+	                    var x = item.datapoint[0].toFixed(2),
+	                        y = item.datapoint[1].toFixed(2);
+	                    
+	                    showTooltip(item.pageX, item.pageY,
+	                                item.series.label + " of " + x + " = " + y);
+	                }
+	            }
+	            else {
+	                $("."+cl).remove();
+	                previousPoint = null;            
+	            }
+	        }
+	    });
+
+	}
+});
+
+
+/////////////////////////////////////////////////////////////
+//	MENUBAR
+/////////////////////////////////////////////////////////////
+
+/**
+ * Add Command Input
+ */
+$.ecoplot.addMenu({
+	name: 'command',
+	classname: 'command',
+	create: function(elem) {
+		var command = elem.options.command;
+		var el = $('<input type="text" name="commandline">');
+		if(!command.show) {
+			el.hide();
+		}
+		return el;
+	}
+});
+
+/**
+ * Add Date inputs menu creator
+ */
+$.ecoplot.addMenu({
+	name: 'dates',
+	classname: 'dateholder',
+	create: function(elem) {
+		var dates = elem.options.dates;
+		var el = $('<div class="'+ this.classname + ' menu-item"></div>');
+		var start_id = elem.id+'_start';
+		var end_id = elem.id+'_end';
+		if(dates.label) {
+			el.append($('<label for_id="'+start_id+'">'+dates.label+'</label>'));
+		}
+		dates.start = $('<input id="'+start_id+'" class="'+dates.cn+'" type="text" name="start">');
+		dates.end   = $('<input id="'+end_id+'" class="'+dates.cn+'" type="text" name="end">');
+		el.append(dates.start);
+		el.append($('<label class="middle">-</label>'));
+		el.append(dates.end);
+		if(!dates.show) {
+			el.hide();
+		}
+		return el;
+	}
+});
+
+
+/**
+ * Add Toolbar items as specified in the options.toolbar array.
+ */
+$.ecoplot.addMenu({
+	name: 'toolbar',
+	classname: 'toolbar',
+	create: function(elem) {
+		var toolbar = elem.options.toolbar;
+		var el = $('<div class="'+ this.classname + ' menu-item"></div>');
+		var id = elem.id+'_'+this.classname;
+		var sl = $('<span id="'+id+'"></span>').appendTo(el);
+		$.each(toolbar, function(i,el) {
+			id = elem.id+'_'+el.classname;
+			var tel = null, eel = null;
+			var ico;
+			if(!el.type || el.type == 'button') {
+				tel = $('<button id="'+id+'" class="'+el.classname+'">'+el.title+'</button>');
+			}
+			else if(el.type == 'checkbox') {
+				tel = $('<input id="'+id+'" type="checkbox" class="'+el.classname+'"/>');
+				eel = $('<label for="'+id+'">'+el.title+'</label>');
+			}
+			if(tel) {
+				sl.append(tel);
+				if(eel) {
+					sl.append(eel);
+				}
+				ico = {};
+				if(el.icon) {
+					ico.primary = el.icon;  
+				}
+				tel.button({
+					text: el.text || false,
+					icons: ico
+				});
+				if(el.decorate) {
+					el.decorate(tel,elem);
+				}
+			}
+		});
+		return el;
+	}
+});
+
 
 ///////////////////////////////////////////////////
-//		PAGINATION
+//		DEFAULT PAGINATION
+//		This can be overritten
 ///////////////////////////////////////////////////
-ecop.paginate = function($this) {
-	var options = $this.options;
+$.ecoplot.paginate = function($this) {
+	var options = $this[0].options;
 	var elems   = options.elems;
 	
-	var _cl     = function(name) {
-		return name;
-		//return options.classname + '-' + name;
-	};
+	elems.menu = $('<div class="menu"></div>').appendTo($this);
+	elems.body = $('<div class="body"></div>').appendTo($this);
+	var page  = $('<div class="main"></div>').appendTo(elems.body);
+	var page2 = $('<div class="secondary"></div>').appendTo(elems.body);
 	
-	page = $(document.createElement("div")).addClass(_cl("main"));
-	elems.canvas_cont  = $(document.createElement("div")).addClass(options.convasContClass);
-	elems.page_options = $(document.createElement("div"))
-							.addClass(_cl("options"))
-							.css({'display':'none'});
-	elems.loader	   = $(document.createElement("div")).css({'display':'none'}).append(
-			$(document.createElement("a")).addClass('loader')
-			.attr({'title':'Loading data'}));
-	elems.html_options = $(document.createElement("div"));
-	
-	elems.canvas_cont.append(elems.canvas).appendTo(page)
-	elems.page_options.append(elems.html_options).appendTo(page);
-	
+	elems.canvas_cont  = $('<div class="canvas-container"></div>').appendTo(page);
+	elems.options = $('<div class="pannel options"></div>').appendTo(page2);
+	elems.logger  = $('<div class="pannel logger"></div>').appendTo(page2);
+	elems.loader  = $('<div class="loader"></div>');
 	
 	/* The menu bar */
-	elems.menu = $(document.createElement("div")).addClass(_cl("menu"));
-	elems.uppermenu = $(document.createElement("div")).addClass(_cl("uppermenu"));
-	elems.lowermenu = $(document.createElement("div")).addClass(_cl("lowermenu"));
-	elems.menu.append(elems.uppermenu).append(elems.lowermenu);
+	var upperm = $('<div class="uppermenu"></div>');
+	var lowerm = $('<div class="lowermenu"></div>');
+	elems.menu.append(upperm).append(lowerm);
 	
-	/* Command line */
-	elems.commandline = $(document.createElement("input")).attr({'type':'text','name':'commandline'});
-	
-	/* Dates. Position inside a div */
-	elems.dates = $(document.createElement("div")).addClass(_cl("dateholder"));
-	elems.start = $(document.createElement("input")).attr({'type':'text','name':'start'}).addClass(options.inputDateClass);
-	elems.end   = $(document.createElement("input")).attr({'type':'text','name':'end'}).addClass(options.inputDateClass);
-	$.ecoplot.set_default_dates($this);
-	
-	if(options.commandline.periodlabel) {
-		elems.dates.append($(document.createElement("label")).html(options.commandline.periodlabel+''));
-	}
-	elems.dates.append(elems.start);
-	elems.dates.append($(document.createElement("span")).html(' - '));
-	elems.dates.append(elems.end);
-	
-	/* Create the navigation menu */
-	elems.nav_menu    = $(document.createElement("div")).addClass(_cl("nav-menu"));
-	nav_menu_ul = $(document.createElement("ul"));
-	elems.nav_menu.append(nav_menu_ul);
-	elems.actionsmenu = nav_menu_ul;
-	
-	var disp = 'none';
-	if(options.caneditchart) {
-		disp = 'inline';
-		_option_html(elems.html_options);
-	}
-	nav_menu_ul.append($(document.createElement("li"))
-			.css({'list-style-type': 'none','display':disp}).append(
-		   $(document.createElement("a"))
-		   .attr({'title':'Edit chart'}).addClass('edit-chart').html('edit')));
-	
-	elems.uppermenu.append(elems.commandline);
-	elems.lowermenu.append(elems.dates).append(elems.nav_menu).append(elems.loader);
+	elems.commandline = $.ecoplot.getmenu('command',$this).appendTo(upperm);
+	elems.dates = $.ecoplot.getmenu('dates',$this).appendTo(lowerm);
+	lowerm.append($.ecoplot.getmenu('toolbar',$this));
+	lowerm.append(elems.loader);
 	
 	var cmdlin = options.commandline;
 	if(cmdlin.symbol)  {
 		elems.commandline.val(cmdlin.symbol+'');
 	}
-	if(!cmdlin.show) {
-		elems.uppermenu.css({'display':'none'});
+	$.ecoplot.set_default_dates($this);
+	options.height = function(el) {
+		elems = el[0].options.elems;
+		var h = Math.max(el.height() - elems.menu.height(),30);
+		elems.body.height(h);
+		elems.canvas_cont.height(h-10).css({'margin':'5px 0'});
+		el.height('auto');
 	}
-	
-	$this.append(elems.menu);
-	$this.append(page);
-	options.height = Math.max($this.height() - elems.menu.height() - 10,20);
 } 
 
 })(jQuery);
