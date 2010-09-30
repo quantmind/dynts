@@ -17,7 +17,10 @@
     		el.height(height);
     		var cmline;
     		if(item.length) {
-    			cmline = {symbol: item.html()};
+    			cmline = {
+    				symbol: item.html(),
+    				show: false
+    			};
     		}
     		else {
     			cmline = null;

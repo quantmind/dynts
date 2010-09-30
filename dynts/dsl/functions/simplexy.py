@@ -26,6 +26,6 @@ class scatter(SimpleFunctionXY):
             except DateNotFound:
                 continue
             data.append([v0[0],v1[0]])
-        return xydata(name = name, data = data)
+        return xydata(name = name, data = data, lines = False)
     
     

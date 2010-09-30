@@ -58,11 +58,13 @@ class Flot(object):
 
 class Serie(object):
     
-    def __init__(self, label = '', data = None):
+    def __init__(self, label = '', data = None, **kwargs):
         self.label = label
         if data is None:
             data = []
         self.data = data
+        for k,v in kwargs.items():
+            setattr(self,k,v)
         
     def todict(self):
         od = self.__dict__.copy()

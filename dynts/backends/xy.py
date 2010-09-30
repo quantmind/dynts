@@ -61,16 +61,33 @@ class DyntsBase(object):
             return formatter(self,**kwargs)
 
 
+
+class xyserie(object):
+    
+    def __init__(self, name = '', data = None, lines = True, points = False):
+        self.points = points if lines else True
+        self.lines = lines
+        self.name = name
+        self.data = data
+
+
+
 class xydata(DyntsBase):
     
-    def __init__(self, name = '', data = None):
+    def __init__(self, name = '', data = None, **kwargs):
         super(xydata,self).__init__(name)
         self._series = []
-        self.data = data
+        if data:
+            self.add(xyserie(name=name,data=data,**kwargs))
         
     def add(self, data):
-        if data:
+        from dynts import tsname
+        if isinstance(data,xyserie):
             self._series.append(data)
+        elif isinstance(data,self.__class__):
+            for serie in data.series():
+                self.name = tsname(self.name,serie.name)
+                self._series.append(serie)
             
     def series(self):
         return self._series

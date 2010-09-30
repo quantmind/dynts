@@ -3,8 +3,9 @@
  * 
  * version: 0.4
  * 
- * @requires jQuery v1.2.2 or Later
- * @requires flot
+ * @requires jQuery v1.4 or Later
+ * @requires jQuery-UI v1.8 or Later
+ * @requires Flot v0.6 or Later
  *
  * Dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -17,7 +18,19 @@
 /*
     Usage Note:  
     -----------
+    
+    $('.ploting-elems').ecoplot(options);
+    
+    options is an object containing several input parameters. All parameters
+    have sensible default values apart from one which
+    needs to supplied.
       
+      load_url: String for the remote data provider URL.
+    
+    The most common options are:
+    
+    	* flot_options: Object containing Flot-specific options
+    	* dates: Object for specifying how dates are displayed
 */
 
 $.extend({
@@ -26,13 +39,16 @@ $.extend({
 		var events         = {};
 		var menubar		   = {};
 		var debug		   = false;
+		var css_loaded	   = false;
+		var siteoptions	   = {
+			url: null,
+			theme: 'smooth'
+		};
 		
 		var default_command_line = {
 		    css:		 null,
 		    show:		 true,
 		    symbol:	 	 null,
-		    showperiod:	 false,
-		    periodlabel: 'Period'
 		};
 		
 		var showPannel = function(p,el) {
@@ -41,12 +57,16 @@ $.extend({
 			if(p) {
 				p.show();
 			}
-			render(el.options.elems.canvas);
+			if(el.options.canvases) {
+				el.options.canvases.render();
+			}
 		}
 		var hidePannel = function(p,el) {
 			$('.secondary .pannel').hide();
 			el.options.elems.body.removeClass('with-pannel');
-			render(el.options.elems.canvas);
+			if(el.options.canvases) {
+				el.options.canvases.render();
+			}
 		}
 		
 		var default_toolbar = [
@@ -55,9 +75,8 @@ $.extend({
 					title: "Zoom Out",
 					icon: "ui-icon-zoomout",
 					decorate: function(b,el) {
-			        	var elems = el.options.elems;
 						b.click(function(e) {
-							var pl = elems.canvas;
+							var pl = el.options.canvases;
 							if(pl) {
 								pl.render();
 							}
@@ -91,8 +110,9 @@ $.extend({
 				}
 				]
 		
+		this.siteoptions = siteoptions;
+		
 		this.defaults = {
-			show:			true,
 			responcetype:   'json',
 			requestMethod:  'get',
 			elems:			{},
@@ -176,6 +196,9 @@ $.extend({
 	        return options;
 		}
 		
+		/**
+		 * Set default dates in the date pannel.
+		 */
 		function _set_default_dates($this)  {
 			var options = $this[0].options;
 			var dates = options.dates;
@@ -186,6 +209,26 @@ $.extend({
 	    	dates.start.val(v1);
 	    	dates.end.val(v2);
 	    }
+		
+		/**
+		 * For loading css. Not used yet.
+		 */
+		function loadCss() {
+			if(siteoptions.url) {
+				var theme = siteoptions.theme + '.css';
+				var head = $(head);
+				var link1 = $(document.createElement('link'));
+				var link2 = $(document.createElement('link'));
+				link1.css({type: "text/css",
+					 	   rel: "stylesheet",
+				 		   href: url + '/ecoplot/ecoplot.css'});
+				link2.css({type: "text/css",
+				 	   	   rel: "stylesheet",
+			 		       href: url + '/ecoplot/skins/' + theme});
+				head.append(link1);
+				head.append(link2);
+			}
+		}
 		
 		/**
 		 * Register ecoplot events
@@ -240,12 +283,13 @@ $.extend({
 			}
 			
 			data_.elem = el_;
-			data_.render = null;
-			
+			data_.render = renderflot;
+			data_.options = $.extend(true, {}, options.flot_options);
 			if(typ == 'timeseries') {
-				data_.options = $.extend(true, {}, options.flot_options);
 				data_.options.xaxis.mode = 'time';
-				data_.render = renderflot;
+			}
+			else {
+				data_.options.xaxis.mode = null;
 			}
 			return data_;
 		}
@@ -253,7 +297,7 @@ $.extend({
 		/**
 		 * Internal function for rendering flot
 		 */
-		var _render = function(idx) {
+		var _render = function(idx,opts) {
 			var all = this.all;
 			if(all.length > 0) {
 				var c = this.current;
@@ -261,12 +305,12 @@ $.extend({
 					c = all[idx];
 				}
 				if(c != this.current) {
-					if(this.current) {
-						this.current.hide();
-					}
+					//if(this.current) {
+					//	this.current.hide();
+					//}
 					this.current = c;
 				}
-				c.render(this.height);
+				c.render(this.height,opts);
 			}
 		}
 		
@@ -301,12 +345,18 @@ $.extend({
 					var ul = $('<ul></ul>').appendTo(outer);
 					$.each(data, function(i,v) {
 						cid = 'canvas' + i;
-						ul.append($('<li><a href="#' + cid + '">' + v.label + '</a></li>'));
+						ul.append($('<li><a href="#' + cid + '">' + v.name + '</a></li>'));
 						cv  = $('<div></div>').attr('id',cid);
 						outer.append(cv);
 						canvases.push(_add(options,cv,v));
 					});
-					outer.tabs(); 
+					outer.tabs({
+						show: function(event,ui) {
+							if(options.canvases.height) {
+								options.canvases.render(ui.index);
+							}
+						}
+					}); 
 				}
 			}
 			options.canvases.height = outer.height()- $('ul',outer).height();
@@ -387,7 +437,7 @@ $.extend({
 	 	}
 	        
 		/**
-		 * Constructor
+		 * The constructor
 		 */
 		function _construct(options_) {
 			return this.each(function(i) {
@@ -410,7 +460,9 @@ $.extend({
 					$.ecoplot.loadData($this);
 				}
 				$this.fadeIn(options.defaultFade);
-				options.height($this);
+				if(options.layout) {
+					options.layout($this);
+				}
 			});
 		}
 		
@@ -460,10 +512,11 @@ $.ecoplot.addEvent({
 		var comm;
 		var options = $this[0].options;
 		$this.bind("plotselected", function (event, ranges) {
-			var pl = options.elems.canvas;
-			if(!pl) {
+			var canvases = options.canvases;
+			if(!canvases) {
 				return;
 			}
+			pl = canvases.current;
     		function checkax(ax)  {
     			if(ax.to - ax.from < 0.00001)  {
     				ax.to = ax.from + 0.00001;
@@ -485,7 +538,7 @@ $.ecoplot.addEvent({
     			opts.y2axis = checkax(ranges.y2axis);
     		}
             // do the zooming
-            pl.render(opts);
+            pl.render(canvases.height,opts);
             // don't fire event on the overview to prevent eternal loop
             //overview.setSelection(ranges, true);
     	});
@@ -532,6 +585,7 @@ ecop.addEvent({
 	        $("#y").text(pos.y.toFixed(2));
 
 	        if(options.show_tooltip) {
+	        	var canvas = options.canvases.current;
 	            if (item) {
 	                if (previousPoint != item.datapoint) {
 	                    previousPoint = item.datapoint;
@@ -539,6 +593,10 @@ ecop.addEvent({
 	                    $("."+cl).remove();
 	                    var x = item.datapoint[0].toFixed(2),
 	                        y = item.datapoint[1].toFixed(2);
+	                    if(canvas.type == 'timeseries') {
+	                    	x = new Date(parseFloat(x));
+	                    	x = $.datepicker.formatDate(options.dates.format, x);
+	                    }
 	                    
 	                    showTooltip(item.pageX, item.pageY,
 	                                item.series.label + " of " + x + " = " + y);
@@ -679,8 +737,11 @@ $.ecoplot.paginate = function($this) {
 	if(cmdlin.symbol)  {
 		elems.commandline.val(cmdlin.symbol+'');
 	}
+	if(!cmdlin.show) {
+		upperm.hide();
+	}
 	$.ecoplot.set_default_dates($this);
-	options.height = function(el) {
+	options.layout = function(el) {
 		elems = el[0].options.elems;
 		var h = Math.max(el.height() - elems.menu.height(),30);
 		elems.body.height(h);

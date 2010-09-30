@@ -57,10 +57,12 @@ class ToFlot(BaseFormatter):
                 serie = flot.Serie(label = name, data = data)
                 res.add(serie)
         else:
-            res = flot.Flot()
+            res = flot.Flot(ts.name)
             for name,serie in izip(ts.names(),ts.series()):
-                data = []
-                serie = flot.Serie(label = name, data = data)
+                serie = flot.Serie(label = serie.name,
+                                   data = serie.data,
+                                   lines = {'show':serie.lines},
+                                   points = {'show':serie.points})
                 res.add(serie)
         result.add(res)
         return result
