@@ -57,8 +57,11 @@ $.extend({
 			if(p) {
 				p.show();
 			}
-			if(el.options.canvases) {
-				el.options.canvases.render();
+			c = el.options.canvases;
+			if(c) {
+				if(c.render()) {
+					p.html('').append(c.current.edit);
+				}
 			}
 		}
 		var hidePannel = function(p,el) {
@@ -266,6 +269,36 @@ $.extend({
 		}
 		
 		/**
+		 * Create the editing pannel for data
+		 */
+		function _editpannel(data) {
+			var table = $('<table class="plot-options"></table>');
+			var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
+			head.html('<th>serie</th><th>show</th><th>ax1</th><th>ax2</th><th>line</th><th>points</th>');
+			var body = $('<tbody></tbody>').appendTo(table);
+			var tdinp = function (type,name,value,checked) {
+				var check = $('<input type="'+type+'" name="'+name+'" value="'+value+'">');
+				if(checked) {
+					check.attr('checked',true);
+				}
+				return $('<td class="center"></td>').append(check);
+			}
+			$.each(data.series, function(i,serie) {
+				var tr = $('<tr class="serie-option"></tr>').appendTo(body);
+				tr.append($('<td>'+serie.label+'</td>'));
+				tr.append(tdinp('checkbox','show','show',i<=1));
+				tr.append(tdinp('radio','axis'+i,'ax1',serie.xaxis ? serie.xaxis==1 : i==0));
+				tr.append(tdinp('radio','axis'+i,'ax2',serie.xaxis ? serie.xaxis==2 : i>0));
+				tr.append(tdinp('checkbox','line','line', serie.lines ? serie.lines.show : true));
+				tr.append(tdinp('checkbox','points','points', serie.points ? serie.points.show : false));
+			});
+			table.click(function() {
+				data.render();
+			});
+			return table;
+		}
+		
+		/**
 		 * Internal function for creating a Flot canvas
 		 */
 		function _add(options, el_, data_) {
@@ -277,14 +310,33 @@ $.extend({
 				var zoptions;
 				if(opts) {zoptions = $.extend(true, {}, this.options, opts);}
 				else {zoptions = this.options;}
-				this.elem.height(height);
-				this.flot = $.plot(this.elem, this.series, zoptions);
+				if(height) {
+					this.height = height;
+				}
+				this.elem.height(this.height);
+				var adata = [];
+				var series = this.series;
+				this.edit.find('tr.serie-option').each(function(i) {
+					var el = $(this);
+					if($("input[name='show']",el).attr('checked')) {
+						var serie = series[i];
+						if($("input[value='ax1']",el).attr("checked")) {
+							serie.yaxis = 1;
+						}
+						else {
+							serie.yaxis = 2;
+						}
+						adata.push(serie);
+					}
+				});
+				this.flot = $.plot(this.elem, adata, zoptions);
 				return this;
 			}
 			
 			data_.elem = el_;
 			data_.render = renderflot;
 			data_.options = $.extend(true, {}, options.flot_options);
+			data_.edit = _editpannel(data_);
 			if(typ == 'timeseries') {
 				data_.options.xaxis.mode = 'time';
 			}
@@ -311,6 +363,10 @@ $.extend({
 					this.current = c;
 				}
 				c.render(this.height,opts);
+				return true;
+			}
+			else {
+				return false;
 			}
 		}
 		

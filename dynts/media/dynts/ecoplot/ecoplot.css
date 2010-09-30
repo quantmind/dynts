@@ -58,6 +58,7 @@ div.econometric-plot .nav-menu ul li a {display: block;
 	width: 94%;
 	height: 94%;
 	margin: 3% auto;
+	padding: 5px;
 }
 			  
 .dataErrorMessage {color: rgb(179,0,0); font-weight: bold;}
@@ -75,10 +76,10 @@ div.econometric-plot .nav-menu ul li a {display: block;
 }
 
 .econometric-plot .body.with-pannel .main {
-	width: 75%;
+	width: 60%;
 }
 .econometric-plot .body.with-pannel .secondary {
-	width: 25%;
+	width: 40%;
 }
 
 /* UI-Tabs */
@@ -97,4 +98,14 @@ div.econometric-plot .nav-menu ul li a {display: block;
 .econometric-plot .canvas-container .ui-tabs .ui-tabs-panel {
 	padding: 0;
 }
-
+.econometric-plot table.plot-options {
+	margin: 0 auto;
+}
+.econometric-plot table.plot-options th, 
+.econometric-plot table.plot-options td {
+	padding: 2px 7px 0 0;
+}
+.econometric-plot table.plot-options td.center {
+	text-align: center;
+}
+	

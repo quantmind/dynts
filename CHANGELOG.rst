@@ -1,11 +1,15 @@
 
 Development
 ======================
+* Added initial support for XY series.
+* Added a simple``scatter`` function for performing scatter plots.
 * Added logging parameter in :func:`dynts.evaluate`.
 * Formatters are instances rather than functions.
 * Can specify backend in :func:`dynts.evaluate`.
 * Introduced :func:`dynts.tsname` for creating names for a mutivariate timeseries.
 * Introduced :func:`dynts.merge` for merging two or more :class:`dynts.TimeSeries`.
+* Refactored jQuery plugin ``ecoplot.js``.
+* **5 ** dsl functions.
 * **60 tests**. 
 
 Version 0.2 - 2010 September 24

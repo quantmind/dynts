@@ -43,6 +43,11 @@ a dictionary of the form::
         return self.__class__.__name__.upper()
     code = property(fget = __get_code)
     
+    def allfields(self, ticker = None):
+        '''Return a list of all fields available for the providers.
+The first of the list will be treated as the default field.'''
+        raise NotImplementedError
+    
     def weblink(self, ticker):
         '''Optional web link for a given *ticker*. Default return ``None``.
         '''
