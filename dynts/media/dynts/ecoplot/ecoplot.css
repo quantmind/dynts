@@ -80,3 +80,21 @@ div.econometric-plot .nav-menu ul li a {display: block;
 .econometric-plot .body.with-pannel .secondary {
 	width: 25%;
 }
+
+/* UI-Tabs */
+.econometric-plot .canvas-container .ui-corner-all {
+	-moz-border-radius:0;
+}
+.econometric-plot .canvas-container .ui-tabs .ui-widget-header,
+.econometric-plot .canvas-container .ui-tabs {
+	padding: 0;
+	border: none;
+}
+.econometric-plot a:link,
+.econometric-plot a:visited {
+	font-weight: normal;
+}
+.econometric-plot .canvas-container .ui-tabs .ui-tabs-panel {
+	padding: 0;
+}
+

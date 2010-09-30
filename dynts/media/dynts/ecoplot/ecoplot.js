@@ -1,7 +1,7 @@
 /* 
  * Econometric Ploting Plugin for jQuery
  * 
- * version: 0.1
+ * version: 0.4
  * 
  * @requires jQuery v1.2.2 or Later
  * @requires flot
@@ -35,11 +35,6 @@ $.extend({
 		    periodlabel: 'Period'
 		};
 		
-		var render = function(canvas) {
-			if(canvas && canvas.render)  {
-				canvas.render();
-			}
-		}
 		var showPannel = function(p,el) {
 			$('.secondary .pannel').hide();
 			el.options.elems.body.addClass('with-pannel');
@@ -101,13 +96,17 @@ $.extend({
 			responcetype:   'json',
 			requestMethod:  'get',
 			elems:			{},
-			dates:			{show: true, label: 'Period', format: "d M yy", cn: "ts-input-date"},
+			dates:			{
+				show: true,
+				label: 'Period',
+				format: "d M yy",
+				cn: "ts-input-date"
+					},
 			command:		{show: true, entry: null},
 			toolbar:		default_toolbar,
 			commandline:	default_command_line,
 			requestParams: 	{},
 			show_tooltip:	true,
-		    date_format: 	"d M yy",
 		    autoload:		true,
 		    load_url:		null,
 		    loaderimage:	'ajax-loader.gif',
@@ -123,7 +122,6 @@ $.extend({
 		    errorClass:		 'dataErrorMessage',
 		    canvasClass:	 'ts-plot-module-canvas',
 		    convasContClass: 'ts-plot-module-canvas-container',
-		    inputDateClass:	 'ts-input-date',
 		    startLoading:	function($this) {
 		    	var co = this.elems;
 		    	co.loader.css({'display':'block'});
@@ -180,25 +178,26 @@ $.extend({
 		
 		function _set_default_dates($this)  {
 			var options = $this[0].options;
+			var dates = options.dates;
 	    	var td = new Date();
-	    	var v2 = $.datepicker.formatDate(options.date_format, td);
+	    	var v2 = $.datepicker.formatDate(dates.format, td);
 	    	td.setMonth(td.getMonth() - options.default_month_interval);
-	    	var v1 = $.datepicker.formatDate(options.date_format, td);
-	    	var elems = options.dates;
-	    	if(elems) {
-	    		elems.start.val(v1);
-	    		elems.end.val(v2);
-	    	}
+	    	var v1 = $.datepicker.formatDate(dates.format, td);
+	    	dates.start.val(v1);
+	    	dates.end.val(v2);
 	    }
 		
 		/**
 		 * Register ecoplot events
 		 */
 		function _registerEvents($this) {
-			var elems = $this[0].options.elems;
+			var opt = $this[0].options
+			var elems = opt.elems;
 			
 			$(window).resize(function() {
-				render(elems.canvas);
+				if(opt.canvases) {
+					opt.canvases.render();
+				}
 	        });
 			
 			var actions = $this[0].options.actions;
@@ -224,51 +223,80 @@ $.extend({
 		}
 		
 		/**
-		 * Internal function for setting up the plot.
-		 * @param data, Array of plot objects
+		 * Internal function for creating a Flot canvas
+		 */
+		function _add(options, el_, data_) {
+			el_.addClass(options.canvasClass);
+			var typ = data_.type;
+			log('Adding '+ typ + ' data to flot canvases.');
+			
+			var renderflot = function(height,opts) {
+				var zoptions;
+				if(opts) {zoptions = $.extend(true, {}, this.options, opts);}
+				else {zoptions = this.options;}
+				this.elem.height(height);
+				this.flot = $.plot(this.elem, this.series, zoptions);
+				return this;
+			}
+			
+			data_.elem = el_;
+			data_.render = null;
+			
+			if(typ == 'timeseries') {
+				data_.options = $.extend(true, {}, options.flot_options);
+				data_.options.xaxis.mode = 'time';
+				data_.render = renderflot;
+			}
+			return data_;
+		}
+		
+		/**
+		 * Internal function for rendering flot
+		 */
+		var _render = function(idx) {
+			var all = this.all;
+			if(all.length > 0) {
+				var c = this.current;
+				if(idx!=undefined && idx>=0 && idx < all.length) {
+					c = all[idx];
+				}
+				if(c != this.current) {
+					if(this.current) {
+						this.current.hide();
+					}
+					this.current = c;
+				}
+				c.render(this.height);
+			}
+		}
+		
+		/**
+		 * Internal function for setting up one or more flot plot depending on data.
+		 * It creates the options.canvases object of the form:
+		 * 
+		 * options.canvases = {
+		 * 			all: Array of canvases
+		 * 			height: height of canvas
+		 * 			current: index of current canvas or null
+		 * 			}
 		 */
 		function _set_new_canavases($this,data) {
 			var options = $this[0].options;
-			var elems   = options.elems;
-			var outer     = $('<div></div>');
-			var container = elems.canvas_cont;
-			var c         = container.children();
-			c.fadeOut(options.defaultFade).remove();
-			var outer = $('<div></div>').appendTo(container);
-			var newcanvases = [];
+			var container = options.elems.canvas_cont;
+			container.children().fadeOut(options.defaultFade).remove();
+			var outer = $('<div></div>').appendTo(container).height(container.height());
 			var datac,typ;
-			
-			function _add(el_, data_) {
-				el_.addClass(options.canvasClass);
-				var typ = data_.type;
-				log('Rendering '+ typ + ' data.');
-				
-				var renderflot = function(opts) {
-					var zoptions;
-					if(opts) {zoptions = $.extend(true, {}, this.options, opts);}
-					else {zoptions = this.options;}
-					this.elem.height(container.height());
-					this.flot = $.plot(this.elem, this.series, zoptions);
-					return this;
-				}
-				
-				data_.elem = el_;
-				data_.render = null;
-				
-				newcanvases.push(data_);
-				
-				if(typ == 'timeseries') {
-					data_.options = $.extend(true, {}, options.flot_options);
-					data_.options.xaxis.mode = 'time';
-					data_.render = renderflot;
-				}
-			}
+			options.canvases = {current: null, render: _render};
+			canvases = [];
+			options.canvases.all = canvases; 
 			
 			if(data) {
 				if(data.length == 1) {
-					_add(outer,data[0]);
+					canvases.push(_add(options,outer,data[0]));
 				}
+				/* Setup tabs if data has more than one plot*/
 				else {
+					/* Setup tabs */
 					var cid, cv
 					var ul = $('<ul></ul>').appendTo(outer);
 					$.each(data, function(i,v) {
@@ -276,17 +304,13 @@ $.extend({
 						ul.append($('<li><a href="#' + cid + '">' + v.label + '</a></li>'));
 						cv  = $('<div></div>').attr('id',cid);
 						outer.append(cv);
-						_add(cv,v);
+						canvases.push(_add(options,cv,v));
 					});
-					outer.tabs();
+					outer.tabs(); 
 				}
-				elems.canvas = newcanvases[0];
 			}
-			else {
-				elems.canvas = null;
-			}
-			elems.canvases = newcanvases;
-			render(elems.canvas);
+			options.canvases.height = outer.height()- $('ul',outer).height();
+			options.canvases.render(0);
 		}
 		
 		/**
@@ -472,12 +496,12 @@ $.ecoplot.addEvent({
 ecop.addEvent({
 	id: 'datepicker',
 	register: function($this) {
-		var options = $this[0].options;
-		$('.'+options.inputDateClass,$this).datepicker({
+		var options = $this[0].options.dates;
+		$('.'+options.cn,$this).datepicker({
 			defaultDate: +0,
 			showStatus: true,
 			beforeShowDay: $.datepicker.noWeekends,
-			dateFormat: options.date_format, 
+			dateFormat: options.format, 
 		    firstDay: 1, 
 		    changeFirstDay: false
 		    //statusForDate: highlightToday, 
