@@ -22,6 +22,7 @@ from dsl import parse, merge, dslresult, function_registry, functions
 from data import providers
 import formatters
 Formatters['flot'] = formatters.ToFlot()
+Formatters['jsonvba'] = formatters.ToJsonVba()
 Formatters['csv']  = formatters.ToCsv()
 Formatters['xls']  = formatters.ToXls()
 Formatters['plot'] = formatters.ToPlot()

@@ -20,7 +20,7 @@ class MissingDataProvider(Exception):
 
 def safetodate(dte):
     try:
-        return todate(end)
+        return todate(dte)
     except:
         return None
 

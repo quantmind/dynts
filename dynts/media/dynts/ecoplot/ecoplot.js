@@ -398,7 +398,8 @@ $.extend({
 	 		if(!options.load_url)  {return;}
 	 		var dataplot = _get_data($this);
 	 		if(!dataplot) {return;}
-	 		log("Preparing to send ajax request to " + options.load_url);
+	 		log("Sending ajax request to " + options.load_url);
+	 		log(dataplot.command + ' from ' + dataplot.start + ' end '+ dataplot.end);
 	 		var params   = {
 	 			timestamp: +new Date()
 	 		};

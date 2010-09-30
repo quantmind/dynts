@@ -3,6 +3,7 @@ import cStringIO
 import csv
 from itertools import izip
 
+from ccy import date2juldate
 from dynts.exceptions import FormattingException
 from dynts.backends import istimeseries
 from dynts.utils import asarray
@@ -65,6 +66,23 @@ class ToFlot(BaseFormatter):
                                    points = {'show':serie.points})
                 res.add(serie)
         result.add(res)
+        return result
+
+
+class ToJsonVba(BaseFormatter):
+    '''A JSON Formatter which can be used to serialize data to
+VBA. For unserializing check http://code.google.com/p/vba-json/
+
+The unserializer is also included in the directory extras'''
+    type = 'json'
+    def __call__(self, ts, container = None, type = None, **kwargs):
+        '''Dump timeseries as a JSON string compatible with ``flot``'''
+        from dynts.conf import settings
+        result = container or flot.MultiPlot()
+        if istimeseries(ts):
+            return list(tsiterator(ts,dateconverter=date2juldate))
+        else:
+            raise NotImplementedError
         return result
 
 
