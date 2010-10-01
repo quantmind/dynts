@@ -6,15 +6,15 @@ from itertools import izip
 from ccy import date2juldate
 from dynts.exceptions import FormattingException
 from dynts.backends import istimeseries
-from dynts.utils import asarray
+from dynts.utils import asarray, JSONdatainfo
 
 default_converter = lambda x : x.isoformat()
 
 
-def tsiterator(ts, dateconverter = None):
+def tsiterator(ts, dateconverter = None, desc = None):
     dateconverter = dateconverter or default_converter
     yield ['Date']+ts.names()
-    for dt,value in ts.items():
+    for dt,value in ts.items(desc = desc):
         dt = dateconverter(dt)
         yield [dt]+list(value)
 
@@ -41,7 +41,7 @@ class ToCsv(BaseFormatter):
 class ToFlot(BaseFormatter):
     type = 'json'
     default = True
-    def __call__(self, ts, container = None, type = None, **kwargs):
+    def __call__(self, ts, container = None, desc = False, **kwargs):
         '''Dump timeseries as a JSON string compatible with ``flot``'''
         from dynts.web import flot
         from dynts.conf import settings
@@ -75,15 +75,12 @@ VBA. For unserializing check http://code.google.com/p/vba-json/
 
 The unserializer is also included in the directory extras'''
     type = 'json'
-    def __call__(self, ts, container = None, type = None, **kwargs):
-        '''Dump timeseries as a JSON string compatible with ``flot``'''
-        from dynts.conf import settings
-        result = container or flot.MultiPlot()
+    def __call__(self, ts, container = None, desc = False, **kwargs):
+        '''Dump timeseries as a JSON string VBA-Excel friendly'''
         if istimeseries(ts):
-            return list(tsiterator(ts,dateconverter=date2juldate))
+            return JSONdatainfo(list(tsiterator(ts, dateconverter=date2juldate, desc = desc)))
         else:
             raise NotImplementedError
-        return result
 
 
 class ToXls(BaseFormatter):

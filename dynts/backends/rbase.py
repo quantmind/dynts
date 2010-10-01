@@ -41,14 +41,22 @@ class rts(dynts.TimeSeries,rpyobject):
             ts = self.factory(date, data, raw = raw)
         self._ts = ts
         
-    def keys(self):
+    def keys(self, desc = None):
         '''numpy asarray does not copy data'''
-        return ny.asarray(self.rc('index'))
+        res = ny.asarray(self.rc('index'))
+        if desc == True:
+            return reversed(res)
+        else:
+            return res
         
-    def values(self):
+    def values(self, desc = None):
         '''numpy asarray does not copy data'''
         if self._ts:
-            return ny.asarray(self._ts)
+            res = ny.asarray(self._ts)
+            if desc == True:
+                return reversed(res)
+            else:
+                return res
         else:
             return ny.ndarray([0,0])
         

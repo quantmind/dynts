@@ -25,3 +25,20 @@ class jsonPickler(object):
     
     def loads(self,sobj):
         return json.loads(sobj)
+
+
+class JSONobject(object):
+    pickler = jsonPickler()
+    
+    def todict(self):
+        return self.__dict__.copy()
+    
+    def tojson(self):
+        return self.pickler.dumps(self.todict())
+    
+    
+class JSONdatainfo(JSONobject):
+    
+    def __init__(self, data = None, info = None):
+        self.data = data
+        self.info = info

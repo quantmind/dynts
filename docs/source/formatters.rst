@@ -9,7 +9,7 @@ Let's say we have a time series object ``ts``::
 
 	s = ts.dump('flot')
 	
-check :class:`dynts.TimeSeries.dump`.
+check :class:`dynts.DynData.dump`.
 
 
 Registering Formatters

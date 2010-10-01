@@ -79,18 +79,18 @@ class dslresult(object):
         elif isxy(res):
             self._xy = res
             
-    def dump(self, format):
+    def dump(self, format, **kwargs):
         ts = self.ts()
         xy = self.xy()
         if ts:
-            ts = ts.dump(format)
+            ts = ts.dump(format, **kwargs)
         else:
             ts = None
         if xy:
             if isxy(xy):
                 xy = [xy]
             for el in xy:
-                ts = el.dump(format, container = ts)
+                ts = el.dump(format, container = ts, **kwargs)
         return ts
             
         

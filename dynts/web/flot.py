@@ -1,38 +1,28 @@
 from datetime import datetime, date
 
-from dynts.utils.anyjson import json
+from dynts.utils.anyjson import JSONdatainfo, JSONobject
 
 EPOCH = 1970
 _EPOCH_ORD = date(EPOCH, 1, 1).toordinal()
 
 
-class JsonPlotBase(object):
-    
-    def tojson(self):
-        raise NotImplementedError('Cannot serialize object to JSON string')
-    
-
-class MultiPlot(object):
+class MultiPlot(JSONdatainfo):
     '''Class holding several plots. A plot can be a timeseries or xy-type.'''
-    def __init__(self, flot = None):
-        self.plots = []
-        self.info  = None
+    def __init__(self, flot = None, info = None):
+        super(MultiPlot,self).__init__(data = [], info = info)
         self.add(flot)
         
     def add(self, flot):
         if isinstance(flot,Flot):
-            self.plots.append(flot)
+            self.data.append(flot)
         
     def todict(self):
         return {'type': 'multiplot',
                 'info': self.info,
-                'plots': [plot.todict() for plot in self.plots]}
-    
-    def tojson(self):
-        return json.dumps(self.todict())
+                'plots': [plot.todict() for plot in self.data]}
     
 
-class Flot(object):
+class Flot(JSONobject):
     '''A single plot'''
     allowed_types = ['xy','timeseries']
     def __init__(self, name = '', type = None):
@@ -50,13 +40,9 @@ class Flot(object):
         od = self.__dict__.copy()
         od['series'] = [serie.todict() for serie in self.series]
         return od
-    
-    def tojson(self):
-        m = MultiPlot(flot = self)
-        return m.tojson()    
 
 
-class Serie(object):
+class Serie(JSONobject):
     
     def __init__(self, label = '', data = None, **kwargs):
         self.label = label
@@ -65,10 +51,6 @@ class Serie(object):
         self.data = data
         for k,v in kwargs.items():
             setattr(self,k,v)
-        
-    def todict(self):
-        od = self.__dict__.copy()
-        return od
 
 
 def pydate2flot(dte):

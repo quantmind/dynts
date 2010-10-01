@@ -55,14 +55,20 @@ class TimeSeries(dynts.TimeSeries):
     def __getitem__(self, i):
         return self._data[i]
     
-    def values(self):
-        return self._data
+    def values(self, desc = None):
+        if desc == True:
+            return reversed(self._data)
+        else:
+            return self._data
     
-    def dates(self):
-        return self._date
+    def dates(self, desc = None):
+        if desc == True:
+            return reversed(self._date)
+        else:
+            return self._date
     
-    def keys(self):
-        return self._date
+    def keys(self, desc = None):
+        return self.dates(desc = desc)
     
     def start(self):
         return self._date[0]

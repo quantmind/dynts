@@ -5,8 +5,8 @@ from dynts.utils import laggeddates, ashash, asbtree, asarray
 from dynts.backends.xy import *
 
 
-class TimeSeries(DyntsBase):
-    '''Interface class for timeseries back-ends.
+class TimeSeries(DynData):
+    '''A :class:`dynts.DynData` specialisation for timeseries back-ends.
     
     .. attribute:: type
     
@@ -18,15 +18,14 @@ class TimeSeries(DyntsBase):
     '''
     type = None
     
-    def __init__(self, name = '', date = None, data = None):
-        super(TimeSeries,self).__init__(name)
+    def __init__(self, name = '', date = None, data = None, info = None):
+        super(TimeSeries,self).__init__(name,info)
         self.make(date,data)
     
     def __len__(self):
         return self.shape[0]
     
     def count(self):
-        '''Number of series in the timeseries'''
         return self.shape[1]
     
     def asbtree(self):
@@ -61,43 +60,41 @@ which exposes hash-table like functionalities of ``self``.'''
         '''Calculate returns as delta(log(self))'''
         return self.log().delta(k)
     
-    def dates(self):
+    def dates(self, desc = None):
         '''Returns an iterable over ``datetime.date`` instances in the timeseries.'''
         c = self.dateinverse
-        for key in self.keys():
+        for key in self.keys(desc = desc):
             yield c(key)
             
-    def keys(self):
+    def keys(self, desc = None):
         '''Returns an iterable over ``raw`` keys. The keys may be different from dates
 for same backend implementations.'''
         raise NotImplementedError
             
-    def values(self):
+    def values(self, desc = None):
         '''Returns a ``numpy.ndarray`` containing the values of the timeseries.
 Implementations should try not to copy data if possible. This function
 can be used to access the timeseries as if it was a matrix.'''
         raise NotImplementedError
     
-    def items(self):
+    def items(self, desc = None):
         '''Returns a python ``generator`` which can be used to iterate over
 :func:`dynts.TimeSeries.dates` and :func:`dynts.TimeSeries.values` returning a two dimensional
 tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
-function.'''
-        for d,v in izip(self.dates(),self.values()):
+function. The additional input parameter *desc* can be used to iterate from
+the greatest to the smallest date in the timeseries by passing ''desc=True``'''
+        for d,v in izip(self.dates(desc = desc),self.values(desc = desc)):
             yield d,v
             
     def series(self):
-        '''geneator of timeseries series'''
         data = self.values()
         for c in range(self.count()):
             yield data[:,c]
             
     def serie(self, index):
-        '''Get serie data by column *index*.'''
         return self.values()[:,index]
     
     def display(self):
-        '''Nicely display self on the shell. Useful during prototyping and development.'''
         for d,v in self.items():
             print('%s: %s' % (d,v))
     
