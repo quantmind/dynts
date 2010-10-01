@@ -78,7 +78,8 @@ The unserializer is also included in the directory extras'''
     def __call__(self, ts, container = None, desc = False, **kwargs):
         '''Dump timeseries as a JSON string VBA-Excel friendly'''
         if istimeseries(ts):
-            return JSONdatainfo(list(tsiterator(ts, dateconverter=date2juldate, desc = desc)))
+            return JSONdatainfo(list(tsiterator(ts, dateconverter=date2juldate, desc = desc)),
+                                info = ts.info)
         else:
             raise NotImplementedError
 

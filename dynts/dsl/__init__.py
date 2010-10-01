@@ -58,7 +58,7 @@ class dslresult(object):
         self.unwind()
         return self._xy
         
-    def _unwind(self):    
+    def _unwind(self):
         res = self.expression.unwind(self.data,self.backend)
         self._ts = None
         self._xy = None

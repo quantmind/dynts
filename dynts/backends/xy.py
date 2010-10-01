@@ -19,13 +19,13 @@ class DynData(object):
     '''Base class for data. It has two subclasses: the timeseries interface :class:`dynts.TimeSeries`
 and :class:`dynts.xydata` for 2 dimensional data types.
 An instance of this class contains a dataset of series. Each serie can be seen as an independent entity
-which, nevertheless, can have close tight with other series in the dataset.
+which, nevertheless, can have close tights with other series in the dataset.
 
-    .. attribute:: name
-    
+.. attribute:: name
+
     name of data object.
     
-    .. attribute:: info
+.. attribute:: info
     
     additional information regarding data object.
     
