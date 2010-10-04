@@ -30,7 +30,7 @@ Formatters['plot'] = formatters.ToPlot()
 
 
 def evaluate(expression, start = None, end = None,
-             loader = None, logger = None, backend = None):
+             loader = None, logger = None, backend = None, **kwargs):
     '''Evaluate expression *e*. This and :func:`dynts.parse`
 represent the main entry point of the library.
     
@@ -58,7 +58,7 @@ Typical usage::
         expression = parse(expression)
     symbols = expression.symbols()
     data = providers.load(symbols, start, end, loader = loader,
-                          logger = logger, backend = backend)
+                          logger = logger, backend = backend, **kwargs)
     return dslresult(expression, data, backend = backend)
 
 

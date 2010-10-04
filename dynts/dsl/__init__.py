@@ -82,7 +82,7 @@ class dslresult(object):
     def dump(self, format, **kwargs):
         ts = self.ts()
         xy = self.xy()
-        if ts:
+        if istimeseries(ts):
             ts = ts.dump(format, **kwargs)
         else:
             ts = None

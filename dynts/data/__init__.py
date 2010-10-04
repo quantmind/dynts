@@ -58,7 +58,7 @@ which can be used to customized its behaviour:
     attribute will be passed to the :meth:`dynts.data.TimeSerieLoader.onresult` method.
     '''
     
-    def load(self, providers, symbols, start, end, logger, backend):
+    def load(self, providers, symbols, start, end, logger, backend, **kwargs):
         '''Load symbols data.
         
 * *providers* Dictionary of registered data providers.
@@ -72,6 +72,7 @@ There is no need to override this function, just use one the three hooks
 available.
 '''
         # Preconditioning on dates
+        logger = logger or logging.getLogger(self.__class__.__name__)
         start, end = self.dates(start, end)
         data = {}
         for symbol in symbols:
@@ -80,12 +81,12 @@ available.
             p  = providers.get(provider,None)
             if not p:
                 raise MissingDataProvider('data provider %s not available' % provider)
-            pre = self.preprocess(ticker, start, end, field, p, logger, backend)
+            pre = self.preprocess(ticker, start, end, field, p, logger, backend, **kwargs)
             if pre.intervals:
                 result = None
                 for st,en in pre.intervals:
-                    logger.debug('Loading %s from %s. From %s to %s' % (ticker,provider,st,en))
-                    res = p.load(ticker, st, en, field, logger, backend)
+                    logger.info('Loading %s from %s. From %s to %s' % (ticker,provider,st,en))
+                    res = p.load(ticker, st, en, field, logger, backend, **kwargs)
                     if result is None:
                         result = res
                     else:
@@ -93,10 +94,10 @@ available.
             else:
                 result = pre.result
             # onresult hook
-            result = self.onresult(ticker, field, p, result, logger, backend)
+            result = self.onresult(ticker, field, p, result, logger, backend, **kwargs)
             data[symbol] = result
         # last hook
-        return self.onfinishload(data, logger, backend)
+        return self.onfinishload(data, logger, backend, **kwargs)
     
     def dates(self, start, end):
         '''Pre-conditioning on dates. This function makes sure the *start*
@@ -184,7 +185,7 @@ The inverse of :meth:`dynts.data.TimeSerieLoader.parse_symbol`.'''
         p = '' if d else '%s%s' % (c,provider)
         return '%s%s%s' % (ticker,f,p)
     
-    def preprocess(self, ticker, start, end, field, provider, logger, backend):
+    def preprocess(self, ticker, start, end, field, provider, logger, backend, **kwargs):
         '''Preprocess **hook**. This is first loading hook and it is
 **called before requesting data** from a dataprovider.
 It must return an instance of :attr:`TimeSerieLoader.preprocessdata`.
@@ -199,7 +200,7 @@ otherwise it will be called as many times as the number of intervals in the retu
 '''
         return self.preprocessdata(intervals = ((start, end),))
     
-    def onresult(self, ticker, field, provider, result, logger, backend):
+    def onresult(self, ticker, field, provider, result, logger, backend, **kwargs):
         '''Post-processing **hook** for results returned by
 calls to :func:`dynts.data.DataProvider.load`, or obtained
 from the :meth:`dynts.data.TimeSerieLoader.preprocess` method.
@@ -210,7 +211,7 @@ By default return ``result``::
 It could be used to store data into a cache or database.'''
         return result
     
-    def onfinishload(self, data, logger, backend):
+    def onfinishload(self, data, logger, backend, **kwargs):
         '''Another post-processing **hook** invoked when the loading is finished.
 By default retun *data*.'''
         return data
@@ -220,13 +221,12 @@ class DataProviders(dict):
     proxies = {}
         
     def load(self, symbols, start = None, end = None, loader = None,
-             logger = None,  backend = None):
+             logger = None,  backend = None, **kwargs):
         loader = loader or settings.default_loader or TimeSerieLoader
         backend = backend or settings.backend
-        logger = self.get_logger(logger)
         if isinstance(loader,type):
             loader = loader()
-        return loader.load(self,symbols,start,end,logger,backend)
+        return loader.load(self,symbols,start,end,logger,backend,**kwargs)
     
     def register(self, provider):
         '''Register a new data provider. *provider* must be an instance of

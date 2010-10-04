@@ -48,7 +48,7 @@ class WebCsv(DataProvider):
     def allfields(self, ticker = None):
         return ['Close','Open','Low','High','Volume']
         
-    def load(self, ticker, startdate, enddate, field, logger, backend):
+    def load(self, ticker, startdate, enddate, field, logger, backend, **kwargs):
         data = self.rowdata(ticker, startdate, enddate)
         if not data:
             return
