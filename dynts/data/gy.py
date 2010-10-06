@@ -7,8 +7,6 @@ try:
 except:
     httplib2 = None
 
-from ccy import dateFromString
-
 from dynts.conf import settings
 
 from base import DataProvider
@@ -27,6 +25,7 @@ class WebCsv(DataProvider):
         self.h = None
         
     def string_to_date(self, sdte):
+        from ccy import dateFromString
         return dateFromString(sdte)
     
     def request(self, url):

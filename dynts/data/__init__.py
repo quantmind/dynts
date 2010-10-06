@@ -4,8 +4,6 @@ from datetime import date, timedelta
 from dynts.conf import settings
 from dynts.exceptions import *
 
-from ccy import todate
-
 from gy import DataProvider, google, yahoo
 
 
@@ -19,6 +17,7 @@ class MissingDataProvider(Exception):
 
 
 def safetodate(dte):
+    from ccy import todate
     try:
         return todate(dte)
     except:

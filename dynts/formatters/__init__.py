@@ -3,7 +3,6 @@ import cStringIO
 import csv
 from itertools import izip
 
-from ccy import date2juldate
 from dynts.exceptions import FormattingException
 from dynts.backends import istimeseries
 from dynts.utils import asarray, JSONdatainfo
@@ -77,6 +76,7 @@ The unserializer is also included in the directory extras'''
     type = 'json'
     def __call__(self, ts, container = None, desc = False, **kwargs):
         '''Dump timeseries as a JSON string VBA-Excel friendly'''
+        from ccy import date2juldate
         if istimeseries(ts):
             return JSONdatainfo(list(tsiterator(ts, dateconverter=date2juldate, desc = desc)),
                                 info = ts.info)
