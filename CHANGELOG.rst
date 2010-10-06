@@ -1,6 +1,6 @@
 
-Development
-======================
+Version 0.3 - 2010 October 06
+==================================
 * Added initial support for XY series in :class:`dynts.xydata`.
 * :class:`dynts.TimeSeries` derived from :class:`dynts.DynData`.
 * Added the :attr:`dynts.DynData.info` attribute for storing additional information about data. 

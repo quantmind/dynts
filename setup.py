@@ -96,7 +96,7 @@ setup(
         cmdclass     = cmdclasses,
         data_files   = data_files,
         install_requires = ['ply>3.0',
-                            'ccy>=0.3.8',
+                            'ccy>=0.3.9',
                             'numpy',
                             'rpy2'],
         classifiers = [
