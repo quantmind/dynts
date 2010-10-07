@@ -1,3 +1,6 @@
+Version 0.3.1 - Development
+=================================
+* Bug fix in :mod:`dynts.dsl` which was crashing the parser when using symbol names starting with a numeric value.
 
 Version 0.3 - 2010 October 06
 ==================================

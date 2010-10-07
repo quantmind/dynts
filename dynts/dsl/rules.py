@@ -42,7 +42,6 @@ class rules(object):
               'SPLIT',
               'QUOTE',
               'ID',
-              'BOOL',
               'FUNCTION'
               ] + re.values() 
         return tokens

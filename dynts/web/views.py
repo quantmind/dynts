@@ -16,7 +16,7 @@ The only view available is an Ajax Get response.'''
         request = djp.request
         if not request.is_ajax():
             raise http.Http404
-        sdata = self.econometric_data(dict(request.GET.items()))
+        sdata = self.econometric_data(djp.request, dict(request.GET.items()))
         return http.HttpResponse(sdata, mimetype='application/javascript')
     
     def get_object(self, code):
@@ -28,7 +28,8 @@ The only view available is an Ajax Get response.'''
             except:
                 return None
                 
-    def econometric_data(self, data):
+    def econometric_data(self, request, data):
+        '''Obtain the data'''
         cts    = data.get('command',None)
         start  = data.get('start',None)
         end    = data.get('end',None)
@@ -41,14 +42,14 @@ The only view available is an Ajax Get response.'''
         if end:
             end = dateFromString(str(end))
         try:
-            return self.getdata(cts,start,end)
+            return self.getdata(request,cts,start,end)
         except IOError, e:
             return ''
     
     def codeobject(self, object):
         return str(object)
     
-    def getdata(self,cts,start,end):
+    def getdata(self,request,cts,start,end):
         '''Pure virtual function which needs to be implemented by implementations.
 It retrieve the actual timeseries data.'''
         raise NotImplementedError

@@ -44,6 +44,10 @@ def p_expression_id(p):
     '''expression : ID'''
     p[0] = Symbol(p[1])
     
+def p_expression_id_number1(p):
+    '''expression : NUMBER ID'''
+    p[0] = Symbol('%s%s' % (p[1],p[2]))
+    
 def p_expression_string(p):
     '''expression : QUOTE expression QUOTE'''
     p[0] = String(p[2])
@@ -58,5 +62,5 @@ def p_expression_bad_function(p):
     raise FunctionDoesNotExist(str(p[1]))
 
 def p_error(p):
-    pass
+    raise ExpressionError('Could not parse %s' % p)
     

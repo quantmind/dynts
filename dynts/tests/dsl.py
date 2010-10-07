@@ -2,9 +2,17 @@ import unittest
 from itertools import izip
 
 import dynts
+from dynts import dsl
 
 class TestDsl(unittest.TestCase):
+    names = ['eur','1eur','eu3r','eur4567']
     
+    def testName(self):
+        for name in self.names:
+            res = dynts.parse(name)
+            self.assertTrue(isinstance(res,dsl.Symbol))
+            self.assertEqual(name.upper(),str(res))
+        
     def testBinaryOperation(self):
         res = dynts.parse('2*GOOG')
         self.assertEqual(len(res.children),2)
