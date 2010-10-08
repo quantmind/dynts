@@ -108,4 +108,6 @@ div.econometric-plot .nav-menu ul li a {display: block;
 .econometric-plot table.plot-options td.center {
 	text-align: center;
 }
-	
+.econometric-plot table.plot-options tr.serie-option td {
+	padding-bottom: 7px;
+}

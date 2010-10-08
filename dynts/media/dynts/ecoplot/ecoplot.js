@@ -283,9 +283,12 @@ $.extend({
 				}
 				return $('<td class="center"></td>').append(check);
 			}
+			var circle = 0
 			$.each(data.series, function(i,serie) {
-				var tr = $('<tr class="serie-option"></tr>').appendTo(body);
-				tr.append($('<td>'+serie.label+'</td>'));
+				var trt = $('<tr class="serie-title"></tr>').appendTo(body);
+				var tr  = $('<tr class="serie-option"></tr>').appendTo(body);
+				tr.append($('<td></td>'));
+				trt.append($('<td colspan="6">'+serie.label+'</td>'));
 				tr.append(tdinp('checkbox','show','show',i<=1));
 				tr.append(tdinp('radio','axis'+i,'ax1',serie.xaxis ? serie.xaxis==1 : i==0));
 				tr.append(tdinp('radio','axis'+i,'ax2',serie.xaxis ? serie.xaxis==2 : i>0));
