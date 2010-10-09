@@ -37,7 +37,7 @@ class Flot(JSONobject):
             self.series.append(serie)
         
     def todict(self):
-        od = self.__dict__.copy()
+        od = super(Flot,self).todict()
         od['series'] = [serie.todict() for serie in self.series]
         return od
 

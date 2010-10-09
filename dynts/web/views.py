@@ -29,7 +29,7 @@ The only view available is an Ajax Get response.'''
                 return None
                 
     def econometric_data(self, request, data):
-        '''Obtain the data'''
+        #Obtain the data
         cts    = data.get('command',None)
         start  = data.get('start',None)
         end    = data.get('end',None)
@@ -50,8 +50,8 @@ The only view available is an Ajax Get response.'''
         return str(object)
     
     def getdata(self,request,cts,start,end):
-        '''Pure virtual function which needs to be implemented by implementations.
-It retrieve the actual timeseries data.'''
+        '''Pure virtual function which needs to be implemented.
+It retrieve the actual timeseries data. It must return a JSON string.'''
         raise NotImplementedError
     
     

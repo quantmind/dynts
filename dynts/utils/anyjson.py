@@ -31,7 +31,9 @@ class JSONobject(object):
     pickler = jsonPickler()
     
     def todict(self):
-        return self.__dict__.copy()
+        d = self.__dict__.copy()
+        d.pop('pickler',None)
+        return d
     
     def tojson(self):
         return self.pickler.dumps(self.todict())
