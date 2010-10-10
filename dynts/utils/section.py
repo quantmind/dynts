@@ -1,5 +1,4 @@
 from itertools import izip
-from numpy import array, ndarray
 
 crossoperator = lambda func,*args : [func(*vals) for vals in izip(*args)]
 
@@ -12,6 +11,7 @@ __all__ = ['cross','asarray','ascolumn','assimple',
 
 def asarray(x):
     '''Convert ``x`` into a ``numpy.ndarray``.'''
+    from numpy import array, ndarray
     iterable = scalarasiter(x)
     if isinstance(iterable,ndarray):
         return iterable

@@ -6,7 +6,8 @@ from datetime import date
 from itertools import izip
 
 from dynts import timeseries, evaluate, tsname
-from dynts.utils import populate, datepopulate, randomts, cross, asarray
+from dynts.utils import cross, asarray
+from dynts.utils.populate import populate, datepopulate, randomts
 from dynts.exceptions import *
 
 

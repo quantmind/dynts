@@ -1,7 +1,6 @@
 import os
 import csv
 from urllib import urlopen
-import numpy as ny
 try:
     import httplib2
 except:

@@ -16,7 +16,7 @@ import sys, os
 # If your extensions are in another directory, add it here.
 source_dir = os.path.split(os.path.abspath(__file__))[0]
 sys.path.append(source_dir)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'dummysettings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'dynts.models'
 docs_dir   = os.path.split(source_dir)[0]
 base_dir   = os.path.split(docs_dir)[0]
 sys.path.append(os.path.join(source_dir, "_ext"))

@@ -1,4 +1,5 @@
 from django import http
+
 from djpcms.views import appview
 
 from ccy import date2yyyymmdd, dateFromString
@@ -7,9 +8,10 @@ from ccy import date2yyyymmdd, dateFromString
 def date2yyyymmdd(dte):
     return dte.day + 100*(dte.month + 100*dte.year)
 
+
 class TimeSeriesView(appview.AppView):
-    '''```djpcms``` application view which can be used to obtain timeseries.
-The only view available is an Ajax Get response.'''
+    '''```djpcms``` application view for retriving timeseries data as  JSON string.
+Available as Ajax Get response.'''
     _methods      = ('get',)
     
     def get_response(self, djp):
@@ -49,9 +51,9 @@ The only view available is an Ajax Get response.'''
     def codeobject(self, object):
         return str(object)
     
-    def getdata(self,request,cts,start,end):
-        '''Pure virtual function which needs to be implemented.
-It retrieve the actual timeseries data. It must return a JSON string.'''
+    def getdata(self,request,expression,start,end):
+        '''Pure virtual function which retrives the actual data.
+It must return a JSON string.'''
         raise NotImplementedError
     
     

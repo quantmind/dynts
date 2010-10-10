@@ -55,8 +55,8 @@ Requirements
 =====================
 There are several requirements that must be met:
 
-* python_ 2.4 or later. Note that Python 3 series are not supported yet.
-* numpy_ arrays and matrices.
+* python_ 2.5 or later. Note that Python 3 series are not supported yet.
+* numpy_ for arrays and matrices.
 * ply_ the building block of the DSL_.
 * rpy2_ if an R_ TimeSeries back-end is used (default).
 * ccy_ for date and currency manipulation.
@@ -76,6 +76,7 @@ Optional Requirements
 * xlwt_ to create spreadsheet from timeseries.
 * simplejson_ if python_ version is less then 2.6
 * matplotlib_ for plotting.
+* djpcms_ for the ``web.views`` module.
 
 __ http://sourceforge.net/projects/pywin32/files/
 
@@ -123,3 +124,4 @@ __ http://github.com/quantmind/dynts/issues
 .. _xlwt: http://pypi.python.org/pypi/xlwt
 .. _simplejson: http://pypi.python.org/pypi/simplejson/
 .. _matplotlib: http://matplotlib.sourceforge.net/
+.. _djpcms: http://djpcms.com

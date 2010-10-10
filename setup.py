@@ -36,6 +36,15 @@ mod = get_module()
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+def requirements():
+    req = read('requirements.txt').replace('\r','').split('\n')
+    result = []
+    for r in req:
+        r = r.replace(' ','')
+        if r:
+            result.append(r)
+    return result 
  
 def fullsplit(path, result=None):
     """
@@ -95,7 +104,7 @@ setup(
         packages     = packages,
         cmdclass     = cmdclasses,
         data_files   = data_files,
-        install_requires = read('requirements.rst').split('\r\n'),
+        install_requires = requirements(),
         classifiers = [
             'Development Status :: 3 - Alpha',
             'Environment :: Plugins',

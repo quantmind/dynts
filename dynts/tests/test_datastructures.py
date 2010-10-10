@@ -2,8 +2,8 @@ import unittest
 from itertools import izip
 
 import dynts
-from dynts.utils import populate, skiplist, rollingOperation
-
+from dynts.utils import skiplist, rollingOperation
+from dynts.utils.populate import populate
 
 class RollingFunctionSkipList(unittest.TestCase):
     

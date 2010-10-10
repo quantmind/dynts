@@ -19,32 +19,10 @@ The settings file should contains::
 TimeSeries View
 =======================
 
-.. class:: dynts.web.views.TimeSeriesView
-
-	Derived from :class:`djpcms.views.appview.AppView`.
-	The only response method available is an AJAX_ Get.
-	
-	.. function:: get_response(djp)
-	
-		Returns an HttpResponse object of *mimetype* ``application/javascript``.
-		
-	.. function:: getdata(code, start, end, **kwargs)
-	
-		Pure virtual function which needs to be implemented by implementations.
-		It retrieve the actual timeseries data.
-		
-		* *code* a :ref:`timeseries expressions <dsl-script>` to be evaluated.
-		* *start* start date
-		* *end* end date
-		
-	.. function:: get_object(code)
-	
-		Check if the code is an instance of the view underlying model.
-		If that is the case it returns the object, otherwise it returns ``None``.
-
-	.. function:: codeobject(object)
-		
-		Inverse of :func:`get_object`
+.. autoclass:: dynts.web.views.TimeSeriesView
+   :members:
+   :member-order: bysource
+   
 
 .. _jQuery: http://jquery.com/
 .. _django: http://www.djangoproject.com/

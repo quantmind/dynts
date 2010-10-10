@@ -38,6 +38,7 @@ Contents
    provider/index
    formatters
    internals/index
+   maths/index
    web/index
    changelog
 

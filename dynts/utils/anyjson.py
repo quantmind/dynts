@@ -44,3 +44,4 @@ class JSONdatainfo(JSONobject):
     def __init__(self, data = None, info = None):
         self.data = data
         self.info = info
+        

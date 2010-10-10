@@ -1,9 +1,10 @@
 from bisect import bisect_left, bisect_right
 
-from numpy import ndarray, array
-
 from dynts.conf import settings
+from dynts.utils.section import asarray
 from dynts.exceptions import *
+
+__all__ = ['TimeSerieWrap','asbtree','ashash']
 
 
 class TimeSerieWrap(object):
@@ -51,10 +52,7 @@ has a shortcut method which construct a ``asbtree``. Here is an example::
 '''
     def wrap(self):
         ts = self.ts
-        dates   = ts.dates()
-        if not isinstance(dates,ndarray):
-            dates = array(list(dates))
-        self.dates  = dates
+        self.dates  = asarray(ts.dates())
         self.values = ts.values()
     
     def __len__(self):
