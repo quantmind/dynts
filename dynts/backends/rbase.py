@@ -60,13 +60,13 @@ class rts(dynts.TimeSeries,rpyobject):
         else:
             return ny.ndarray([0,0])
         
-    def lag(self, k = 1):
+    def lag(self, k = 1, **kwargs):
         return self.rcts('lag',k)
     
-    def delta(self, k = 1):
-        return self.rcts('diff',k)
+    def delta(self, lag = 1, name = None, **kwargs):
+        return self.rcts('diff',lag)
     
-    def log(self):
+    def log(self, name = None, **kwargs):
         return self.rcts('log')
     
     def stddev(self):

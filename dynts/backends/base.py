@@ -129,7 +129,8 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
     def colnames(self):
         raise NotImplementedError
     
-    def delta(self, k = 1):
+    def delta(self, lag = 1, **kwargs):
+        '''First order derivative with lag ``k``.'''
         raise NotImplementedError
     
     def lag(self, k = 1):

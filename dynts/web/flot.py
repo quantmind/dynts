@@ -60,7 +60,8 @@ class Serie(JSONobject):
     
     def __init__(self, label = '', data = None,
                  color = None, line = None, point = None,
-                 shadowSize = None, **kwargs):
+                 shadowSize = None, yaxis = 1, xaxis = 1,
+                 **kwargs):
         self.label = label
         if data is None:
             data = []
@@ -70,6 +71,8 @@ class Serie(JSONobject):
         if isinstance(color,basestring):
             if not color.startswith('#'):
                 color = '#%s' % color
+        self.xaxis = xaxis
+        self.yaxis = yaxis
         if color:
             self.color = color
         if line:

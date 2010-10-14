@@ -2,17 +2,6 @@ from dynts.dsl import FunctionBase
 from dynts import TimeSeries
 
 
-class Delta(FunctionBase):
-    def __call__(self, data, step = 1):
-        pass
-    
-    
-class Log(FunctionBase):
-    def __call__(self, data, step = 1):
-        for k,v in data:
-            yield k,log(v)
-
-
 class ScalarFunction(FunctionBase):
     abstract = True
     def __call__(self, args, window = 20, **kwargs):
@@ -23,6 +12,17 @@ class ScalarFunction(FunctionBase):
             result.append(ts)
         if result:
             return result if len(result)>1 else result[0]
+        
+
+class Log(ScalarFunction):
+    """Delta"""
+    def apply(self, ts, **kwargs):
+        return ts.log(**kwargs)
+    
+class Delta(ScalarFunction):
+    """Delta"""
+    def apply(self, ts, **kwargs):
+        return ts.delta(**kwargs)
 
 
 class Ma(ScalarFunction):

@@ -117,14 +117,14 @@ class TimeSeries(dynts.TimeSeries):
             hash[dt] = mdt(dt)
         return hash.getts()
     
-    def log(self):
-        pass
+    def log(self, name = None, **kwargs):
+        raise NotImplementedError
     
-    def delta(self, k = 1, name = None):
-        self.precondition(k<len(self) and k > 0,dynts.DyntsOutOfBound)
-        v = self._data[k:] - self._data[:-k]
-        name = name or 'delta(%s,%s)' % (self.name,k)
-        return self.clone(self._date[k:],v,name)
+    def delta(self, lag = 1, name = None, **kwargs):
+        self.precondition(lag<len(self) and lag > 0,dynts.DyntsOutOfBound)
+        v = self._data[lag:] - self._data[:-lag]
+        name = name or 'delta(%s,%s)' % (self.name,lag)
+        return self.clone(self._date[lag:],v,name)
     
     def _rollapply(self, func, window = 20, **kwargs):
         fs = _functions.get(func,None)

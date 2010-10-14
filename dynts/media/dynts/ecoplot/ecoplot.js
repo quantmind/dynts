@@ -269,12 +269,12 @@ $.extend({
 		}
 		
 		/**
-		 * Create the editing pannel for data
+		 * Create the editing panel for data
 		 */
 		function _editpannel(data, oldcanvas) {
 			var table = $('<table class="plot-options"></table>');
 			var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
-			head.html('<th>serie</th><th>show</th><th>ax1</th><th>ax2</th><th>line</th><th>points</th>');
+			head.html('<th>serie</th><th>show</th><th>y-axis1</th><th>y-axis2</th><th>line</th><th>points</th>');
 			var body = $('<tbody></tbody>').appendTo(table);
 			var tdinp = function (type,name,value,checked) {
 				var check = $('<input type="'+type+'" name="'+name+'" value="'+value+'">');
@@ -286,6 +286,9 @@ $.extend({
 			var circle = 0
 			$.each(data.series, function(i,serie) {
 				var lines = serie.lines;
+				if(circle>1) {
+					circle = 0
+				}
 				if(lines) {
 					if(lines.show == null) {
 						lines.show = i<=1;
@@ -295,15 +298,16 @@ $.extend({
 					lines = {show: i<=1};
 					serie.lines = lines;
 				}
-				var trt = $('<tr class="serie-title"></tr>').appendTo(body);
-				var tr  = $('<tr class="serie-option"></tr>').appendTo(body);
+				var trt = $('<tr class="line'+circle+' serie-title"></tr>').appendTo(body);
+				var tr  = $('<tr class="line'+circle+' serie-option"></tr>').appendTo(body);
 				tr.append($('<td></td>'));
-				trt.append($('<td colspan="6">'+serie.label+'</td>'));
+				trt.append($('<td class="label" colspan="6">'+serie.label+'</td>'));
 				tr.append(tdinp('checkbox','show','show',lines.show));
-				tr.append(tdinp('radio','axis'+i,'ax1',serie.xaxis ? serie.xaxis==1 : i==0));
-				tr.append(tdinp('radio','axis'+i,'ax2',serie.xaxis ? serie.xaxis==2 : i>0));
+				tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis==1 : i==0));
+				tr.append(tdinp('radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis==2 : i>0));
 				tr.append(tdinp('checkbox','line','line', serie.lines ? serie.lines.show : true));
 				tr.append(tdinp('checkbox','points','points', serie.points ? serie.points.show : false));
+				circle += 1
 			});
 			table.click(function() {
 				data.render();
@@ -333,7 +337,7 @@ $.extend({
 					var el = $(this);
 					if($("input[name='show']",el).attr('checked')) {
 						var serie = series[i];
-						if($("input[value='ax1']",el).attr("checked")) {
+						if($("input[value='y-ax1']",el).attr("checked")) {
 							serie.yaxis = 1;
 						}
 						else {
