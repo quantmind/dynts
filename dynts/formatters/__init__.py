@@ -40,21 +40,24 @@ class ToCsv(BaseFormatter):
 class ToFlot(BaseFormatter):
     type = 'json'
     default = True
-    def __call__(self, ts, container = None, desc = False, **kwargs):
+    def __call__(self, ts, container = None, desc = False, series_info = None, **kwargs):
         '''Dump timeseries as a JSON string compatible with ``flot``'''
         from dynts.web import flot
         from dynts.conf import settings
         result = container or flot.MultiPlot()
+        df = {}
+        series_info = series_info or df
         if istimeseries(ts):
-            res = flot.Flot(ts.name, type = 'timeseries')
+            res = flot.Flot(ts.name, type = 'timeseries', **series_info)
             dates  = asarray(ts.dates())
             missing = settings.ismissing
             for name,serie in izip(ts.names(),ts.series()):
+                info = series_info.get(name,df) 
                 data = []
                 for dt,val in izip(dates,serie):
                     if not missing(val):
                         data.append([flot.pydate2flot(dt),val])
-                serie = flot.Serie(label = name, data = data)
+                serie = flot.Serie(label = name, data = data, **info)
                 res.add(serie)
         else:
             res = flot.Flot(ts.name)

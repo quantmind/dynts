@@ -271,7 +271,7 @@ $.extend({
 		/**
 		 * Create the editing pannel for data
 		 */
-		function _editpannel(data) {
+		function _editpannel(data, oldcanvas) {
 			var table = $('<table class="plot-options"></table>');
 			var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
 			head.html('<th>serie</th><th>show</th><th>ax1</th><th>ax2</th><th>line</th><th>points</th>');
@@ -285,11 +285,21 @@ $.extend({
 			}
 			var circle = 0
 			$.each(data.series, function(i,serie) {
+				var lines = serie.lines;
+				if(lines) {
+					if(lines.show == null) {
+						lines.show = i<=1;
+					}
+				}
+				else {
+					lines = {show: i<=1};
+					serie.lines = lines;
+				}
 				var trt = $('<tr class="serie-title"></tr>').appendTo(body);
 				var tr  = $('<tr class="serie-option"></tr>').appendTo(body);
 				tr.append($('<td></td>'));
 				trt.append($('<td colspan="6">'+serie.label+'</td>'));
-				tr.append(tdinp('checkbox','show','show',i<=1));
+				tr.append(tdinp('checkbox','show','show',lines.show));
 				tr.append(tdinp('radio','axis'+i,'ax1',serie.xaxis ? serie.xaxis==1 : i==0));
 				tr.append(tdinp('radio','axis'+i,'ax2',serie.xaxis ? serie.xaxis==2 : i>0));
 				tr.append(tdinp('checkbox','line','line', serie.lines ? serie.lines.show : true));
@@ -304,7 +314,7 @@ $.extend({
 		/**
 		 * Internal function for creating a Flot canvas
 		 */
-		function _add(options, el_, data_) {
+		function _add(options, el_, data_, oldcanvas) {
 			el_.addClass(options.canvasClass);
 			var typ = data_.type;
 			log('Adding '+ typ + ' data to flot canvases.');
@@ -329,6 +339,7 @@ $.extend({
 						else {
 							serie.yaxis = 2;
 						}
+						serie.lines.show = true;
 						adata.push(serie);
 					}
 				});
@@ -338,8 +349,8 @@ $.extend({
 			
 			data_.elem = el_;
 			data_.render = renderflot;
-			data_.options = $.extend(true, {}, options.flot_options);
-			data_.edit = _editpannel(data_);
+			data_.options = $.extend(true, {}, options.flot_options, data_.options);
+			data_.edit = _editpannel(data_, oldcanvas);
 			if(typ == 'timeseries') {
 				data_.options.xaxis.mode = 'time';
 			}
@@ -389,13 +400,22 @@ $.extend({
 			container.children().fadeOut(options.defaultFade).remove();
 			var outer = $('<div></div>').appendTo(container).height(container.height());
 			var datac,typ;
+			var oldcanvases  = options.canvases || []; 
 			options.canvases = {current: null, render: _render};
 			canvases = [];
 			options.canvases.all = canvases; 
 			
 			if(data) {
+				var c = 0;
 				if(data.length == 1) {
-					canvases.push(_add(options,outer,data[0]));
+					if(oldcanvases.length > c) {
+						oldcanvas = oldcanvases[c];
+						c += 1;
+					}
+					else {
+						oldcanvas = null;
+					}
+					canvases.push(_add(options,outer,data[0],oldcanvas));
 				}
 				/* Setup tabs if data has more than one plot*/
 				else {

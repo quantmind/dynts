@@ -7,12 +7,22 @@ _EPOCH_ORD = date(EPOCH, 1, 1).toordinal()
 
 
 class MultiPlot(JSONdatainfo):
-    '''Class holding several plots. A plot can be a timeseries or xy-type.'''
+    '''Class holding several :class:`dynts.web.flot.Flot` instances.
+    
+    .. attribute:: plots
+    
+        list of :class:`dynts.web.flot.Flot` instances.
+        
+    .. attribute:: info
+    
+        Additional serialisable data
+    '''
     def __init__(self, flot = None, info = None):
         super(MultiPlot,self).__init__(data = [], info = info)
         self.add(flot)
         
     def add(self, flot):
+        '''Add a new :class:`dynts.web.flot.Flot` instance to :attr:`dynts.web.flot.MultiPlot.plots`.'''
         if isinstance(flot,Flot):
             self.data.append(flot)
         
@@ -23,14 +33,18 @@ class MultiPlot(JSONdatainfo):
     
 
 class Flot(JSONobject):
-    '''A single plot'''
+    '''A single plot which can be a timeseries or a XY plot.'''
     allowed_types = ['xy','timeseries']
-    def __init__(self, name = '', type = None):
+    def __init__(self, name = '', type = None, shadowSize = None, **kwargs):
         if type not in self.allowed_types:
             type = 'xy'
         self.name   = name
         self.type   = type
         self.series = []
+        df = {}
+        self.options = df
+        if shadowSize:
+            df['shadowSize'] = shadowSize
         
     def add(self, serie):
         if isinstance(serie,Serie):
@@ -44,13 +58,26 @@ class Flot(JSONobject):
 
 class Serie(JSONobject):
     
-    def __init__(self, label = '', data = None, **kwargs):
+    def __init__(self, label = '', data = None,
+                 color = None, line = None, point = None,
+                 shadowSize = None, **kwargs):
         self.label = label
         if data is None:
             data = []
         self.data = data
         for k,v in kwargs.items():
             setattr(self,k,v)
+        if isinstance(color,basestring):
+            if not color.startswith('#'):
+                color = '#%s' % color
+        if color:
+            self.color = color
+        if line:
+            self.lines = line
+        if point:
+            self.points = point
+        if shadowSize:
+            self.shadowSize = shadowSize
 
 
 def pydate2flot(dte):

@@ -19,6 +19,7 @@ Contents
    :maxdepth: 1
    
    ecoplot
+   flot
    plugin
 
 __ http://www.djangoproject.com/

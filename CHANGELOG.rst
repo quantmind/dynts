@@ -1,3 +1,9 @@
+Development
+==================
+* Added ``series_info`` parameter to :ref:`flot formatter <formatters-flot>`.
+* :ref:`Ecoplot plugin <ecoplot-web>` handles series options from server.
+* More documentation.
+
 Version 0.3.1 - 2010 October 10
 =================================
 * Removed all dependencies from ``setup`` module.
