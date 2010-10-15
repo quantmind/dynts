@@ -14,6 +14,7 @@
     		var url  = $('a',el).attr('href');
     		var height = parseInt($('.height',el).html());
     		var item = $('.item',el);
+    		var dshow = $('.show',el);
     		el.height(height);
     		var cmline;
     		if(item.length) {
@@ -31,14 +32,18 @@
     		if(info) {
     			elems_ = {'info': info};
     		}
+    		var options = {
+        			load_url:		url,
+        			commandline:    cmline,
+        			elems:		    elems_,
+        			flot_options:   poptions,
+        			parse: 		    parsedata
+        		}; 
+    		if(!dshow.length) {
+    			options.showplot = function(i) {return i<=1;}
+    		}
 
-    		el.ecoplot({
-    			load_url:		url,
-    			commandline:    cmline,
-    			elems:		    elems_,
-    			flot_options:   poptions,
-    			parse: 		    parsedata
-    		});
+    		el.ecoplot(options);
     	});
     }
 

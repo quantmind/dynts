@@ -1,3 +1,109 @@
+/*
+ * jQuery Hotkeys Plugin
+ * Copyright 2010, John Resig
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ *
+ * Based upon the plugin by Tzury Bar Yochay:
+ * http://github.com/tzuryby/hotkeys
+ *
+ * Original idea by:
+ * Binny V A, http://www.openjs.com/scripts/events/keyboard_shortcuts/
+*/
+
+(function(jQuery){
+	
+	/* Add hotkeys plugin if not already available
+	 *
+	 */
+	if(!jQuery.hotkeys) {
+		
+		jQuery.hotkeys = {
+			version: "0.8",
+	
+			specialKeys: {
+				8: "backspace", 9: "tab", 13: "return", 16: "shift", 17: "ctrl", 18: "alt", 19: "pause",
+				20: "capslock", 27: "esc", 32: "space", 33: "pageup", 34: "pagedown", 35: "end", 36: "home",
+				37: "left", 38: "up", 39: "right", 40: "down", 45: "insert", 46: "del", 
+				96: "0", 97: "1", 98: "2", 99: "3", 100: "4", 101: "5", 102: "6", 103: "7",
+				104: "8", 105: "9", 106: "*", 107: "+", 109: "-", 110: ".", 111 : "/", 
+				112: "f1", 113: "f2", 114: "f3", 115: "f4", 116: "f5", 117: "f6", 118: "f7", 119: "f8", 
+				120: "f9", 121: "f10", 122: "f11", 123: "f12", 144: "numlock", 145: "scroll", 191: "/", 224: "meta"
+			},
+		
+			shiftNums: {
+				"`": "~", "1": "!", "2": "@", "3": "#", "4": "$", "5": "%", "6": "^", "7": "&", 
+				"8": "*", "9": "(", "0": ")", "-": "_", "=": "+", ";": ": ", "'": "\"", ",": "<", 
+				".": ">",  "/": "?",  "\\": "|"
+			}
+		};
+	
+		function keyHandler( handleObj ) {
+			// Only care when a possible input has been specified
+			if ( typeof handleObj.data !== "string" ) {
+				return;
+			}
+			
+			var origHandler = handleObj.handler,
+				keys = handleObj.data.toLowerCase().split(" ");
+		
+			handleObj.handler = function( event ) {
+				// Don't fire in text-accepting inputs that we didn't directly bind to
+				if ( this !== event.target && (/textarea|select/i.test( event.target.nodeName ) ||
+					 event.target.type === "text") ) {
+					return;
+				}
+				
+				// Keypress represents characters, not special keys
+				var special = event.type !== "keypress" && jQuery.hotkeys.specialKeys[ event.which ],
+					character = String.fromCharCode( event.which ).toLowerCase(),
+					key, modif = "", possible = {};
+	
+				// check combinations (alt|ctrl|shift+anything)
+				if ( event.altKey && special !== "alt" ) {
+					modif += "alt+";
+				}
+	
+				if ( event.ctrlKey && special !== "ctrl" ) {
+					modif += "ctrl+";
+				}
+				
+				// TODO: Need to make sure this works consistently across platforms
+				if ( event.metaKey && !event.ctrlKey && special !== "meta" ) {
+					modif += "meta+";
+				}
+	
+				if ( event.shiftKey && special !== "shift" ) {
+					modif += "shift+";
+				}
+	
+				if ( special ) {
+					possible[ modif + special ] = true;
+	
+				} else {
+					possible[ modif + character ] = true;
+					possible[ modif + jQuery.hotkeys.shiftNums[ character ] ] = true;
+	
+					// "$" can be triggered as "Shift+4" or "Shift+$" or just "$"
+					if ( modif === "shift+" ) {
+						possible[ jQuery.hotkeys.shiftNums[ character ] ] = true;
+					}
+				}
+	
+				for ( var i = 0, l = keys.length; i < l; i++ ) {
+					if ( possible[ keys[i] ] ) {
+						return origHandler.apply( this, arguments );
+					}
+				}
+			};
+		}
+	
+		jQuery.each([ "keydown", "keyup", "keypress" ], function() {
+			jQuery.event.special[ this ] = { add: keyHandler };
+		});
+	}
+
+})( jQuery );
+
 /* 
  * Econometric Ploting Plugin for jQuery
  * 
@@ -29,12 +135,14 @@
     
     The most common options are:
     
-    	* flot_options: Object containing Flot-specific options
-    	* dates: Object for specifying how dates are displayed
+    * flot_options: Object containing Flot-specific options
+    * dates: Object for specifying how dates are displayed
 */
-
+	
 $.extend({
 	ecoplot: new function() {
+		var _version	   = "0.2";
+		var _plugin_class  = "econometric-plot";
 		var extraTools     = {};
 		var events         = {};
 		var menubar		   = {};
@@ -46,31 +154,28 @@ $.extend({
 		};
 		
 		var default_command_line = {
-		    css:		 null,
-		    show:		 true,
-		    symbol:	 	 null,
+		    css:null,
+		    show:true,
+		    symbol:null
 		};
 		
-		var showPannel = function(p,el) {
-			$('.secondary .pannel').hide();
-			el.options.elems.body.addClass('with-pannel');
+		var showPanel = function(p,el) {
+			$('.secondary .panel').hide();
 			if(p) {
+				el.options.elems.body.addClass('with-panel');
 				p.show();
 			}
-			c = el.options.canvases;
-			if(c) {
-				if(c.render()) {
-					p.html('').append(c.current.edit);
-				}
-			}
-		}
-		var hidePannel = function(p,el) {
-			$('.secondary .pannel').hide();
-			el.options.elems.body.removeClass('with-pannel');
 			if(el.options.canvases) {
 				el.options.canvases.render();
 			}
-		}
+		};
+		var hidePanel = function(name,el) {
+			$('.secondary .panel').hide();
+			el.options.elems.body.removeClass('with-panel');
+			if(el.options.canvases) {
+				el.options.canvases.render();
+			}
+		};
 		
 		var default_toolbar = [
 		        {
@@ -84,8 +189,8 @@ $.extend({
 								pl.render();
 							}
 						});
-		        	}
-				},
+		            }
+			    },
 				{
 					classname: 'reload',
 					title: "Refresh data",
@@ -93,8 +198,7 @@ $.extend({
 					decorate: function(b,el) {
 						var $this = $(el);
 						b.click(function(e) {
-							$this.trigger('pre-reload',[this, $this]);
-							$.ecoplot.loadData($this);
+							$this.trigger('load',[$this, this]);
 						});
 					}
 				},
@@ -104,14 +208,21 @@ $.extend({
 					icon: "ui-icon-image",
 					type: "checkbox",
 					decorate: function(b,el) {
-						var options = el.options.elems.options;
 						b.toggle(
-								function() {showPannel(options,el);},
-								function() {hidePannel(options,el);}
+								function() {
+									if(el.options.canvases) {
+										showPanel(el.options.canvases.current.panel,el);
+									}
+								},
+								function() {
+									if(el.options.canvases) {
+										hidePanel(el.options.canvases.current.panel,el);
+									}
+								}
 						);
 					}
 				}
-				]
+				];
 		
 		this.siteoptions = siteoptions;
 		
@@ -128,6 +239,7 @@ $.extend({
 			command:		{show: true, entry: null},
 			toolbar:		default_toolbar,
 			commandline:	default_command_line,
+			showplot:		function(i) {return true;},
 			requestParams: 	{},
 			show_tooltip:	true,
 		    autoload:		true,
@@ -139,15 +251,14 @@ $.extend({
 		    paginate:		null,
 		    infoPanel:		'ecoplot-info',
 		    defaultFade:	300,
-		    actions:		 ['zoom', 'datepicker', 'tooltip'],
 		    default_month_interval: 12,
 		    classname:		 'ts-plot-module',
 		    errorClass:		 'dataErrorMessage',
 		    canvasClass:	 'ts-plot-module-canvas',
 		    convasContClass: 'ts-plot-module-canvas-container',
 		    startLoading:	function($this) {
-		    	var co = this.elems;
-		    	co.loader.css({'display':'block'});
+				var co = this.elems;
+				co.loader.css({'display':'block'});
 				co.canvas_cont.css({'opacity':'0.4'});
 		    },
 			stopLoading: 	function($this) {
@@ -165,8 +276,6 @@ $.extend({
 			if(debug) {
 				if (typeof console != "undefined" && typeof console.debug != "undefined") {
 					console.log('$.ecoplot: '+ s);
-				} else {
-					//alert(s);
 				}
 			}
 		}
@@ -200,7 +309,7 @@ $.extend({
 		}
 		
 		/**
-		 * Set default dates in the date pannel.
+		 * Set default dates in the date panel.
 		 */
 		function _set_default_dates($this)  {
 			var options = $this[0].options;
@@ -237,7 +346,7 @@ $.extend({
 		 * Register ecoplot events
 		 */
 		function _registerEvents($this) {
-			var opt = $this[0].options
+			var opt = $this[0].options;
 			var elems = opt.elems;
 			
 			$(window).resize(function() {
@@ -246,19 +355,15 @@ $.extend({
 				}
 	        });
 			
-			var actions = $this[0].options.actions;
-			$.each(actions, function(i,v) {
-				var eve = events[v];
-				if(eve) {
-					log('Registering event '+v);
-					eve.register($this);
-				}
+			$.each(events, function(id,eve) {
+				log('Registering event '+id);
+				eve.register($this);
     		});
     	}
 		
 		function _get_data($this)  {
 			var opt = $this[0].options;
-			var ticker = opt.elems.commandline.val()
+			var ticker = opt.elems.commandline.val();
 			if(!ticker) {return null;}
 			return {
 				start: opt.dates.start.val(),
@@ -269,59 +374,100 @@ $.extend({
 		}
 		
 		/**
-		 * Create the editing panel for data
+		 * Create the editing panel for a given Flot canvas
 		 */
-		function _editpannel(data, oldcanvas) {
-			var table = $('<table class="plot-options"></table>');
-			var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
-			head.html('<th>serie</th><th>show</th><th>y-axis1</th><th>y-axis2</th><th>line</th><th>points</th>');
-			var body = $('<tbody></tbody>').appendTo(table);
+		function _editpanel(data, showplot, oldcanvas) {
+			// check if oldcanvas is the same. If so keep it!
+			var newcanvas = data;
+			var table = null;
+			var body  = null;
+			var oldbody = null;
+			var oseries = [];
+			if(!oldcanvas) {
+				log('Creating editing panel.');
+				table = $('<table class="plot-options"></table>');
+				var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
+				head.html('<th>serie</th><th>show</th><th>y-axis1</th><th>y-axis2</th><th>line</th><th>points</th>');
+				body = $('<tbody></tbody>').appendTo(table);
+				table.click(function() {
+					data.render();
+				});
+			}
+			else {
+				table = oldcanvas.edit;
+				body = $('tbody',table).html('');
+				oseries = oldcanvas.series;
+			}
+			
 			var tdinp = function (type,name,value,checked) {
 				var check = $('<input type="'+type+'" name="'+name+'" value="'+value+'">');
 				if(checked) {
 					check.attr('checked',true);
 				}
 				return $('<td class="center"></td>').append(check);
-			}
-			var circle = 0
-			$.each(data.series, function(i,serie) {
-				var lines = serie.lines;
-				if(circle>1) {
-					circle = 0
-				}
-				if(lines) {
-					if(lines.show == null) {
-						lines.show = i<=1;
+			};
+			var checkmedia = function(med,show) {
+				if(med) {
+					if(med.show === undefined) {
+						med.show = show;
 					}
 				}
 				else {
-					lines = {show: i<=1};
-					serie.lines = lines;
+					med = {show: show};
 				}
-				var trt = $('<tr class="line'+circle+' serie-title"></tr>').appendTo(body);
-				var tr  = $('<tr class="line'+circle+' serie-option"></tr>').appendTo(body);
+				return med;
+			};
+			var circle = 0;
+			$.each(data.series, function(i,serie) {
+				var oserie = null;
+				if(oseries.length > i) {
+					var os = oseries[i];
+					if(serie.label === os.label) {
+						oserie = os;
+					}
+				}
+				if(circle>1) {
+					circle = 0;
+				}
+				if(!oserie) {
+					serie.lines  = checkmedia(serie.lines,showplot(i));
+					serie.points = checkmedia(serie.points,false);
+					serie.bars   = checkmedia(serie.bars,false);
+				}
+				else {
+					serie.lines = oserie.lines;
+					serie.points = oserie.points;
+					serie.bars = oserie.bars;
+					serie.yaxis = oserie.yaxis;
+					serie.xaxis = oserie.xaxis;
+				}
+				var trt = $('<tr class="line'+circle+' serie'+i+' serie-title"></tr>').appendTo(body);
+				var tr  = $('<tr class="line'+circle+' serie'+i+' serie-option"></tr>').appendTo(body);
 				tr.append($('<td></td>'));
 				trt.append($('<td class="label" colspan="6">'+serie.label+'</td>'));
-				tr.append(tdinp('checkbox','show','show',lines.show));
-				tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis==1 : i==0));
+				tr.append(tdinp('checkbox','show','show',serie.lines.show || serie.points.show || serie.bars.show));
+				tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis==1 : i===0));
 				tr.append(tdinp('radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis==2 : i>0));
-				tr.append(tdinp('checkbox','line','line', serie.lines ? serie.lines.show : true));
-				tr.append(tdinp('checkbox','points','points', serie.points ? serie.points.show : false));
-				circle += 1
-			});
-			table.click(function() {
-				data.render();
+				tr.append(tdinp('checkbox','line','line', serie.lines.show));
+				tr.append(tdinp('checkbox','points','points', serie.points.show));
+				circle += 1;
 			});
 			return table;
 		}
 		
 		/**
-		 * Internal function for creating a Flot canvas
+		 * Internal function for adding a new Flot canvas
 		 */
-		function _add(options, el_, data_, oldcanvas) {
+		function _add(options, el_, data_, oldcanvas, panel) {
 			el_.addClass(options.canvasClass);
 			var typ = data_.type;
 			log('Adding '+ typ + ' data to flot canvases.');
+			if(typ == "timeseries") {
+				typ = "time";
+			}
+			else {
+				typ = null;
+			}
 			
 			var renderflot = function(height,opts) {
 				var zoptions;
@@ -343,24 +489,31 @@ $.extend({
 						else {
 							serie.yaxis = 2;
 						}
-						serie.lines.show = true;
-						adata.push(serie);
+						serie.lines.show = $("input[name='line']",el).attr('checked');
+						serie.points.show = $("input[name='points']",el).attr('checked');
+						adata.push(serie); 
 					}
 				});
 				this.flot = $.plot(this.elem, adata, zoptions);
 				return this;
-			}
+			};
 			
-			data_.elem = el_;
-			data_.render = renderflot;
-			data_.options = $.extend(true, {}, options.flot_options, data_.options);
-			data_.edit = _editpannel(data_, oldcanvas);
-			if(typ == 'timeseries') {
-				data_.options.xaxis.mode = 'time';
+			var showplot = options.showplot;
+			if(oldcanvas && oldcanvas.options.xaxis.mode === typ) {
+				oldcanvas.name = data_.name;
+				oldcanvas.edit = _editpanel(data_,showplot,oldcanvas);
+				oldcanvas.series = data_.series;
+				data_ = oldcanvas;
 			}
 			else {
-				data_.options.xaxis.mode = null;
+				data_.panel  = panel;
+				data_.render = renderflot;
+				data_.options = $.extend(true, {}, options.flot_options, data_.options);
+				data_.options.xaxis.mode = typ;
+				data_.edit = _editpanel(data_,showplot);
+				panel.html('').append($('<h2>Series options</h2>')).append(data_.edit);
 			}
+			data_.elem   = el_;
 			return data_;
 		}
 		
@@ -371,7 +524,7 @@ $.extend({
 			var all = this.all;
 			if(all.length > 0) {
 				var c = this.current;
-				if(idx!=undefined && idx>=0 && idx < all.length) {
+				if(idx!==undefined && idx>=0 && idx < all.length) {
 					c = all[idx];
 				}
 				if(c != this.current) {
@@ -386,7 +539,7 @@ $.extend({
 			else {
 				return false;
 			}
-		}
+		};
 		
 		/**
 		 * Internal function for setting up one or more flot plot depending on data.
@@ -404,34 +557,45 @@ $.extend({
 			container.children().fadeOut(options.defaultFade).remove();
 			var outer = $('<div></div>').appendTo(container).height(container.height());
 			var datac,typ;
-			var oldcanvases  = options.canvases || []; 
-			options.canvases = {current: null, render: _render};
+			var oldcanvases  = options.canvases; 
+			options.canvases = {current: null,
+								render: _render};
 			canvases = [];
-			options.canvases.all = canvases; 
+			options.canvases.all = canvases;
+			
+			var optpanel = function(c) {
+				// create options pnel if not available
+				var cn = 'option'+c;
+				var opt = $('.secondary .panel.'+cn,$this);
+				if(!opt.length) {
+					var holder = $('.secondary',$this);
+					opt = $('<div class = "panel '+cn+'"></div>').appendTo(holder);
+				}
+				return opt;
+			};
+			var oldcanvas = function(c) {
+				if(oldcanvases) {
+					if(oldcanvases.all.length > c) {
+						return oldcanvases.all[c];
+					}
+				}
+			};
 			
 			if(data) {
-				var c = 0;
 				if(data.length == 1) {
-					if(oldcanvases.length > c) {
-						oldcanvas = oldcanvases[c];
-						c += 1;
-					}
-					else {
-						oldcanvas = null;
-					}
-					canvases.push(_add(options,outer,data[0],oldcanvas));
+					canvases.push(_add(options,outer,data[0],oldcanvas(0),optpanel(0)));
 				}
 				/* Setup tabs if data has more than one plot*/
 				else {
 					/* Setup tabs */
-					var cid, cv
+					var cid, cv;
 					var ul = $('<ul></ul>').appendTo(outer);
 					$.each(data, function(i,v) {
 						cid = 'canvas' + i;
 						ul.append($('<li><a href="#' + cid + '">' + v.name + '</a></li>'));
 						cv  = $('<div></div>').attr('id',cid);
 						outer.append(cv);
-						canvases.push(_add(options,cv,v));
+						canvases.push(_add(options,cv,v,oldcanvas(i),optpanel(i)));
 					});
 					outer.tabs({
 						show: function(event,ui) {
@@ -454,7 +618,7 @@ $.extend({
 		 * }
 		 */
 		function _finaliseLoad($this,data) {
-			var options = $this[0].options
+			var options = $this[0].options;
 			var elems = options.elems;
 			if(elems.info) {
 				elems.info.html("");
@@ -504,7 +668,7 @@ $.extend({
 							}
 							catch(e) {
 								ok = false;
-								log("Failed to parse data. " + e);
+								log("Failed to parse. Error in line " + e.lineNumber + ": " + e);
 							}
 						}
 						options.stopLoading($this);
@@ -512,8 +676,8 @@ $.extend({
 							try {
 								_finaliseLoad($this,data);
 							}
-							catch(e) {
-								log("Failed to plot data. " + e);
+							catch(e2) {
+								log("Failed to data. Error in line " + e2.lineNumber + ": " + e2);
 							}
 						}
 					}
@@ -525,8 +689,10 @@ $.extend({
 		 */
 		function _construct(options_) {
 			return this.each(function(i) {
-				var options = _parseOptions(options_, $.ecoplot.defaults);
-				var $this = $(this).attr({'id':options.classname+"_"+i});
+				var eco = $.ecoplot;
+				var cln = eco.plugin_class;
+				var options = _parseOptions(options_, eco.defaults);
+				var $this = $(this).attr({'id':cln+"_"+i}).addClass(eco);
 				this.options = options;
 				$this.hide().html("");
 				
@@ -541,7 +707,7 @@ $.extend({
 				_registerEvents($this);
 				
 				if(options.autoload) {
-					$.ecoplot.loadData($this);
+					$this.trigger("load");
 				}
 				$this.fadeIn(options.defaultFade);
 				if(options.layout) {
@@ -552,26 +718,29 @@ $.extend({
 		
 		
 		/////////////////////////////////////////////////////////////////
-		//		API FUNCTIONS
+		//		API FUNCTIONS AND PROPERTIES
 		/////////////////////////////////////////////////////////////////
 		this.construct			= _construct;
 		this.paginate  		   	= null;
 		this.set_default_dates 	= _set_default_dates;
 		this.loadData    		= _request;
-		this.addEvent	    	= function(e){_addelement(e,events)};
+		this.addEvent	    	= function(e){_addelement(e,events);};
+		this.removeEvent        = function(id){delete events[id];};
 		this.debug		   		= function(){return debug;};
 		this.setdebug	   		= function(v){debug = v;};
 		this.log			 	= log;
+		this.version		 	= _version;
+		this.plugin_class		= _plugin_class;
 		
 		this.addMenu = function(menu) {
 			menubar[menu.name] = menu;
-		}
+		};
 		this.getmenu = function(name,$this) {
 			var menu = menubar[name];
 			if(menu) {
 				return menu.create($this[0]);
 			}
-		}
+		};
 	}
 });
 
@@ -582,13 +751,50 @@ $.fn.extend({
 });
 
 
+///////////////////////////////////////////////////
+// Some Random Functions
+///////////////////////////////////////////////////
 
-var ecop = $.ecoplot;
+/*
+ * Excel like functionality.
+ */
+$.ecoplot.shiftf9 = function() {
+	$(document).bind('keydown','Shift+f9', function(event) {
+		$('.'+$.ecoplot.plugin_class).each(function() {
+			var $this = $(this); 
+			$this.trigger("load");
+			this.options.elems.commandline.bind('keydown','Shift+f9', function(event) {
+				$this.trigger("load");
+			});
+			this.options.dates.start.bind('keydown','Shift+f9', function(event) {
+				$this.trigger("load");
+			});
+			this.options.dates.end.bind('keydown','Shift+f9', function(event) {
+				$this.trigger("load");
+			});
+		});
+	});
+};
+	
 
 
 ///////////////////////////////////////////////////
-//	SOME ACTIONS
+//	DEFAULT EVENTS
 ///////////////////////////////////////////////////
+$.ecoplot.addEvent({
+	id: 'load',
+	register: function($this) {
+		$this.bind("load", function(event, elem) {
+			if(!elem) {
+				elem = $(this);
+			}
+			elem.trigger('pre-reload',[elem, this]);
+			$.ecoplot.loadData(elem);
+			elem.trigger('after-reload',[elem, this]);
+		});
+	}
+});
+
 $.ecoplot.addEvent({
 	id: 'zoom',
 	className: 'zoom-out',
@@ -630,7 +836,7 @@ $.ecoplot.addEvent({
 });
 
 
-ecop.addEvent({
+$.ecoplot.addEvent({
 	id: 'datepicker',
 	register: function($this) {
 		var options = $this[0].options.dates;
@@ -650,7 +856,7 @@ ecop.addEvent({
 });
 
 
-ecop.addEvent({
+$.ecoplot.addEvent({
 	id: 'tooltip',
 	register: function($this) {
 		var options = $this[0].options;
@@ -660,18 +866,21 @@ ecop.addEvent({
 	            position: 'absolute',
 	            display: 'none',
 	            top: y + 5,
-	            left: x + 5,
+	            left: x + 5
 	        }).appendTo("body").fadeIn(200);
 	    }
 		
 		$this.bind("plothover", function (event, pos, item) {
+			if(!pos.x) {
+				return;
+			}
 	        $("#x").text(pos.x.toFixed(2));
 	        $("#y").text(pos.y.toFixed(2));
 
 	        if(options.show_tooltip) {
 	        	var canvas = options.canvases.current;
 	            if (item) {
-	                if (previousPoint != item.datapoint) {
+	                if(previousPoint || previousPoint != item.datapoint) {
 	                    previousPoint = item.datapoint;
 	                    
 	                    $("."+cl).remove();
@@ -803,8 +1012,8 @@ $.ecoplot.paginate = function($this) {
 	var page2 = $('<div class="secondary"></div>').appendTo(elems.body);
 	
 	elems.canvas_cont  = $('<div class="canvas-container"></div>').appendTo(page);
-	elems.options = $('<div class="pannel options"></div>').appendTo(page2);
-	elems.logger  = $('<div class="pannel logger"></div>').appendTo(page2);
+	elems.options = $('<div class="panel options"></div>').appendTo(page2);
+	elems.logger  = $('<div class="panel logger"></div>').appendTo(page2);
 	elems.loader  = $('<div class="loader"></div>');
 	
 	/* The menu bar */
@@ -831,7 +1040,7 @@ $.ecoplot.paginate = function($this) {
 		elems.body.height(h);
 		elems.canvas_cont.height(h-10).css({'margin':'5px 0'});
 		el.height('auto');
-	}
-} 
+	};
+};
 
 })(jQuery);

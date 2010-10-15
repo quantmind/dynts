@@ -11,6 +11,7 @@ skin = getattr(settings,'DYNTS_SKIN','dynts/ecoplot/skins/smooth.css')
 
 class EcoForm(forms.Form):
     url    = forms.CharField()
+    default_show = forms.BooleanField(initial = True, required = False)
     height = forms.IntegerField()
     
 class EcoPlot(DJPplugin):
@@ -31,10 +32,11 @@ __ http://packages.python.org/djpcms/'''
               'dynts/ecoplot/ecoplot.js',
               'dynts/decorator.js']
     
-    def render(self, djp, wrapper, prefix, height = 400, url = '', **kwargs):
+    def render(self, djp, wrapper, prefix, height = 400, default_show = True, url = '', **kwargs):
         height = abs(int(height))
         ctx = {'url':    url,
                'height': height,
+               'default_show': default_show,
                'item':   djp.instancecode()}
         return loader.render_to_string('dynts/econometric-plot.html', ctx)
     

@@ -75,9 +75,9 @@ class Serie(JSONobject):
         self.yaxis = yaxis
         if color:
             self.color = color
-        if line:
+        if isinstance(line,dict):
             self.lines = line
-        if point:
+        if isinstance(line,dict):
             self.points = point
         if shadowSize:
             self.shadowSize = shadowSize

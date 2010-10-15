@@ -51,14 +51,16 @@ div.econometric-plot .nav-menu ul li a {display: block;
 	background-position: center;
 	height: 34px; width: 34px;
 	float:right; margin-right: 2%;
+	opacity: 0.5;
 }
 
-.econometric-plot .secondary .pannel {
+.econometric-plot .secondary .panel {
 	display: none;
-	width: 94%;
+	width: 92%;
 	height: 94%;
-	margin: 3% auto;
-	padding: 5px;
+	margin: 0;
+	float: right;
+	padding: 3% 10px;
 }
 			  
 .dataErrorMessage {color: rgb(179,0,0); font-weight: bold;}
@@ -75,10 +77,10 @@ div.econometric-plot .nav-menu ul li a {display: block;
 	margin: 0 10px;
 }
 
-.econometric-plot .body.with-pannel .main {
+.econometric-plot .body.with-panel .main {
 	width: 60%;
 }
-.econometric-plot .body.with-pannel .secondary {
+.econometric-plot .body.with-panel .secondary {
 	width: 40%;
 }
 

@@ -1,7 +1,8 @@
 <div class="econometric-plot">
 <div class="data" style="display:none">{% if item %}
 <span class="item">{{ item }}</span>{% endif %}
-<span class="height">{{ height }}</span>
+<span class="height">{{ height }}</span>{% if default_show %}
+<span class="show"></span>{% endif %}
 <a href="{{ url }}"></a>
 </div>
 </div>
