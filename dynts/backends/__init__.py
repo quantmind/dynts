@@ -1,6 +1,6 @@
 from dynts.utils import import_module
 from dynts.conf import settings
-from base import TimeSeries, Formatters, xydata, DynData
+from base import TimeSeries, Formatters, xydata, DynData, ops
 
 BACKENDS = {
     'zoo': 'zoo',

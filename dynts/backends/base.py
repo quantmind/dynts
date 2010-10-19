@@ -1,9 +1,11 @@
 from itertools import izip
 
-from dynts.conf import settings
 from dynts.utils import laggeddates, ashash, asbtree, asarray
 from dynts.backends.xy import *
+from dynts.backends import operators 
 
+
+ops = operators._ops
 
 class TimeSeries(DynData):
     '''A :class:`dynts.DynData` specialisation for timeseries back-ends.
@@ -22,10 +24,16 @@ class TimeSeries(DynData):
         super(TimeSeries,self).__init__(name,info)
         self.make(date,data)
     
+    __add__ = operators.add
+    __sub__ = operators.sub
+    __mul__ = operators.mul
+    __div__ = operators.div
+    
     def __len__(self):
         return self.shape[0]
     
     def count(self):
+        '''Number of series in timeseries.'''
         return self.shape[1]
     
     def asbtree(self):
@@ -56,9 +64,9 @@ which exposes hash-table like functionalities of ``self``.'''
         '''Mean value'''
         return asarray(self.apply('mean')[0])
     
-    def returns(self, k = 1):
+    def returns(self):
         '''Calculate returns as delta(log(self))'''
-        return self.log().delta(k)
+        return self.logdelta()
     
     def dates(self, desc = None):
         '''Returns an iterable over ``datetime.date`` instances in the timeseries.'''
@@ -133,14 +141,15 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
         '''First order derivative with lag ``k``.'''
         raise NotImplementedError
     
-    def lag(self, k = 1):
+    def lag(self, lag = 1):
         raise NotImplementedError
     
     def log(self):
         raise NotImplementedError
     
-    def logdelta(self):
-        pass
+    def logdelta(self, lag = 1, **kwargs):
+        '''Delta in log-space. Used for percentage changes.'''
+        raise NotImplementedError
     
     def stddev(self):
         raise NotImplementedError
@@ -194,9 +203,6 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
         else:
             ts.make(date,data)
         return ts
-        
-    def __add__(self, other):
-        return addts(self,other)
     
     # INTERNALS
     ################################################################

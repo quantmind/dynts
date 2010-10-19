@@ -23,6 +23,11 @@ class Delta(ScalarFunction):
     """Delta"""
     def apply(self, ts, **kwargs):
         return ts.delta(**kwargs)
+    
+class LDelta(ScalarFunction):
+    """Log-Delta. Can be used for calculating percentage moments."""
+    def apply(self, ts, **kwargs):
+        return ts.logdelta(**kwargs)
 
 
 class Ma(ScalarFunction):

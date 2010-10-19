@@ -1,34 +1,15 @@
 #
 # NOT USED DIRECTLY - THIS CLASS IS IMPORTED IN dynts.tests.timeseries
 #
-import unittest
+from dynts.test import TestCase
 from datetime import date
 from itertools import izip
 
-from dynts import timeseries, evaluate, tsname
 from dynts.utils import cross, asarray
-from dynts.utils.populate import populate, datepopulate, randomts
 from dynts.exceptions import *
 
 
-class TestTS(unittest.TestCase):
-    backend = None
-    
-    def getdata(self, size = 100, cols = 1, delta = 1, start = None):
-        dates = datepopulate(size = size, delta = delta)
-        data = populate(size = size, cols = cols)
-        return dates,data
-        
-    def getts(self, returndata = False, delta = 1, cols = 1, size = 100):
-        dates,data = self.getdata(size,cols,delta)
-        ts   = timeseries(name = 'test', date = dates, data = data, backend = self.backend)
-        self.assertEqual(ts.shape,(size,cols))
-        self.assertEqual(len(ts),size)
-        self.assertEqual(ts.count(),cols)
-        if returndata:
-            return ts,list(dates),list(data)
-        else:
-            return ts
+class TestTS(TestCase):
             
     def _rollingTest(self, func):
         ts = self.getts(cols = 2)
@@ -118,7 +99,7 @@ class TestTS(unittest.TestCase):
             
     def testBinaryTreeWrapper(self):
         '''Test included in documentation'''
-        ts = randomts(cols = 2, start = date(2010,1,1), size = 50)
+        ts = self.randomts(cols = 2, start = date(2010,1,1), size = 50)
         dts = ts.asbtree()
         self.assertEqual(dts.shape,ts.shape)
         values = ts.values()
@@ -126,7 +107,7 @@ class TestTS(unittest.TestCase):
         self.assertEqual(dts[ts.end()].all(),values[49].all())
         
     def testHashWrapper(self):
-        ts = randomts(cols = 2, start = date(2010,1,1), size = 50)
+        ts = self.randomts(cols = 2, start = date(2010,1,1), size = 50)
         dts = ts.ashash()
         self.assertEqual(dts.shape,ts.shape)
         self.assertFalse(dts.modified)
@@ -140,15 +121,15 @@ class TestTS(unittest.TestCase):
         self.assertTrue(dts.isconsistent())
         
     def testCSVformatter(self):
-        ts = randomts(name = tsname("serie1","serie2"),
-                      cols = 2, start = date(2010,1,1), size = 50)
+        ts = self.randomts(name = self.tsname("serie1","serie2"),
+                           cols = 2, start = date(2010,1,1), size = 50)
         self.assertEqual(ts.names(),['serie1','serie2'])
         csv = ts.dump('csv')
         self.assertTrue(csv)
         
     def testXLSformatter(self):
-        ts = randomts(name = "serie1,serie2",
-                      cols = 2, start = date(2010,1,1), size = 50)
+        ts = self.randomts(name = "serie1,serie2",
+                           cols = 2, start = date(2010,1,1), size = 50)
         try:
             import xlwt
         except ImportError:
@@ -161,8 +142,8 @@ class TestTS(unittest.TestCase):
             self.assertTrue(xls)
             
     def testPlot(self):
-        ts = randomts(name = "serie1,serie2",
-                      cols = 2, start = date(2010,1,1), size = 50)
+        ts = self.randomts(name = "serie1,serie2",
+                           cols = 2, start = date(2010,1,1), size = 50)
         try:
             import matpotlib
         except ImportError:
@@ -175,7 +156,7 @@ class TestTS(unittest.TestCase):
             self.assertTrue(plot)
         
     def testDslNames(self):
-        res = evaluate('amzn:yahoo,min(amzn:yahoo)', backend = self.backend)
+        res = self.evaluate('amzn:yahoo,min(amzn:yahoo)', backend = self.backend)
         self.assertEqual(str(res.expression),'AMZN:YAHOO,min(AMZN:YAHOO)')
         self.assertEqual(len(res.data),1)
         ts = res.ts()

@@ -1,10 +1,12 @@
 Development
 ==================
+* Added ``test`` module which implements shortcut functions for testing.
+* Support for binary operations ``+-*\`` in place.
 * Added ``series_info`` parameter to :ref:`flot formatter <formatters-flot>`.
 * :ref:`Ecoplot plugin <ecoplot-web>` handles series options from server.
 * More documentation.
-* **7** ``dsl`` functions.
-* **61 tests**. 
+* **8** ``dsl`` functions.
+* **65 tests**. 
 
 
 Version 0.3.1 - 2010 October 10

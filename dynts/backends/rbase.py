@@ -64,10 +64,15 @@ class rts(dynts.TimeSeries,rpyobject):
         return self.rcts('lag',k)
     
     def delta(self, lag = 1, name = None, **kwargs):
-        return self.rcts('diff',lag)
+        return self.rcts('diff',lag, name or 'delta(%s,%s)' % (self.name,lag))
     
     def log(self, name = None, **kwargs):
-        return self.rcts('log')
+        return self.rcts('log', name = name or 'log(%s)' % self.name)
+    
+    def logdelta(self, lag = 1, name = None, **kwargs):
+        self.r('''logdelta <- function(df,lag){ diff(log(df),lag)}''')
+        name = name or 'logdelta(%s,%s)' % (self.name,lag)
+        return self.rcts('logdelta',lag, name = name)
     
     def stddev(self):
         raise self.rcts('sd')

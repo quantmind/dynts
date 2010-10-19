@@ -227,7 +227,7 @@ $.extend({
 		this.siteoptions = siteoptions;
 		
 		this.defaults = {
-			responcetype:   'json',
+			responsetype:   'json',
 			requestMethod:  'get',
 			elems:			{},
 			dates:			{
@@ -387,7 +387,7 @@ $.extend({
 				log('Creating editing panel.');
 				table = $('<table class="plot-options"></table>');
 				var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
-				head.html('<th>serie</th><th>show</th><th>y-axis1</th><th>y-axis2</th><th>line</th><th>points</th>');
+				head.html('<th>serie</th><th>line</th><th>points</th><th>bars</th><th>y-axis1</th><th>y-axis2</th>');
 				body = $('<tbody></tbody>').appendTo(table);
 				table.click(function() {
 					data.render();
@@ -435,21 +435,21 @@ $.extend({
 					serie.bars   = checkmedia(serie.bars,false);
 				}
 				else {
-					serie.lines = oserie.lines;
+					serie.lines  = oserie.lines;
 					serie.points = oserie.points;
-					serie.bars = oserie.bars;
-					serie.yaxis = oserie.yaxis;
-					serie.xaxis = oserie.xaxis;
+					serie.bars   = oserie.bars;
+					serie.yaxis  = oserie.yaxis;
+					serie.xaxis  = oserie.xaxis;
 				}
 				var trt = $('<tr class="line'+circle+' serie'+i+' serie-title"></tr>').appendTo(body);
 				var tr  = $('<tr class="line'+circle+' serie'+i+' serie-option"></tr>').appendTo(body);
 				tr.append($('<td></td>'));
 				trt.append($('<td class="label" colspan="6">'+serie.label+'</td>'));
-				tr.append(tdinp('checkbox','show','show',serie.lines.show || serie.points.show || serie.bars.show));
-				tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis==1 : i===0));
-				tr.append(tdinp('radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis==2 : i>0));
 				tr.append(tdinp('checkbox','line','line', serie.lines.show));
 				tr.append(tdinp('checkbox','points','points', serie.points.show));
+				tr.append(tdinp('checkbox','bars','bars', serie.bars.show));
+				tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis==1 : i===0));
+				tr.append(tdinp('radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis==2 : i>0));
 				circle += 1;
 			});
 			return table;
@@ -481,17 +481,18 @@ $.extend({
 				var series = this.series;
 				this.edit.find('tr.serie-option').each(function(i) {
 					var el = $(this);
-					if($("input[name='show']",el).attr('checked')) {
-						var serie = series[i];
-						if($("input[value='y-ax1']",el).attr("checked")) {
-							serie.yaxis = 1;
-						}
-						else {
-							serie.yaxis = 2;
-						}
-						serie.lines.show = $("input[name='line']",el).attr('checked');
-						serie.points.show = $("input[name='points']",el).attr('checked');
-						adata.push(serie); 
+					var serie = series[i];
+					serie.lines.show  = $("input[name='line']",el).attr('checked');
+					serie.points.show = $("input[name='points']",el).attr('checked');
+					serie.bars.show = $("input[name='bars']",el).attr('checked');
+					if($("input[value='y-ax1']",el).attr("checked")) {
+						serie.yaxis = 1;
+					}
+					else {
+						serie.yaxis = 2;
+					}
+					if(serie.lines.show || serie.points.show || serie.bars.show) {
+						adata.push(serie);
 					}
 				});
 				this.flot = $.plot(this.elem, adata, zoptions);
@@ -624,20 +625,6 @@ $.extend({
 				elems.info.html("");
 			}
 			_set_new_canavases($this, data);
-			/*
-			if(!data.success) {
-				log('Server error. Data contains errors.');
-				if(elems.info) {
-					$.each(data.errors,function(i,v) {
-						elems.info.append($('<p></p>').html(v).addClass(options.errorClass));
-					});
-				}
-				_set_new_canavases($this);
-			}
-			else {
-				_set_new_canavases($this,data.result);
-			}
-			*/
 		}
 		
 		function _request($this)  {
@@ -658,7 +645,7 @@ $.extend({
 	 		$.ajax({url: options.load_url,
 	 				type: options.requestMethod,
 	 				data: $.param(params),
-	 				dataType: options.responcetype,
+	 				dataType: options.responsetype,
 	 				success: function(data) {
 						log("Got the response from server");
 						var ok = true;

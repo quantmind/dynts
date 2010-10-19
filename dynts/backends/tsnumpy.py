@@ -126,6 +126,12 @@ class TimeSeries(dynts.TimeSeries):
         name = name or 'delta(%s,%s)' % (self.name,lag)
         return self.clone(self._date[lag:],v,name)
     
+    def logdelta(self, lag = 1, name = None, **kwargs):
+        self.precondition(lag<len(self) and lag > 0,dynts.DyntsOutOfBound)
+        v = ny.log(self._data[lag:] - self._data[:-lag])
+        name = name or 'logdelta(%s,%s)' % (self.name,lag)
+        return self.clone(self._date[lag:],v,name)
+    
     def _rollapply(self, func, window = 20, **kwargs):
         fs = _functions.get(func,None)
         if fs:

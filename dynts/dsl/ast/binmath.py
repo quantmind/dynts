@@ -6,10 +6,7 @@ class BinMathOp(BinOp):
         super(BinMathOp,self).__init__(left,right,op)
     
     def dooper(self, le, ri):
-        if isnumber(le) and isnumber(ri):
-            return self.simpleoper(le,ri)
-        else:
-            return self.complexoper(le,ri)
+        raise NotImplementedError
     
     def _unwind(self, values, backend, full = False, **kwargs):
         le = self.left.unwind(values, backend, **kwargs)
@@ -27,28 +24,13 @@ class BinMathOp(BinOp):
                 dr[k] = nv*v
             return dr
     
-    def simpleoper(self,le,ri):
-        '''Neeeds implementation'''
-        pass
-    
-    def complexoper(self,le,ri):
-        name = str(self)
-        if isnumber(le):
-            data = self.simpleoper(le, ri.values())
-            return ri.clone(data = data, name = name)
-        elif isnumber(ri):
-            data = self.simpleoper(le.values(), ri)
-            return le.clone(data = data, name = name)
-        else:
-            raise NotImplementedError
-    
 
 class PlusOp(BinMathOp):
     
     def __init__(self,left,right):
         BinMathOp.__init__(self,left,right,'+')
     
-    def simpleoper(self, le, ri):
+    def dooper(self, le, ri):
         return le+ri
     
     def lineardecomp(self):
@@ -66,7 +48,7 @@ class MinusOp(BinMathOp):
     def __init__(self,left,right):
         BinMathOp.__init__(self,left,right,'-')
 
-    def simpleoper(self, le, ri):
+    def dooper(self, le, ri):
         return le-ri
     
     def lineardecomp(self):
@@ -81,10 +63,11 @@ class MinusOp(BinMathOp):
         
         
 class MultiplyOp(BinMathOp):
+    
     def __init__(self,left,right):
         BinMathOp.__init__(self,left,right,'*')
         
-    def simpleoper(self, le, ri):
+    def dooper(self, le, ri):
         return le*ri
     
     def lineardecomp(self):
@@ -96,7 +79,7 @@ class DivideOp(BinMathOp):
     def __init__(self,left,right):
         BinMathOp.__init__(self,left,right,'/')
         
-    def simpleoper(self, le, ri):
+    def dooper(self, le, ri):
         return le/ri
     
     def lineardecomp(self):

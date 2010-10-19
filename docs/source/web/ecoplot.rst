@@ -21,7 +21,8 @@ There are two dependencies:
 The scripts to include are the followings::
 
 	<script type="text/javascript" src=".../dynts/flot/excanvas.min.js"></script>
-	<script type="text/javascript" src=".../dynts/flot/jquery.flot.js"></script>
+	<script type="text/javascript" src=".../dynts/flot/jquery.flot.min.js"></script>
+	<script type="text/javascript" src=".../dynts/flot/jquery.flot.selection.min.js"></script>
 	<script type="text/javascript" src=".../dynts/ecoplot/ecoplot.js"></script>
 	
 
@@ -38,10 +39,24 @@ It is as easy as this::
 	
 where options is an objects containing parameters for the plugin.
 
+Input Options
+~~~~~~~~~~~~~~~~~~~~
 .. js:attribute:: options.autoload
 
-	If ``true`` (default) data is loaded when the plugin is created. 
+	If ``True`` (default) data is loaded when the plugin is created. 
 
+.. js:attribute:: options.requestMethod
+
+	Type of AJAX request to send to server for obtaining data. Default ``get``.
+	
+.. js:attribute:: options.responsetype
+
+	Type of response from server. Currently only ``json`` is supported.
+	
+
+Output Options
+~~~~~~~~~~~~~~~~~~~~~
+The ``options`` object is updated with information useful for data manipulation.
 
 .. js:attribute:: options.canvases
 
@@ -74,7 +89,7 @@ Attributes
 addEvent
 ~~~~~~~~~~~~~
 
-Add custom event to the plugin. Check the :ref:`events <ecoplot-web-events>` documentation
+Add a custom event to the plugin. Check the :ref:`events <ecoplot-web-events>` documentation
 for further information.
 
 .. js:function:: $.ecoplot.addEvent({id:idname,register:reg_handler})

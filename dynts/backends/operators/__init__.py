@@ -1,25 +1,21 @@
 import numpy as np
-from dynts.backends import base
 
-_addoper = lambda x,y : x+y
-_suboper = lambda x,y : x-y
-_muloper = lambda x,y : x*y
-_divoper = lambda x,y : x/y
+from dynts.conf import settings
+from dynts.exceptions import ExpressionError
 
-_ops = { 'add' : _addoper,
-        'sub' : _suboper,
-        'mul' : _muloper,
-        'div' : _divoper,
+_ops = {'add' : lambda x,y : x+y,
+        'sub' : lambda x,y : x-y,
+        'mul' : lambda x,y : x*y,
+        'div' : lambda x,y : x/y,
         }
-
 
 def _get_op(op_name):
     global _ops
     op = _ops.get(op_name, None)
     if op is None:
-        msg = 'There is no op called %s. choices are %s' %(op_name, ops)
-        raise ValueError(msg)
+        raise ExpressionError('There is no op called %s.' % op_name)
     return op
+
 
 def binOp(op, indx, amap, bmap, handle_missing):
     '''
@@ -44,6 +40,7 @@ def binOp(op, indx, amap, bmap, handle_missing):
     data = np.vstack(seq_arys)
     return data
 
+
 def applyfn(op, v1, v2, handle_missing):
     def op_or_missing(a,b):
         try:
@@ -60,9 +57,6 @@ def applyfn(op, v1, v2, handle_missing):
     rt = map(op_or_missing, v1, v2)
     return rt
 
-def is_timeseries(ts_or_scalar):
-    result = isinstance(ts_or_scalar, base.TimeSeries)
-    return result
 
 def _combine_dts(dts1, dts2, all):
     if all:
@@ -101,19 +95,19 @@ def _handle_ts(op, ts, ts2, all, fill_fn):
     return indx, result
 
 def _handle_ts_or_scalar(op_name, ts, ts_or_scalar, all = True, fill = None):
+    from dynts import istimeseries
     op = _get_op(op_name)
+    fill = fill if fill is not None else settings.missing_value
     if callable(fill):
         fill_fn = fill
     else:
         fill_fn = lambda : fill
 
-    scalar = not is_timeseries(ts_or_scalar)
-    if scalar:
-        dts, data = _handle_scalar(op, ts, ts_or_scalar, fill_fn)
-    else:
+    if istimeseries(ts_or_scalar):
         dts, data = _handle_ts(op, ts, ts_or_scalar, all, fill_fn)
-    new_ts = ts.clone(date = dts, data = data)
-    return new_ts
+    else:
+        dts, data = _handle_scalar(op, ts, ts_or_scalar, fill_fn)
+    return ts.clone(date = dts, data = data)
 
 def ts_fn(op_name):
     fn = lambda  *args,  **kwargs : _handle_ts_or_scalar(op_name, *args, **kwargs)
