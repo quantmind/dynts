@@ -1,5 +1,5 @@
 from dynts.conf import settings
-from dynts import timeseries, istimeseries
+from dynts import timeseries, istimeseries, ts_bin_op
 from dynts.exceptions import *
 
 def isnumber(value):

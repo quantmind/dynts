@@ -38,6 +38,19 @@ class TestDsl(unittest.TestCase):
         self.assertEqual(str(res[0]),'GS:YAHOO')
         self.assertEqual(str(res[1]),'min(GS:YAHOO,window=30)')
         
+    def testBinOpSerieFunction(self):
+        '''Get a timeseries and a function and check for consistency'''
+        res = dynts.parse('goog:yahoo-ma(goog:yahoo,window=30)')
+        self.assertEqual(res.symbols(),['GOOG:YAHOO'])
+        self.assertEqual(len(res),2)
+        self.assertEqual(str(res[0]),'GOOG:YAHOO')
+        self.assertEqual(str(res[1]),'ma(GOOG:YAHOO,window=30)')
+        result = dynts.evaluate(res)
+        self.assertEqual(len(result.data),1)
+        data = result.ts()
+        self.assertTrue(dynts.istimeseries(data))
+        self.assertEqual(data.count(),1)
+        
     def testDataProvider(self):
         result = dynts.evaluate('2*GOOG,GOOG')
         self.assertEqual(len(result.data),1)

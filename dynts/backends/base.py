@@ -6,6 +6,8 @@ from dynts.backends import operators
 
 
 ops = operators._ops
+ts_bin_op = operators._handle_ts_or_scalar
+
 
 class TimeSeries(DynData):
     '''A :class:`dynts.DynData` specialisation for timeseries back-ends.
@@ -188,6 +190,10 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
         '''A :ref:`rolling function <rolling-function>` for mean values'''
         return self.rollapply('mean',**kwargs)
     
+    def rollstddev(self, **kwargs):
+        '''A :ref:`rolling function <rolling-function>` for stadard-deviation values'''
+        return self.rollapply('sd',**kwargs)
+    
     def window(self, start, end):
         raise NotImplementedError
     
@@ -220,3 +226,4 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
     def precondition(self, precond, errorclass = DyntsException, msg = ''):
         if not precond:
             raise errorclass(msg)
+    

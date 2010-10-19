@@ -38,9 +38,10 @@ class TimeSeries(rts):
         #TODO: Not working since we did not set names
         return self.r['colnames'](self._ts)
     
-    def _rollapply(self, func, window = None, **kwargs):
+    def _rollapply(self, func, window = None, name = None, **kwargs):
+        name = name or '%s(%s)' % (func,self.name)
         fun    = self.r[func]
-        return self.rcts('rollapply', window, fun, **kwargs)
+        return self.rcts('rollapply', window, fun, name = name, **kwargs)
     
     def start(self):
         return self.dateinverse(self.rc('start')[0])

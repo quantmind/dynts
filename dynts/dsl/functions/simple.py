@@ -1,5 +1,5 @@
 from dynts.dsl import FunctionBase
-from dynts import TimeSeries
+from dynts import TimeSeries, tsfunctions
 
 
 class ScalarFunction(FunctionBase):
@@ -19,10 +19,12 @@ class Log(ScalarFunction):
     def apply(self, ts, **kwargs):
         return ts.log(**kwargs)
     
+    
 class Delta(ScalarFunction):
     """Delta"""
     def apply(self, ts, **kwargs):
         return ts.delta(**kwargs)
+    
     
 class LDelta(ScalarFunction):
     """Log-Delta. Can be used for calculating percentage moments."""
@@ -52,6 +54,19 @@ class Min(ScalarFunction):
     """Moving min function"""
     def apply(self, ts, **kwargs):
         return ts.rollmin(**kwargs)
+    
+    
+class zscore(ScalarFunction):
+    """Rolling Z-Score function"""
+    def apply(self, ts, **kwargs):
+        return tsfunctions.zscore(ts, **kwargs)
+    
+
+class prange(ScalarFunction):
+    """Rolling Percentage range function"""
+    def apply(self, ts, **kwargs):
+        return tsfunctions.prange(ts, **kwargs)
+    
     
     
 class Avol(ScalarFunction):

@@ -5,8 +5,8 @@ Development
 * Added ``series_info`` parameter to :ref:`flot formatter <formatters-flot>`.
 * :ref:`Ecoplot plugin <ecoplot-web>` handles series options from server.
 * More documentation.
-* **8** ``dsl`` functions.
-* **65 tests**. 
+* **10** ``dsl`` functions.
+* **66 tests**. 
 
 
 Version 0.3.1 - 2010 October 10

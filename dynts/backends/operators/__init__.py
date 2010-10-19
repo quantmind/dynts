@@ -58,16 +58,6 @@ def applyfn(op, v1, v2, handle_missing):
     return rt
 
 
-def _combine_dts(dts1, dts2, all):
-    if all:
-        all_dts = set(dts1).union(set(dts2))
-    else:
-        all_dts = set(dts1).intersection(set(dts2))
-
-    result = list(all_dts)
-    result.sort()
-    return result
-
 def _toVec(shape, val):
     '''
     takes a single value and creates a vecotor / matrix with that value filled
@@ -77,7 +67,15 @@ def _toVec(shape, val):
     mat.fill(val)
     return mat
 
-def _handle_scalar(op, ts, scalar, fill_fn):
+def _handle_scalar_ts(op_name, op, scalar, ts, fill_fn):
+    values = ts.values()
+    shape = values.shape
+    v2 = _toVec(shape, scalar)
+    dts = ts.dates()
+    result = applyfn(op, v2, values, fill_fn)
+    return dts, result
+
+def _handle_ts_scalar(op_name, op, ts, scalar, fill_fn):
     values = ts.values()
     shape = values.shape
     v2 = _toVec(shape, scalar)
@@ -85,16 +83,28 @@ def _handle_scalar(op, ts, scalar, fill_fn):
     result = applyfn(op, values, v2, fill_fn)
     return dts, result
 
-def _handle_ts(op, ts, ts2, all, fill_fn):
-    dts1 = ts.dates()
-    dts2 = ts2.dates()
-    indx = _combine_dts(dts1, dts2, all)
-    tsMap = ts.asbtree()
-    ts2Map = ts2.asbtree()
-    result = binOp(op, indx, tsMap, ts2Map, fill_fn)
-    return indx, result
+def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
+    if ts.count() != ts2.count():
+        raise ExpressionError("Cannot %s two timeseries with different number of series." % op_name)
+    dts1 = set(ts.dates())
+    if all:
+        indx = dts1.union(ts2.dates())
+    else:
+        indx = dts1.intersection(ts2.dates())
+    hash = ts.ashash()
+    hash2 = ts2.ashash()
+    fill = np.array([fill_fn()])
+    for dt in indx:
+        v  = hash.get(dt,None)
+        v2 = hash2.get(dt,None)
+        if v is None or v2 is None:
+            v = fill
+        else:
+            v = op(v,v2)
+        hash[dt] = v
+    return hash.getts()
 
-def _handle_ts_or_scalar(op_name, ts, ts_or_scalar, all = True, fill = None):
+def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None):
     from dynts import istimeseries
     op = _get_op(op_name)
     fill = fill if fill is not None else settings.missing_value
@@ -103,10 +113,21 @@ def _handle_ts_or_scalar(op_name, ts, ts_or_scalar, all = True, fill = None):
     else:
         fill_fn = lambda : fill
 
-    if istimeseries(ts_or_scalar):
-        dts, data = _handle_ts(op, ts, ts_or_scalar, all, fill_fn)
+    name = name or '%s(%s,%s)' % (op_name,ts1,ts2)
+    ts = None
+    if istimeseries(ts1):
+        ts = ts1
+        if istimeseries(ts2):
+            return _handle_ts_ts(op_name, op, ts1, ts2, all, fill_fn)
+        else:
+            dts, data = _handle_ts_scalar(op_name, op, ts1, ts2, fill_fn)
     else:
-        dts, data = _handle_scalar(op, ts, ts_or_scalar, fill_fn)
+        if istimeseries(ts2):
+            ts = ts2
+            dts, data = _handle_scalar_ts(op_name, op, ts1, ts2, fill_fn)
+        else:
+            return op(ts1,ts2)
+        
     return ts.clone(date = dts, data = data)
 
 def ts_fn(op_name):
