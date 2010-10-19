@@ -42,7 +42,7 @@ class TestOperators(TestCase):
         curry_fn = lambda : op(ts1, ts2)
         self.assertRaises(exceptions.ExpressionError, curry_fn)
     
-    def xtestArithOpWithMissingDates(self):
+    def testArithOpWithMissingDates(self):
         ts1, dates1, data1 = self.getts(returndata = True, cols = 2)
         ts2, dates2, data2 = self.getts(returndata = True, cols = 2, delta = 2)
         
@@ -61,10 +61,10 @@ class TestOperators(TestCase):
         
     def _check_missing_dts(self, dts, btree):
         from dynts.conf import settings
-        is_missing = settings.is_missing
+        ismissing = settings.ismissing
         
         for dt in  dts:
             vals = btree[dt]
             for val in vals:
-                self.assertTrue(is_missing(val))
+                self.assertTrue(ismissing(val))
         

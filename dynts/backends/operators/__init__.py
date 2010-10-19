@@ -17,7 +17,7 @@ def _get_op(op_name):
     return op
 
 
-def binOp(op, indx, amap, bmap, handle_missing):
+def binOp(op, indx, amap, bmap, fill_vec):
     '''
     Combines the values from two map objects using the indx values
     using the op operator. In situations where there is a missing value
@@ -27,33 +27,33 @@ def binOp(op, indx, amap, bmap, handle_missing):
         va = amap.get(id, None)
         vb = bmap.get(id, None)
         if va is None or vb is None:
-            result = handle_missing() #This should create as many elements as the number of columns!?
+            result = fill_vec #This should create as many elements as the number of columns!?
         else:
             try:
                 result = op(va, vb)
             except Exception, e:
                 result = None
             if result == None:
-                result = handle_missing()
+                result = fill_vec
             return result
     seq_arys = map(op_or_missing, indx)
     data = np.vstack(seq_arys)
     return data
 
 
-def applyfn(op, v1, v2, handle_missing):
+def applyfn(op, v1, v2, fill_vec):
     def op_or_missing(a,b):
         try:
             result = op(a,b)
         except Exception, e:
             result = None
         if result is None:
-                result = handle_missing()
+                result = fill_vec
         return result
     if len(v1) != len(v2):
         msg = "Vectors %s, %s are different lengths %s, %s" %(v1, v2, len(v1),
                 len(v2))
-        raise ValueError(msg)
+        raise ExpressionError(msg)
     rt = map(op_or_missing, v1, v2)
     return rt
 
@@ -67,20 +67,28 @@ def _toVec(shape, val):
     mat.fill(val)
     return mat
 
+def _create_fill_vec(ts, fill_fn):
+    shape = (ts.count(),)
+    fill = _toVec(shape, fill_fn())
+    return fill
+
 def _handle_scalar_ts(op_name, op, scalar, ts, fill_fn):
+    fill_vec = _create_fill_vec(ts, fill_fn)
     values = ts.values()
     shape = values.shape
     v2 = _toVec(shape, scalar)
+    
     dts = ts.dates()
-    result = applyfn(op, v2, values, fill_fn)
+    result = applyfn(op, v2, values, fill_vec)
     return dts, result
 
 def _handle_ts_scalar(op_name, op, ts, scalar, fill_fn):
+    fill_vec = _create_fill_vec(ts, fill_fn)
     values = ts.values()
     shape = values.shape
     v2 = _toVec(shape, scalar)
     dts = ts.dates()
-    result = applyfn(op, values, v2, fill_fn)
+    result = applyfn(op, values, v2, fill_vec)
     return dts, result
 
 def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
@@ -93,7 +101,9 @@ def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
         indx = dts1.intersection(ts2.dates())
     hash = ts.ashash()
     hash2 = ts2.ashash()
-    fill = np.array([fill_fn()])
+    
+    fill = _create_fill_vec(ts, fill_fn)
+    #fill = np.array([fill_fn()])
     for dt in indx:
         v  = hash.get(dt,None)
         v2 = hash2.get(dt,None)
@@ -105,6 +115,15 @@ def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
     return hash.getts()
 
 def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None):
+    '''
+    this is the main entry point for any arithmetic type function performed on a timeseries
+    and/or a scalar. 
+    op_name - name of the function to be performed
+    ts1, ts2 - timeseries or scalars that the function is to performed over
+    all - whether all dates should be included in the result
+    fill - the value that should be used to represent "missing values"
+    name - the name of the resulting time series
+    '''
     from dynts import istimeseries
     op = _get_op(op_name)
     fill = fill if fill is not None else settings.missing_value
