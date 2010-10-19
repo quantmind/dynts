@@ -1,6 +1,7 @@
 import random
 from dynts.test import TestCase
 from dynts.backends import ops
+from dynts import exceptions 
 
 __all__ = ['TestOperators',
            ]
@@ -28,4 +29,42 @@ class TestOperators(TestCase):
             exp = map(curry_op, data)
             self.check_dates(new_ts, dates)
             self.check_values(new_ts, exp)
-
+    
+    def testArithOpWithDiffNumberCols(self):
+        '''
+        you can't perform arithmetic on timeseries that each have a different number of columns
+        '''
+        ts1 = self.getts(cols = 2)
+        ts2 = self.getts(cols = 1)
+        
+        op = ops.values()[0]
+        
+        curry_fn = lambda : op(ts1, ts2)
+        self.assertRaises(exceptions.ExpressionError, curry_fn)
+    
+    def xtestArithOpWithMissingDates(self):
+        ts1, dates1, data1 = self.getts(returndata = True, cols = 2)
+        ts2, dates2, data2 = self.getts(returndata = True, cols = 2, delta = 2)
+        
+        all_dates = list(set(dates1).union(set(dates2)))
+        all_dates.sort()
+        op = ops.values()[0]
+        ts3 = op(ts1,ts2)
+        self.check_dates(ts3, all_dates) ##Check that all the dates are in the return series by default
+        
+        btree = ts3.asbtree()
+        not_in_dates2 = set(dates1) - set(dates2)
+        self._check_missing_dts(not_in_dates2, btree)
+        
+        not_in_dates1 = set(dates2) - set(dates1)
+        self._check_missing_dts(not_in_dates1, btree)
+        
+    def _check_missing_dts(self, dts, btree):
+        from dynts.conf import settings
+        is_missing = settings.is_missing
+        
+        for dt in  dts:
+            vals = btree[dt]
+            for val in vals:
+                self.assertTrue(is_missing(val))
+        
