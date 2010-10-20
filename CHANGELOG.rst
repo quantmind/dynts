@@ -1,5 +1,5 @@
-Development
-==================
+Version 0.3.2 - 2010 October 20
+======================================
 * Development status set to ``Beta``.
 * Added ``test`` module which implements shortcut functions for testing.
 * Support for binary operations ``+-*\`` in place.

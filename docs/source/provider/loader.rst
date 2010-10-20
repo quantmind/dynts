@@ -3,8 +3,10 @@
 ===========================
 Data Loader
 ===========================
-
-The default data loader is :class:`dynts.TimeSerieLoader`.
+A data loader object coordinates which data provider to use and provides hooks
+for pre-processing, post-processing and storing data on your database if required.
+ 
+The default data loader is :class:`dynts.data.TimeSerieLoader`.
 To select a different one, simply pass it to the :func:`dynts.evaluate`
 functions::
 
