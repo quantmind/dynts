@@ -106,12 +106,15 @@ setup(
         data_files   = data_files,
         install_requires = requirements(),
         classifiers = [
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 4 - Beta',
             'Environment :: Plugins',
             'Intended Audience :: Developers',
+            'Intended Audience :: Financial and Insurance Industry',
+            'Intended Audience :: Science/Research',
             'License :: OSI Approved :: BSD License',
             'Operating System :: OS Independent',
             'Programming Language :: Python',
+            'Programming Language :: JavaScript',
             'Topic :: Scientific/Engineering',
             'Topic :: Scientific/Engineering :: Mathematics',
             'Topic :: Office/Business :: Financial'
