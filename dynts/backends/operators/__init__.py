@@ -112,7 +112,9 @@ def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
         else:
             v = op(v,v2)
         hash[dt] = v
-    return hash.getts()
+    new_ts = hash.getts()
+    rt = zip(*new_ts.items())
+    return rt
 
 def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None):
     '''
@@ -137,7 +139,8 @@ def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None
     if istimeseries(ts1):
         ts = ts1
         if istimeseries(ts2):
-            return _handle_ts_ts(op_name, op, ts1, ts2, all, fill_fn)
+            dts, data =  _handle_ts_ts(op_name, op, ts1, ts2, all, fill_fn)
+            
         else:
             dts, data = _handle_ts_scalar(op_name, op, ts1, ts2, fill_fn)
     else:
@@ -147,7 +150,7 @@ def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None
         else:
             return op(ts1,ts2)
         
-    return ts.clone(date = dts, data = data)
+    return ts.clone(date = dts, data = data, name = name)
 
 def ts_fn(op_name):
     fn = lambda  *args,  **kwargs : _handle_ts_or_scalar(op_name, *args, **kwargs)
@@ -157,4 +160,3 @@ add = ts_fn('add')
 sub = ts_fn('sub')
 mul = ts_fn('mul')
 div = ts_fn('div')
-

@@ -63,5 +63,26 @@ class TestDsl(unittest.TestCase):
         for v1,v2 in izip(ts1,ts2):
             self.assertAlmostEqual(v1,2.*v2)
         
+    def testTSName(self):
+        '''
+        The dslresult should include an attribute 'name' 
+        which is the equivalent to the expression passed.
+        In situations where multiple timeseries are returned 
+        the name should be the concatenation of all the names 
+        joined by "__".
+        '''
+        expressions = ['GOOG+YHOO',
+                       '2*GOOG',
+                       'GOOG,YHOO',
+                       ]
+        for expr in expressions:
+            result = dynts.evaluate(expr)
+            ts = result.ts()
+            name = ts.name
+            
+            expected_name = '__'.join(expr.split(','))
+            self.assertEqual(name, expected_name)
+            
+        
 
         
