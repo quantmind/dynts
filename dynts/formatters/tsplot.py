@@ -22,5 +22,20 @@ def toplot(ts, filename = None, **kwargs):
     # rotates and right aligns the x labels, and moves the bottom of the
     # axes up to make room for them
     fig.autofmt_xdate()
+    
+    ## add legend or title
+    names = ts.name.split('__')
+    if len(names) == 1:
+        ##add title
+        title = names[0]
+        #fontsize = kwargs.get('title_fontsize', 7)
+        fontweight = kwargs.get('title_fontweight', 'bold')
+        ax.set_title(title, fontweight=fontweight)#,fontsize=fontsize,         
+    else:
+        ##add legend
+        loc = kwargs.get('legend_location','best')
+        ncol = kwargs.get('legend_ncol', 2)
+        ax.legend(names, loc=loc, ncol=ncol)
+    
     return plt
     
