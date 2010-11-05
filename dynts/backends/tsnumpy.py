@@ -15,14 +15,13 @@ arraytype = ny.ndarray
 
 arrayfunc = lambda func, *args : [func(*items) for items in izip()]
 
-##5 Nov 2010 These functions currently aren't used so
-##Commenting out to avoid confusion
-#_functions = {'min':min,
-#              'max':max,
-#              
-#              'mean': ny.mean,
-#              'med': ny.median,
-#              }
+
+_functions = {'min':'min',
+              'max':'max',
+              ###Ned to check these functions
+              'mean': 'mean',
+              'med': 'median',
+              }
 
 
 def rollsingle(self, func, window = 20, name = None, **kwargs):
@@ -123,8 +122,10 @@ class TimeSeries(dynts.TimeSeries):
         return hash.getts()
     
     def log(self, name = None, **kwargs):
-        raise NotImplementedError
-    
+        v = ny.log(self._data)
+        name = name or 'log(%s,%s)' % (self.name,lag)
+        return self.clone(self._date,v,name)
+            
     def delta(self, lag = 1, name = None, **kwargs):
         self.precondition(lag<len(self) and lag > 0,dynts.DyntsOutOfBound)
         v = self._data[lag:] - self._data[:-lag]
@@ -138,12 +139,7 @@ class TimeSeries(dynts.TimeSeries):
         return self.clone(self._date[lag:],v,name)
     
     def _rollapply(self, func, window = 20, **kwargs):
-#        This check is not necessary at the moment.
-#        if it is to catch an error in the function name, it can be made more
-#        explicit
-
-#        fs = _functions.get(func,None)
-#        if fs:
-#            return rollsingle(self, func, window = window, **kwargs)
+        func = _functions.get(func,None) or func
         return rollsingle(self, func, window = window, **kwargs)
+        
     
