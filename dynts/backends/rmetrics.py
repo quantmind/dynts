@@ -12,13 +12,16 @@ __ http://cran.r-project.org/web/packages/timeSeries/index.html
     type = 'rmetrics'
     libraries = ['timeSeries','zoo']
         
-    def factory(self, date, data):
+    def factory(self, date, data, **kwargs):
         tdate = self.dateconvert
         adt = StrVector([tdate(dt) for dt in date])
         #data = FloatVector(data)
         return self.r['timeSeries'](data, adt)
     
     def dateconvert(self, dte):
+        #isoformat is not defined for datetime objects
+        if hasattr(dte, 'date') and callable(dte.date):
+            dte = dte.date()
         return isoformat(dte)
     
     def dateinverse(self, x):
