@@ -29,8 +29,11 @@ the average value and the standard deviation of the data value have to be estima
 '''
     m = ts.rollmean(**kwargs)
     s = ts.rollstddev(**kwargs)
-    return (ts - m)/s
-
+    result = (ts - m)/s
+    name = kwargs.get('name', None)
+    if name:
+        result.name = name
+    return result
 
 @better_ts_function
 def prange(ts, **kwargs):
