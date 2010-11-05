@@ -123,6 +123,12 @@ def smedian(olist,missing):
     else:
         return missing
 
+def smean(olist,missing):
+    if olist:
+        mean = sum(olist) / len(olist)
+        return mean
+    else:
+        return missing
 
 
 class rollingOperation(object):
@@ -134,6 +140,9 @@ class rollingOperation(object):
         self.missing = settings.missing_value
         self.ismissing = settings.ismissing
         
+    def mean(self):
+        return self.rolling(smean)
+    
     def min(self):
         return self.rolling(smin)
     
