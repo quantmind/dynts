@@ -99,7 +99,7 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
     def series(self):
         '''Generator of single series.'''
         data = self.values()
-        if data:
+        if len(data):
             for c in range(self.count()):
                 yield data[:,c]
         else:

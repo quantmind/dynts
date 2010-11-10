@@ -1,3 +1,8 @@
+Development
+====================
+* Bug fix in :func:`dynts.TimeSeries.series` generator.
+* **73 Tests**
+
 Version 0.3.2 - 2010 October 20
 ======================================
 * Development status set to ``Beta``.
