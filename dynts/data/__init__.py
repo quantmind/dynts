@@ -31,6 +31,17 @@ class PreProcessData(object):
         self.result    = result
         
 
+class SymbolData(object):
+    
+    def __init__(self, ticker, field, provider):
+        self.ticker = ticker
+        self.field = field
+        self.provider = provider
+    
+    def __str__(self):
+        return self.ticker
+        
+
 class TimeSerieLoader(object):
     '''Cordinates the loading of timeseries data into :class:`dynts.dsl.Symbol`.
 This class can be overritten by a custom one if required. There are three **hooks**
@@ -46,6 +57,7 @@ which can be used to customized its behaviour:
 
     separator = ':'
     preprocessdata = PreProcessData
+    symboldata = SymbolData
     '''Class holding data returned by the :meth:`dynts.data.TimeSerieLoader.preprocess` method.
     It contains two attributes:
     
@@ -76,11 +88,10 @@ available.
         data = {}
         for symbol in symbols:
             # Get ticker, field and provider
-            ticker, field, provider = self.parse_symbol(symbol)
-            p  = providers.get(provider,None)
-            if not p:
-                raise MissingDataProvider('data provider %s not available' % provider)
-            pre = self.preprocess(ticker, start, end, field, p, logger, backend, **kwargs)
+            sd = self.parse_symbol(symbol, providers)
+            if not sd.provider:
+                raise MissingDataProvider('data provider for %s not available' % symbol)
+            pre = self.preprocess(sd, start, end, field, p, logger, backend, **kwargs)
             if pre.intervals:
                 result = None
                 for st,en in pre.intervals:
@@ -112,7 +123,7 @@ There should be no reason to override this function.'''
             start = end - timedelta(days=int(round(30.4*settings.months_history)))
         return start,end
     
-    def parse_symbol(self, symbol):
+    def parse_symbol(self, symbol, providers):
         '''Parse a symbol to obtain information regarding ticker, field and provider.
 Must return a tuple containing::
 
@@ -168,7 +179,10 @@ the behaviour when the provider is not available.
         
         if provider is None:
             provider = self.default_provider_for_ticker(ticker, field)
-        return ticker,field,provider
+        
+        if provider:
+            provider  = providers.get(provider,None)
+        return self.symboldata(ticker,field,provider)
  
     def default_provider_for_ticker(self, ticker, field):
         '''Calculate the provider when not available in the symbol. By default it returns
