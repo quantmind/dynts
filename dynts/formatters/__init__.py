@@ -44,6 +44,8 @@ class ToFlot(BaseFormatter):
         '''Dump timeseries as a JSON string compatible with ``flot``'''
         from dynts.web import flot
         from dynts.conf import settings
+        
+        pydate2flot = flot.pydate2flot
         result = container or flot.MultiPlot()
         df = {}
         series_info = series_info or df
@@ -54,9 +56,10 @@ class ToFlot(BaseFormatter):
             for name,serie in izip(ts.names(),ts.series()):
                 info = series_info.get(name,df) 
                 data = []
+                append = data.append
                 for dt,val in izip(dates,serie):
                     if not missing(val):
-                        data.append([flot.pydate2flot(dt),val])
+                        append([pydate2flot(dt),val])
                 serie = flot.Serie(label = name, data = data, **info)
                 res.add(serie)
         else:
