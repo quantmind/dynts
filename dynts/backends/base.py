@@ -21,6 +21,7 @@ class TimeSeries(DynData):
         tuple containing the timeseries dimensions.
     '''
     type = None
+    default_align = 'right'
     
     def __init__(self, name = '', date = None, data = None, info = None):
         super(TimeSeries,self).__init__(name,info)
@@ -55,19 +56,23 @@ which exposes hash-table like functionalities of ``self``.'''
         return key
     
     def max(self):
-        '''Max value'''
+        '''Max values by series'''
         return asarray(self.apply('max')[0])
     
     def min(self):
-        '''Max value'''
+        '''Max values by series'''
         return asarray(self.apply('min')[0])
     
     def mean(self):
-        '''Mean value'''
+        '''Mean values by series'''
         return asarray(self.apply('mean')[0])
     
+    def median(self):
+        '''Median values by series'''
+        return asarray(self.apply('median')[0])
+    
     def returns(self):
-        '''Calculate returns as delta(log(self))'''
+        '''Calculate returns as delta(log(self)) by series'''
         return self.logdelta()
     
     def dates(self, desc = None):
@@ -160,42 +165,68 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
     def stddev(self):
         raise NotImplementedError
     
-    def apply(self, func, **kwargs):
-        return self._rollapply(func, window = len(self), **kwargs)
+    def apply(self, func,
+              window = None,
+              bycolumn = True,
+              align = None, **kwargs):
+        '''Apply function ``func`` to the timeseries.
+        
+    :keyword func: string indicating function to apply
+    :keyword window: Rolling window, If not defined ``func`` is applied on
+                     the whole dataset. Default ``None``.
+    :keyword bycolumn: If ``True``, function ``func`` is applied on
+                       each column separately. Default ``True``.
+    :keyword align: string specifying whether the index of the result should be ``left`` or
+                    ``right`` (default) or ``centered`` aligned compared to the
+                    rolling window of observations.
+    :keyword kwargs: dictionary of auxiliary parameters used by function ``func``.'''
+        N = len(self)
+        window = window or N
+        self.precondition(window<=N and window > 0,DyntsOutOfBound)
+        return self._rollapply(func,
+                               window = window,
+                               align = align or self.default_align,
+                               bycolumn = bycolumn,
+                               **kwargs)
     
-    def rollapply(self, func, window = 20,
-                  align = 'right', bycolumn = True,  **kwargs):
+    def rollapply(self, func, window = 20, **kwargs):
         '''A generic :ref:`rolling function <rolling-function>` for function *func*.
-
-* *func* string indicating function, such as ``min``, ``max``, ``std`` and so forth
-* *window* number of point per group.
-* *align* string specifying whether the index of the result should be ``left`` or
-  ``right`` (default) or ``centered`` aligned compared to the rolling window of observations.
-* *bycolumn* if ``True`` each *func* will be applied to each column separately.'''
-        window = window or len(self)
-        self.precondition(window<=len(self) and window > 0,DyntsOutOfBound)
-        return self._rollapply(func, window = window,
-                               align = align,
-                               bycolumn = bycolumn, **kwargs)
+Same construct as :meth:`dynts.TimeSeries.apply` but with default ``window`` set to ``20``.'''
+        return self.apply(func, window=window, **kwargs)
     
     def rollmax(self, **kwargs):
-        '''A :ref:`rolling function <rolling-function>` for max values'''
+        '''A :ref:`rolling function <rolling-function>` for max values.
+Same as::
+        
+    self.rollapply('max',**kwargs)'''
         return self.rollapply('max',**kwargs)
     
     def rollmin(self, **kwargs):
-        '''A :ref:`rolling function <rolling-function>` for max values'''
+        '''A :ref:`rolling function <rolling-function>` for min values.
+Same as::
+
+    self.rollapply('min',**kwargs)'''
         return self.rollapply('min',**kwargs)
     
     def rollmedian(self, **kwargs):
-        '''A :ref:`rolling function <rolling-function>` for median values'''
+        '''A :ref:`rolling function <rolling-function>` for median values.
+Same as::
+
+    self.rollapply('median',**kwargs)'''
         return self.rollapply('median',**kwargs)
     
     def rollmean(self, **kwargs):
-        '''A :ref:`rolling function <rolling-function>` for mean values'''
+        '''A :ref:`rolling function <rolling-function>` for mean values:
+Same as::
+
+    self.rollapply('mean',**kwargs)'''
         return self.rollapply('mean',**kwargs)
     
     def rollstddev(self, **kwargs):
-        '''A :ref:`rolling function <rolling-function>` for stadard-deviation values'''
+        '''A :ref:`rolling function <rolling-function>` for stadard-deviation values:
+Same as::
+
+    self.rollapply('sd',**kwargs)'''
         return self.rollapply('sd',**kwargs)
     
     def window(self, start, end):
@@ -217,6 +248,12 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
     # INTERNALS
     ################################################################
     
+    def makename(self, func, window = None, **kwargs):
+        if window == len(self) or not window:
+            return '%s(%s)' % (func,self.name)
+        else:
+            return '%s(%s,window=%s)' % (func,self.name,window)
+        
     def _rollapply(func, window = 20, **kwargs):
         raise NotImplementedError
     

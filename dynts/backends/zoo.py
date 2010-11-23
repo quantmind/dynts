@@ -4,6 +4,7 @@ from rpy2.robjects import IntVector
 import dynts
 from dynts.conf import settings
 from dynts.backends.rbase import rts
+from dynts.backends.tsnumpy import rollsingle
 
  
 def v2bool(v):
@@ -25,6 +26,8 @@ def tozoo(ts):
 
 class TimeSeries(rts):
     type = 'zoo'
+    # we don't include median since it fails on NA and even windows
+    special_roll = ('mean','max')
     libraries = ['zoo,PerformanceAnalytics']
     
     def factory(self, date, data, raw = False):
@@ -38,10 +41,16 @@ class TimeSeries(rts):
         #TODO: Not working since we did not set names
         return self.r['colnames'](self._ts)
     
-    def _rollapply(self, func, window = None, name = None, **kwargs):
-        name = name or '%s(%s)' % (func,self.name)
-        fun    = self.r[func]
-        return self.rcts('rollapply', window, fun, name = name, **kwargs)
+    def _rollapply(self, func, window = 20, name = None, **kwargs):
+        name = name or self.makename(func,window=window)
+        # R does not like to evaluate function on the whole windows for some reasons
+        merge = False
+        if window == len(self):
+            return rollsingle(self, func, window, name = name, **kwargs)
+        if func in self.special_roll:
+            return self.rcts('roll%s' % func, window, name = name, **kwargs)
+        else:
+            return self.rcts('rollapply', window, self.r[func], name = name, **kwargs)
     
     def start(self):
         return self.dateinverse(self.rc('start')[0])

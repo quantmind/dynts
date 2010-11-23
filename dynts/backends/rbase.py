@@ -83,9 +83,6 @@ class rts(dynts.TimeSeries,rpyobject):
     def frequency(self):
         return self.rc('frequency')[0]
     
-    def _rollapply(self, func, window = None, **kwargs):
-        return self.rcts('roll%s' % func, window, **kwargs)
-    
     def window(self, start, end):
         c = self.dateconvert
         return self.rcts('window', start = c(start), end = c(end))

@@ -53,18 +53,22 @@ class TestTS(TestCase):
         val = cross(ts.max())
         for v in ts.values():
             self.assertTrue(val >= v)
-        ts = self.getts(cols = 2)
-        val = cross(ts.max())
+        ts = self.getts(cols = 3)
+        val = ts.max()
+        self.assertEqual(len(val),3)
+        val = cross(val)
         for v in ts.values():
             self.assertTrue(val >= v)
-    
+            
     def testMin(self):
         ts  = self.getts()
         val = cross(ts.min())
         for v in ts.values():
             self.assertTrue(val <= v)
-        ts = self.getts(cols = 2)
-        val = cross(ts.min())
+        ts = self.getts(cols = 3)
+        val = ts.min()
+        self.assertEqual(len(val),3)
+        val = cross(val)
         for v in ts.values():
             self.assertTrue(val <= v)
         

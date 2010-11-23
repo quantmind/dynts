@@ -28,8 +28,9 @@ def rollsingle(self, func, window = 20, name = None, **kwargs):
     '''Efficient rolling window calculation for min, max type functions'''
     rolling = lambda serie : list(getattr(rollingOperation(serie,window),func)())
     data = ny.array([rolling(serie) for serie in self.series()])
-    name = name or '%s(%s,window=%s)' % (func,self.name,window)
-    return self.clone(self.dates()[window-1:], data.transpose(), name = name)
+    name = name or self.makename(func,window=window)
+    dates = asarray(self.dates())
+    return self.clone(dates[window-1:], data.transpose(), name = name)
 
 
 def days(d1,d0):

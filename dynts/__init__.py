@@ -20,6 +20,7 @@ from dynts.exceptions import *
 from backends import timeseries, xydata, TimeSeries, DynData, tsfunctions
 from backends import istimeseries, Formatters, BACKENDS, ts_bin_op
 from dsl import parse, merge, dslresult, function_registry, functions
+from maths import BasicStatistics
 from data import providers
 import formatters
 Formatters['flot'] = formatters.ToFlot()
@@ -61,6 +62,17 @@ Typical usage::
                           logger = logger, backend = backend, **kwargs)
     return dslresult(expression, data, backend = backend)
 
+
+def statistics(expression,
+               start = None,
+               end = None,
+               multivariate = False, **kwargs):
+    tseries = evaluate(expression, start = start, end = end, **kwargs).ts()
+    if not multivariate:
+        return BasicStatistics(tseries)
+    else:
+        raise NotImplementedError
+    
 
 def tsname(*names):
     from dynts.conf import settings
