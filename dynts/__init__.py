@@ -1,6 +1,6 @@
 '''Quantitative financial timeseries analysis'''
 
-VERSION = (0, 3, 3)
+VERSION = (0, 3, 4)
  
 def get_version():
     if len(VERSION) == 3:

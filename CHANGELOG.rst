@@ -1,3 +1,8 @@
+Version 0.3.4
+=====================
+* Bug fixes.
+* **75 Tests**
+
 Version 0.3.3 - 2010 November 16
 ===================================
 * Bug fix in :func:`dynts.TimeSeries.series` generator.
