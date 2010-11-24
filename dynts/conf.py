@@ -21,6 +21,10 @@ class Settings(object):
     
         Default :class:`dynts.data.DataProvider` code. Default ``"YAHOO"``.
         
+    .. attribute:: field_separator
+    
+        Character used to separate tickers from fields and providers. Default ``:``.
+        
     .. attribute:: months_history
     
         the default number of months of history. Default: ``12``.
@@ -45,6 +49,7 @@ To change settings::
         self.concat_operator    = ','
         self.separator_operator = '|'
         self.default_provider   = 'YAHOO'
+        self.field_separator    = ':'
         self.default_loader     = None
         self.months_history     = 12
         self.proxies = {}

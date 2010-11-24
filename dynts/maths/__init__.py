@@ -13,17 +13,28 @@ class BasicStatistics(object):
             return {}
         names = tseries.names();
         values = tseries.values()
-        vlast = list(values[-1])
-        vmin  = list(tseries.min())
-        vmax  = list(tseries.max())
-        vpr   = [(v-nv)/(xv-nv) for v,nv,xv in izip(vlast,vmin,vmax)]
         data  = {
                 'names': names,
-                'latest': v,
-                'min': vmin,
+                'latest': list(values[-1]),
+                'min': list(tseries.min()),
                 'mean': list(tseries.mean()),
-                'max': vmax,
-                'prange': vpr
+                'max': list(tseries.max()),
                 }
         return data
+    
+
+class SimpleStatisticsTable(object):
+    
+    def __init__(self, data):
+        self.data = data
+        
+    def headers(self):
+        return ['','latest','min','mean','max','% range']
+    
+    def table(self):
+        data = self.data
+        iterator = izip(data['names'],data['latest'],data['min'],data['mean'],data['max'])
+        for name,lat,min,mea,max in iterator:
+            yield name,lat,min,mea,max,100*(lat-min)/(max-min)
+        
     

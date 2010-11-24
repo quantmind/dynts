@@ -66,13 +66,8 @@ This class can be overritten by a custom one if required. There are four differe
 * :func:`dynts.data.TimeSerieLoader.parse_symbol`
 * :func:`dynts.data.TimeSerieLoader.preprocess`
 * :func:`dynts.data.TimeSerieLoader.onresult`
-* :func:`dynts.data.TimeSerieLoader.onfinishload`
+* :func:`dynts.data.TimeSerieLoader.onfinishload`'''
 
-.. attribute:: separator
-    
-    character for separating ticker, field and vendor. Default ``:``'''
-
-    separator = ':'
     preprocessdata = PreProcessData
     '''Class holding data returned by the :meth:`dynts.data.TimeSerieLoader.preprocess` method.
     It contains two attributes:
@@ -175,8 +170,9 @@ This function is called before retrieving data.
 '''
         if not symbol:
             raise BadSymbol("symbol not provided")
+        separator = settings.field_separator
         symbol = str(symbol)
-        bits = symbol.split(self.separator)
+        bits = symbol.split(separator)
         pnames = providers.keys()
         ticker = symbol
         provider = None
@@ -215,7 +211,7 @@ This function is called before retrieving data.
     def getsymbol(self, ticker, field, provider):
         '''Convert *ticker*, *field* and *provider* to symbol code.
 The inverse of :meth:`dynts.data.TimeSerieLoader.parse_symbol`.'''
-        c = self.separator
+        c = settings.field_separator
         f = '' if not field else '%s%s' % (c,field)
         d = provider == self.default_provider_for_ticker(ticker, field)
         p = '' if d else '%s%s' % (c,provider)
