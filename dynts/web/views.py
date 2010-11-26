@@ -9,7 +9,7 @@ def date2yyyymmdd(dte):
     return dte.day + 100*(dte.month + 100*dte.year)
 
 
-class TimeSeriesView(appview.AppView):
+class TimeSeriesView(appview.ModelView):
     '''```djpcms``` application view for retriving timeseries data as  JSON string.
 Available as Ajax Get response.'''
     _methods      = ('get',)
