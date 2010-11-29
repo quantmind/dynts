@@ -35,6 +35,8 @@ class SimpleStatisticsTable(object):
         data = self.data
         iterator = izip(data['names'],data['latest'],data['min'],data['mean'],data['max'])
         for name,lat,min,mea,max in iterator:
-            yield name,lat,min,mea,max,100*(lat-min)/(max-min)
+            range = max - min
+            prange = 0 if not range else 100*(lat-min)/(max-min)
+            yield name,lat,min,mea,max,prange
         
     
