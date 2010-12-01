@@ -54,3 +54,12 @@ class StatisticsTest(TestCase):
         max   = p.get('max')
         self.assertEqual(range,[min,max])
         
+    def __testFunctions(self):
+        '''Not working yet'''
+        ts = self.getts(cols = 4)
+        b = BasicStatistics(ts, functions=['min','max','mean','zscore'])
+        d = b.calculate()
+        self.assertEqual(len(d),6)
+        p = pivottable(d)
+        self.assertEqual(len(p.fields),5)
+        

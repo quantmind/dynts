@@ -1,8 +1,10 @@
 from itertools import izip
 
+from dynts import tsfunctions
+
 
 class BasicStatistics(object):
-    default_functions = 'min,mean,max'
+    default_functions = ['min','mean','max']
     
     def __init__(self, ts, functions = None):
         self.functions = functions or self.default_functions
@@ -23,10 +25,15 @@ class BasicStatistics(object):
                 }
         for name in self.functions:
             func = getattr(tseries,name,None)
-            try:
-                data[name] = list(func())
-            except:
-                pass
+            if not func:
+                tfunc = getattr(tsfunctions,name,None)
+                if tfunc:
+                    func = lambda : tfunc(tseries, window = len(tseries))
+            if func:
+                try:
+                    data[name] = list(func())
+                except Exception, e:
+                    pass
         return data
     
     
