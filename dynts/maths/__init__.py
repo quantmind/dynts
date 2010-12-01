@@ -2,8 +2,10 @@ from itertools import izip
 
 
 class BasicStatistics(object):
+    default_functions = 'min,mean,max'
     
-    def __init__(self, ts):
+    def __init__(self, ts, functions = None):
+        self.functions = functions or self.default_functions
         self.ts = ts
         
     def count(self):
@@ -18,10 +20,13 @@ class BasicStatistics(object):
         data  = {
                 'names': names,
                 'latest': list(values[-1]),
-                'min': list(tseries.min()),
-                'mean': list(tseries.mean()),
-                'max': list(tseries.max()),
                 }
+        for name in self.functions:
+            func = getattr(tseries,name,None)
+            try:
+                data[name] = list(func())
+            except:
+                pass
         return data
     
     
@@ -35,12 +40,17 @@ class pivottable(object):
             self.defaultname = self.names[0]
             d = self.default
             self._names = dict(((name,{d:v}) for name,v in izip(data['names'],data[d])))
+        else:
+            self._names = None
         
     def __get_fields(self):
         return self.data.keys()
     fields = property(__get_fields)
         
     def get(self, code, name = None):
+        if not self._names:
+            return None
+        
         dnames = self._names
         
         # First we check if code is a name
@@ -87,7 +97,7 @@ class pivottable(object):
         min  = self.get('min',name)
         max  = self.get('max',name)
         return [min,max]
-    
+            
 
 class SimpleStatisticsTable(object):
     
@@ -99,10 +109,14 @@ class SimpleStatisticsTable(object):
     
     def table(self):
         data = self.data
-        iterator = izip(data['names'],data['latest'],data['min'],data['mean'],data['max'])
-        for name,lat,min,mea,max in iterator:
-            range = max - min
-            prange = 0 if not range else 100*(lat-min)/(max-min)
-            yield name,lat,min,mea,max,prange
+        if data:
+            iterator = izip(data['names'],data['latest'],data['min'],data['mean'],data['max'])
+            for name,lat,min,mea,max in iterator:
+                range = max - min
+                prange = 0 if not range else 100*(lat-min)/(max-min)
+                yield name,lat,min,mea,max,prange
+        else:
+            yield StopIteration
+        
         
     

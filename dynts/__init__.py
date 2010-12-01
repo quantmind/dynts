@@ -66,10 +66,11 @@ Typical usage::
 def statistics(expression,
                start = None,
                end = None,
+               functions = None,
                multivariate = False, **kwargs):
     tseries = evaluate(expression, start = start, end = end, **kwargs).ts()
     if not multivariate:
-        return BasicStatistics(tseries)
+        return BasicStatistics(tseries, functions = functions)
     else:
         raise NotImplementedError
     
