@@ -1,5 +1,5 @@
-from dynts.tests import tsinterface
-from dynts.tests import testop
+from regression.interface import tsinterface, testop
+
 
 class TestZooTS(tsinterface.TestTS):
     backend = 'zoo'

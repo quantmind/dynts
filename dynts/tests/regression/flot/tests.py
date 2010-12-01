@@ -3,6 +3,7 @@ import unittest
 import dynts
 from dynts.utils.anyjson import json
 
+
 class TestFlot(unittest.TestCase):
     
     def testFlot1(self):

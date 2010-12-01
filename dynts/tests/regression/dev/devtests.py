@@ -5,6 +5,8 @@ import itertools
 
 __all__ = ['FunctionTest',
            ]
+
+
 class FunctionTest(unittest.TestCase):
     '''
     This is a dynamic unittest function generating class

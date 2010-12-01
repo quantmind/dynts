@@ -20,7 +20,7 @@ from dynts.exceptions import *
 from backends import timeseries, xydata, TimeSeries, DynData, tsfunctions
 from backends import istimeseries, Formatters, BACKENDS, ts_bin_op
 from dsl import parse, merge, dslresult, function_registry, functions
-from maths import BasicStatistics
+from maths import BasicStatistics, pivottable
 from data import providers
 import formatters
 Formatters['flot'] = formatters.ToFlot()
@@ -88,14 +88,11 @@ def add2path():
     if path not in sys.path:
         sys.path.insert(0,path)
         
-def runtests():
-    import unittest
+def runtests(tags = None, verbosity = 1):
     add2path()
-    from dynts import tests
-    loader = unittest.TestLoader()
-    suite  = loader.loadTestsFromModule(tests)
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+    from dynts.tests.runtests import run
+    run(tags = tags, verbosity = verbosity)
+    
     
 def runbench():
     add2path()

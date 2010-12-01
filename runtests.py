@@ -1,10 +1,23 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+import os
+import sys
+from optparse import OptionParser
+
+import dynts
+
+
+def makeoptions():
+    parser = OptionParser()
+    parser.add_option("-v", "--verbosity",
+                      type = int,
+                      action="store",
+                      dest="verbosity",
+                      default=1,
+                      help="Tests verbosity level, one of 0, 1, 2 or 3")
+    return parser
+
+    
 if __name__ == '__main__':
-    #try:
-    #    import psyco
-    #    psyco.full()
-    #except ImportError:
-    #    pass
-    from dynts import runtests
-    runtests()
+    options, tags = makeoptions().parse_args()
+    dynts.runtests(tags, verbosity=options.verbosity)

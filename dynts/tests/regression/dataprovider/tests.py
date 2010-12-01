@@ -1,6 +1,6 @@
-import unittest
 
 import dynts
+from dynts.test import TestCase
 from dynts.data import DataProvider, TimeSerieLoader
 from dynts.data import providers, register, unregister
 
@@ -19,7 +19,7 @@ class CustomLoader(TimeSerieLoader):
         
 
 
-class TestDataProvider(unittest.TestCase):
+class TestDataProvider(TestCase):
     
     def testyahoo(self):
         ts = dynts.evaluate('GOOG:yahoo')

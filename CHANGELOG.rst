@@ -1,5 +1,12 @@
-Version 0.3.4
-=====================
+
+Version 0.3.4 - Development
+================================
+* Redesign of test suite. You can now run tests for given tags::
+
+	python runtests dsl interface ...
+	
+  Each tag is defined by a directory in the :mod:`dynts.tests.regression` module.
+* Added simple statistics pivot table.
 * Bug fixes.
 * **75 Tests**
 
