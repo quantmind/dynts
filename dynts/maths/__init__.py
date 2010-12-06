@@ -123,7 +123,7 @@ class SimpleStatisticsTable(object):
                 prange = 0 if not range else 100*(lat-min)/(max-min)
                 yield name,lat,min,mea,max,prange
         else:
-            yield StopIteration
+            raise StopIteration
         
         
     
