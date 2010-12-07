@@ -6,6 +6,7 @@ import types
 import numpy as np
 
 from dynts import timeseries, evaluate, tsname
+from dynts.utils.importlib import import_modules
 from dynts.utils.populate import populate, datepopulate, randomts
 
 
@@ -141,4 +142,43 @@ class TestLoader(unittest.TestLoader):
                     issubclass(obj, unittest.TestCase)):
                     tests.append(self.loadTestsFromTestCase(obj))
         return self.suiteClass(tests)
+        
+
+        
+class BenchMark(object):
+            
+    def __str__(self):
+        return self.__class__.__name__
+        
+    def setUp(self):
+        pass
+        
+    def register(self):
+        pass
+    
+    
+class BenchLoader(TestLoader):
+    cls = BenchMark
+    suiteClass = None
+    
+    def loadTestsFromTestCase(self, obj):
+        return obj()
+    
+    def loadBenchFromModules(self, modules): 
+        modules = import_modules(modules)
+        elems = []
+        for mod in modules:
+            self.loadTestsFromModule(mod)
+        return elems
+
+    
+def runbench(benchs):
+    from timeit import Timer
+    t = Timer("test()", "from __main__ import test")
+    for elem in benchs:
+        path = elem.__module__
+        name = elem.__class__.__name__
+        t = Timer("b.run()", 'from %s import %s\nb = %s()\nb.setUp()' % (path,name,name))
+        t = t.timeit(elem.number)
+        print('Run %15s --> %s' % (elem,t))
         

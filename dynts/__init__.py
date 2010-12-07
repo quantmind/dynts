@@ -115,7 +115,9 @@ def runtests(tags = None, verbosity = 1):
     run(tags = tags, verbosity = verbosity)
     
     
-def runbench():
+def runbench(tags = None, verbosity = 1):
     add2path()
-    from dynts.bench import runbench
-    runbench()
+    from dynts import test
+    loader = test.BenchLoader()
+    suite  = loader.loadBenchFromModules(['dynts.bench.*'])
+    test.runbench(suite)

@@ -15,9 +15,17 @@ def makeoptions():
                       dest="verbosity",
                       default=1,
                       help="Tests verbosity level, one of 0, 1, 2 or 3")
+    parser.add_option("-b", "--bench",
+                      action="store_true",
+                      dest="bench",
+                      default=False,
+                      help="Run benchmarks")
     return parser
 
     
 if __name__ == '__main__':
     options, tags = makeoptions().parse_args()
-    dynts.runtests(tags, verbosity=options.verbosity)
+    if options.bench:
+        dynts.runbench(tags, verbosity=options.verbosity)
+    else:
+        dynts.runtests(tags, verbosity=options.verbosity)
