@@ -14,6 +14,20 @@ __license__  = "BSD"
 __author__   = "Luca Sbardella"
 __contact__  = "luca@quantmind.com"
 __homepage__ = "http://github.com/quantmind/dynts/"
+CLASSIFIERS  = [
+                'Development Status :: 4 - Beta',
+                'Environment :: Plugins',
+                'Intended Audience :: Developers',
+                'Intended Audience :: Financial and Insurance Industry',
+                'Intended Audience :: Science/Research',
+                'License :: OSI Approved :: BSD License',
+                'Operating System :: OS Independent',
+                'Programming Language :: Python',
+                'Programming Language :: JavaScript',
+                'Topic :: Scientific/Engineering',
+                'Topic :: Scientific/Engineering :: Mathematics',
+                'Topic :: Office/Business :: Financial'
+                ]
 
 
 from dynts.exceptions import *

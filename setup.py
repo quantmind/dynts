@@ -1,6 +1,3 @@
-from distutils.core import setup
-from distutils.command.install_data import install_data
-from distutils.command.install import INSTALL_SCHEMES
 import os
 import sys
 
@@ -8,6 +5,20 @@ package_name = 'dynts'
 root_dir     = os.path.dirname(__file__)
 package_dir  = os.path.join(root_dir, package_name)
 
+# Try to import lib build
+try:
+    import cython
+    from numpy.distutils.misc_util import Configuration
+    from numpy.distutils.core import setup
+    with_extensions = True
+    print('Building with cython extensions')
+except ImportError:
+    from distutils.core import setup
+    with_extensions = False
+    print('Building without cython extensions')
+    
+from distutils.command.install_data import install_data
+from distutils.command.install import INSTALL_SCHEMES
 
 class osx_install_data(install_data):
 
@@ -92,32 +103,36 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
         file_info[0] = '\\PURELIB\\%s' % file_info[0]
         
 
-setup(
-        name         = package_name,
-        version      = mod.__version__,
-        author       = mod.__author__,
-        author_email = mod.__contact__,
-        url          = mod.__homepage__,
-        license      = mod.__license__,
-        description  = mod.__doc__,
-        long_description = read('README.rst'),
-        packages     = packages,
-        cmdclass     = cmdclasses,
-        data_files   = data_files,
-        install_requires = requirements(),
-        classifiers = [
-            'Development Status :: 4 - Beta',
-            'Environment :: Plugins',
-            'Intended Audience :: Developers',
-            'Intended Audience :: Financial and Insurance Industry',
-            'Intended Audience :: Science/Research',
-            'License :: OSI Approved :: BSD License',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python',
-            'Programming Language :: JavaScript',
-            'Topic :: Scientific/Engineering',
-            'Topic :: Scientific/Engineering :: Mathematics',
-            'Topic :: Office/Business :: Financial'
-        ],
-    )
+setupdat = {
+            'name'         : package_name,
+            'version'      : mod.__version__,
+            'author'       : mod.__author__,
+            'author_email' : mod.__contact__,
+            'url'          : mod.__homepage__,
+            'license'      : mod.__license__,
+            'description'  : mod.__doc__,
+            'long_description' : read('README.rst'),
+            'packages'     : packages,
+            'cmdclass'     : cmdclasses,
+            'data_files'   : data_files,
+            'install_requires' : requirements(),
+            'classifiers' : mod.CLASSIFIERS
+            }
+
+if with_extensions:
+    def configuration(parent_package='', top_path=None):
+        config = Configuration(None, parent_package, top_path,
+                               version=mod.__version__)
+        config.set_options(ignore_setup_xxx_py=True,
+                           assume_default_configuration=True,
+                           delegate_options_to_subpackages=True,
+                           quiet=True)
+
+        config.add_subpackage(package_name)
+        return config
+ 
+ 
+setupdat['configuration'] = configuration
+ 
+setup(**setupdat)
  
