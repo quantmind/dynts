@@ -13,6 +13,10 @@
 Timeseries analysis and a timeseries domain specific language written in Python.
 
 
+.. contents::
+    :local:
+
+
 Timeserie Object
 ========================
 
@@ -80,6 +84,7 @@ Optional Requirements
 
 __ http://sourceforge.net/projects/pywin32/files/
 
+
 Running Tests
 =================
 Form the package directory::
@@ -102,6 +107,15 @@ which looks like this::
 	    runtests()
 	    
 	    
+To access coverage of tests you need to install the coverage_ package and run the tests using::
+
+	coverage run --source=dynts runtests.py
+	
+and to check out the coverage report::
+
+	coverage report -m
+	
+	
 Community
 =================
 Trying to use an IRC channel **#dynts** on ``irc.freenode.net``
@@ -125,3 +139,4 @@ __ http://github.com/quantmind/dynts/issues
 .. _simplejson: http://pypi.python.org/pypi/simplejson/
 .. _matplotlib: http://matplotlib.sourceforge.net/
 .. _djpcms: http://djpcms.com
+.. _coverage: http://nedbatchelder.com/code/coverage/

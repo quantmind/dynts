@@ -40,12 +40,13 @@ def smean(olist,missing):
 
 class rollingOperation(object):
     
-    def __init__(self, iterable, window):
+    def __init__(self, iterable, window, skiplist_class = skiplist):
         from dynts.conf import settings
         self.iterable = iterable
         self.window = window
         self.missing = settings.missing_value
         self.ismissing = settings.ismissing
+        self.skiplist = skiplist_class
         
     def mean(self):
         return self.rolling(smean)
@@ -66,7 +67,7 @@ class rollingOperation(object):
         window = self.window
         it = iter(self.iterable)
         queue = deque(islice(it, window))
-        ol    = skiplist(window)
+        ol    = self.skiplist(window)
         for elem in queue:
             if not ismissing(elem):
                 ol.insert(elem)

@@ -25,17 +25,10 @@ NIL = Node(End(), [], [])               # Singleton terminator node
 class skiplist:
     'Sorted collection supporting O(lg n) insertion, removal, and lookup by rank.'
 
-    def __init__(self, expected_size=100, data = None):
-        if data is not None:
-            if hasattr(data,'__len__'):
-                expected_size = max(expected_size,len(data))
+    def __init__(self, expected_size=100):
         self.size = 0
         self.maxlevels = int(1 + log(expected_size, 2))
         self.head = Node('HEAD', [NIL]*self.maxlevels, [1]*self.maxlevels)
-        if data is not None:
-            insert = self.insert
-            for value in data:
-                insert(value)
 
     def __len__(self):
         return self.size

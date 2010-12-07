@@ -2,20 +2,25 @@ import unittest
 from itertools import izip
 
 import dynts
-from dynts.utils import skiplist, rollingOperation
+from dynts import lib
+from dynts.stats import rollingOperation
 from dynts.utils.populate import populate
 
 
 class RollingFunctionSkipList(unittest.TestCase):
+    fallback = False
     
+    def setUp(self):
+        self.skiplist = lib.fallback.skiplist if self.fallback else lib.skiplist
+        
     def testSkipList(self):
         data  = populate(size = 500)[:,0]
-        ol = skiplist(data = data)
+        ol = lib.makeskiplist(data = data, use_fallback = self.fallback)
         reduce(lambda x,y: self.assertTrue(y>x),ol)
         
     def testRollingOp(self):
         data  = populate(size = 500)[:,0]
-        roll  = rollingOperation(data,20)
+        roll  = rollingOperation(data, 20, skiplist_class = self.skiplist)
         rmin  = roll.min()
         rmax  = roll.max()
         rmed  = roll.median()
@@ -24,3 +29,7 @@ class RollingFunctionSkipList(unittest.TestCase):
             self.assertTrue(m2>=m1)
         
         
+if dynts.hasextensions():
+    
+    class FallbackRollingFunctionSkipList(RollingFunctionSkipList):
+        fallback = True

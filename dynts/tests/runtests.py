@@ -51,7 +51,7 @@ def import_tests(tags):
             mod = import_module(test_module)
         except ImportError, e:
             logger.debug("Could not import tests for %s: %s" % (test_module,e))
-            continue
+            raise
         
         logger.debug("Adding tests for %s" % app)
         apptests.append(mod)

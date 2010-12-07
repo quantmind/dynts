@@ -10,7 +10,7 @@ Version 0.3.4 - Development
   Each tag is defined by a directory in the :mod:`dynts.tests.regression` module.
 * Added simple statistics pivot table.
 * Bug fixes.
-* **72 Tests**, **31% test coverage**
+* **76 Tests**, **73% test coverage**
 
 Version 0.3.3 - 2010 November 16
 ===================================
