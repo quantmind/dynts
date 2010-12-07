@@ -7,7 +7,8 @@ from itertools import izip
 import numpy as ny
 
 import dynts
-from dynts.utils import rollingOperation, laggeddates, asarray
+from dynts.stats import rollingOperation
+from dynts.utils import laggeddates, asarray
 
 
 arraytype = ny.ndarray

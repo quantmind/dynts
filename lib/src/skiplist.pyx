@@ -1,4 +1,4 @@
-# Cython version of IndexableSkiplist, for implementing moving median
+# Cython version of skiplist
 # with O(log n) updates
 # Original author: Raymond Hettinger
 # Original license: MIT
@@ -45,7 +45,8 @@ cdef class Node:
 
 NIL = Node(np.inf, [], np.array([])) # Singleton terminator node
 
-cdef class IndexableSkiplist:
+
+cdef class skiplist:
     '''
     Sorted collection supporting O(lg n) insertion, removal, and lookup by rank.
     '''

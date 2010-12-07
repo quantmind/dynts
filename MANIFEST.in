@@ -7,6 +7,7 @@ include requirements.txt
 include runtests.py
 recursive-include dynts/templates *
 recursive-include dynts/media *
+recursive-include lib/src *.pyx
 include docs/make.bat
 include docs/Makefile
 include docs/source/conf.py

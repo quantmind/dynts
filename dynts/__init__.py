@@ -94,6 +94,12 @@ def tsname(*names):
     return reduce(lambda x,y: '%s%s%s' % (x,settings.splittingnames,y), names)
 
 
+def hasextensions():
+    '''True if cython extensions are available'''
+    from .lib import hasextensions
+    return hasextensions
+
+
 ################### For testings
 #    
 def add2path():

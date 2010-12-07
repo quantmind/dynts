@@ -1,6 +1,8 @@
 
 Version 0.3.4 - Development
 ================================
+* Created the ``lib`` module where cython_ extensions will be placed. Cython extensions will be compiled only
+  if cython is available, otherwise a fall-back pure python library will be used.
 * Redesign of test suite. You can now run tests for given tags::
 
 	python runtests dsl interface ...
@@ -8,7 +10,7 @@ Version 0.3.4 - Development
   Each tag is defined by a directory in the :mod:`dynts.tests.regression` module.
 * Added simple statistics pivot table.
 * Bug fixes.
-* **75 Tests**
+* **72 Tests**, **31% test coverage**
 
 Version 0.3.3 - 2010 November 16
 ===================================
@@ -63,4 +65,5 @@ Version 0.1.0  - 2010 September 12
 * First release to PyPi in pre-alpha.
  
 
+.. _cython: http://www.cython.org/
 .. _ccy: http://code.google.com/p/ccy/

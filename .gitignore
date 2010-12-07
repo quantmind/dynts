@@ -3,7 +3,9 @@
 .pydevproject
 .settings/*
 dist/*
+build/*
 docs/build/*
+lib/src/*.c
 parser.out
 parsetab.py
 MANIFEST
