@@ -152,24 +152,26 @@ class BenchMark(object):
         
     def setUp(self):
         pass
-        
-    def register(self):
-        pass
     
     
 class BenchLoader(TestLoader):
-    cls = BenchMark
-    suiteClass = None
+    bclass = BenchMark
     
-    def loadTestsFromTestCase(self, obj):
-        return obj()
+    def loadTestsFromModule(self, module):
+        """Return a suite of all tests cases contained in the given module"""
+        tests = self.tests
+        for name in dir(module):
+            cls = getattr(module, name)
+            if (isinstance(cls, (type, types.ClassType)) and
+                issubclass(cls, self.bclass)):
+                tests.append(cls())
     
     def loadBenchFromModules(self, modules): 
         modules = import_modules(modules)
-        elems = []
+        self.tests = []
         for mod in modules:
             self.loadTestsFromModule(mod)
-        return elems
+        return self.tests
 
     
 def runbench(benchs):
