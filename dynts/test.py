@@ -1,3 +1,4 @@
+import os
 import unittest
 from datetime import date
 from itertools import izip
@@ -174,11 +175,14 @@ class BenchLoader(TestLoader):
         return self.tests
 
     
-def runbench(benchs):
+def runbench(benchs, tags, verbosity):
     from timeit import Timer
     t = Timer("test()", "from __main__ import test")
     for elem in benchs:
         path = elem.__module__
+        label = path.split('.')[-1].lower()
+        if tags and label not in tags:
+            continue
         name = elem.__class__.__name__
         t = Timer("b.run()", 'from %s import %s\nb = %s()\nb.setUp()' % (path,name,name))
         t = t.timeit(elem.number)

@@ -116,8 +116,9 @@ def runtests(tags = None, verbosity = 1):
     
     
 def runbench(tags = None, verbosity = 1):
+    '''Run benchmark suite'''
     add2path()
     from dynts import test
     loader = test.BenchLoader()
     suite  = loader.loadBenchFromModules(['dynts.bench.*'])
-    test.runbench(suite)
+    test.runbench(suite,tags,verbosity)

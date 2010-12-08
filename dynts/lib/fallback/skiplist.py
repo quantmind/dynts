@@ -30,6 +30,12 @@ class skiplist:
         self.maxlevels = int(1 + log(expected_size, 2))
         self.head = Node('HEAD', [NIL]*self.maxlevels, [1]*self.maxlevels)
 
+    def __repr__(self):
+        return list(self).__repr__()
+    
+    def __str__(self):
+        return self.__repr__()
+    
     def __len__(self):
         return self.size
 

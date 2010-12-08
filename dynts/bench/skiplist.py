@@ -4,7 +4,6 @@ from dynts.utils.populate import populate
 
 
 class CythonSkiplistInsert(test.BenchMark):
-    tags = ['skiplist']
     size   = 10000
     number = 10
     
@@ -38,4 +37,5 @@ class SkiplistIteration(CythonSkiplistIteration):
     
     def setUp(self):
         self.data = makeskiplist(data = populate(size = self.size), use_fallback = True)
+    
      
