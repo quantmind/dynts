@@ -100,6 +100,15 @@ def hasextensions():
     return hasextensions
 
 
+def functions_docs():
+    names = sorted(function_registry.keys())
+    docs = ''
+    for name in names:
+        func = function_registry[name]
+        docs += func.__doc__
+    return docs
+
+
 ################### For testings
 #    
 def add2path():

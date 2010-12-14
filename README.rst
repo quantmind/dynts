@@ -75,8 +75,10 @@ Installing rpy2_ on Linux is straightforward, on windows it requires the
 `python for windows`__ extension library.
 
 Optional Requirements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===============================
 
+* cython_ for performance. The library is not strictly dependent on cython, however its usage
+  is highly recommended. If available several python modules will be replaced by more efficient compiled C code.
 * xlwt_ to create spreadsheet from timeseries.
 * simplejson_ if python_ version is less then 2.6
 * matplotlib_ for plotting.
@@ -87,7 +89,7 @@ __ http://sourceforge.net/projects/pywin32/files/
 
 Running Tests
 =================
-Form the package directory::
+From the distribution directory type::
 	
 	python runtests.py
 	
@@ -140,3 +142,4 @@ __ http://github.com/quantmind/dynts/issues
 .. _matplotlib: http://matplotlib.sourceforge.net/
 .. _djpcms: http://djpcms.com
 .. _coverage: http://nedbatchelder.com/code/coverage/
+.. _cython: http://www.cython.org/

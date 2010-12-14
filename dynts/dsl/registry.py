@@ -27,7 +27,8 @@ class FunctionRegistry(UserDict):
 
 
 class ASTFunctionMeta(type):
-    '''Meta class magic'''    
+    '''Meta class for dsl functions. This type ensure
+function registration to the global registry.'''    
     def __new__(cls, name, bases, attrs):
         global function_registry
         super_new = super(ASTFunctionMeta, cls).__new__
@@ -67,6 +68,8 @@ The only member function to implement is the ``__call__`` method.
 
     def __repr__(self):
         return self.name
+
+
 
 function_registry = FunctionRegistry()
 

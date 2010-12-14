@@ -1,6 +1,7 @@
 
 Version 0.3.4 - Development
 ================================
+* Added sphinx_ extension in mod:`dynts.web.dyntsx` for displaying the list of timeseries functions available.
 * Created the ``lib`` module where cython_ extensions will be placed. Cython extensions will be compiled only
   if cython is available, otherwise a fall-back pure python library will be used.
 * Redesign of test suite. You can now run tests for given tags::
@@ -67,3 +68,4 @@ Version 0.1.0  - 2010 September 12
 
 .. _cython: http://www.cython.org/
 .. _ccy: http://code.google.com/p/ccy/
+.. _sphinx: http://sphinx.pocoo.org/

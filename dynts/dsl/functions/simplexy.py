@@ -11,7 +11,17 @@ class SimpleFunctionXY(FunctionBase):
         
 
 class scatter(SimpleFunctionXY):
-    """A simple scatter plot"""
+    """\
+    
+scatter
+============
+
+A two-dimensional scatter plot::
+
+    scatter(GOOG,YHOO)
+    
+will plot Google price on the x-axis versus Yahoo price on the y-axis.
+"""
     def apply(self, args, **kwargs):
         if not len(args) == 2:
             raise FunctionTypeError(self,"function requires two timeseries")

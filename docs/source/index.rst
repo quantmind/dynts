@@ -4,7 +4,12 @@
 DynTS
 =================================
 
-.. rubric:: A domain specific language for Timeseries_ analysis and manipulation.
+.. rubric:: A domain specific language for timeseries analysis and manipulation.
+
+
+.. math::
+
+	a^2+b^3
 
 **Get it**
 :ref:`Overview, Installation and Development <intro-overview>`
@@ -36,6 +41,7 @@ Contents
    dsl/index
    backends/index
    provider/index
+   functions
    formatters
    internals/index
    maths/index
