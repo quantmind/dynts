@@ -41,7 +41,7 @@ First order difference evaluated as
 
 .. math::
 
-    \delta y_t = y_t - y_{t-1}
+    \Delta y_t = y_t - y_{t-lag}
 
 """
     def apply(self, ts, **kwargs):
@@ -59,7 +59,8 @@ in log-space useful for evaluationg percentage moments
     
 .. math::
 
-    {ldelta}(y_t) = \log \frac{y_t}{y_{t-1}}
+    {\tt ldelta}(y_t) = \frac{y_t}{y_{t-1}}
+    
 
 """
     def apply(self, ts, **kwargs):

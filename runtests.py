@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import os
 import sys
 from optparse import OptionParser
@@ -20,12 +19,34 @@ def makeoptions():
                       dest="bench",
                       default=False,
                       help="Run benchmarks")
+    parser.add_option("-l", "--list",
+                      action="store_true",
+                      dest="show_list",
+                      default=False,
+                      help="Show the list of available profiling tests")
+    parser.add_option("-p", "--proxy",
+                      action="store",
+                      dest="proxy",
+                      default='',
+                      help="Set the HTTP_PROXY environment variable")
     return parser
 
     
 if __name__ == '__main__':
+    try:
+        import _dep
+    except ImportError:
+        pass
     options, tags = makeoptions().parse_args()
+    if options.proxy:
+        from dynts.conf import settings
+        settings.proxies['http'] = options.proxy
     if options.bench:
-        dynts.runbench(tags, verbosity=options.verbosity)
+        runner = dynts.runbench
     else:
-        dynts.runtests(tags, verbosity=options.verbosity)
+        runner = dynts.runtests
+        
+    runner(tags,
+           verbosity=options.verbosity,
+           show_list=options.show_list)
+    

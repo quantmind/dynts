@@ -1,4 +1,3 @@
-#
 # NOT USED DIRECTLY - THIS CLASS IS IMPORTED IN dynts.tests.timeseries
 #
 from dynts.test import TestCase
@@ -8,14 +7,14 @@ from itertools import izip
 from dynts.utils import cross, asarray
 from dynts.exceptions import *
 
-
-class TestTS(TestCase):
-            
+class TestFunctionTS(TestCase):
+    
     def _rollingTest(self, func):
+        # A rolling frunction calculation
         ts = self.getts(cols = 2)
         rollfun = 'roll%s' % func
-        mts30 = getattr(ts,rollfun)(window = 30)
-        mts60 = getattr(ts,rollfun)(window = 60)
+        mts30 = getattr(ts,rollfun)(window = 30, fallback = self.fallback)
+        mts60 = getattr(ts,rollfun)(window = 60, fallback = self.fallback)
         self.assertEqual(len(mts30),len(ts) - 29)
         self.assertEqual(len(mts60),len(ts) - 59)
         self.assertEqual(mts30.count(),2)
@@ -31,6 +30,39 @@ class TestTS(TestCase):
             c += 1
             for a,b in izip(v,tv):
                 self.assertAlmostEqual(a,b)
+                
+    def testMax(self):
+        ts  = self.getts()
+        val = cross(ts.max(fallback = self.fallback))
+        for v in ts.values():
+            self.assertTrue(val >= v)
+        ts = self.getts(cols = 3)
+        val = ts.max(fallback = self.fallback)
+        self.assertEqual(len(val),3)
+        val = cross(val)
+        for v in ts.values():
+            self.assertTrue(val >= v)
+            
+    def testMin(self):
+        ts  = self.getts()
+        val = cross(ts.min(fallback = self.fallback))
+        for v in ts.values():
+            self.assertTrue(val <= v)
+        ts = self.getts(cols = 3)
+        val = ts.min(fallback = self.fallback)
+        self.assertEqual(len(val),3)
+        val = cross(val)
+        for v in ts.values():
+            self.assertTrue(val <= v)
+        
+    def testRollingMin(self):
+        self._rollingTest('min')
+        
+    def testRollingMax(self):
+        self._rollingTest('max')
+                    
+
+class TestTS(TestFunctionTS):
     
     def testInit(self):
         ts,dates,data = self.getts(True)
@@ -47,30 +79,6 @@ class TestTS(TestCase):
         ts = self.getts()
         f = ts.frequency()
         self.assertAlmostEqual(f,1)
-    
-    def testMax(self):
-        ts  = self.getts()
-        val = cross(ts.max())
-        for v in ts.values():
-            self.assertTrue(val >= v)
-        ts = self.getts(cols = 3)
-        val = ts.max()
-        self.assertEqual(len(val),3)
-        val = cross(val)
-        for v in ts.values():
-            self.assertTrue(val >= v)
-            
-    def testMin(self):
-        ts  = self.getts()
-        val = cross(ts.min())
-        for v in ts.values():
-            self.assertTrue(val <= v)
-        ts = self.getts(cols = 3)
-        val = ts.min()
-        self.assertEqual(len(val),3)
-        val = cross(val)
-        for v in ts.values():
-            self.assertTrue(val <= v)
         
     def testDates(self):
         ts = self.getts()
@@ -95,12 +103,6 @@ class TestTS(TestCase):
         #names = ts.colnames()
         #self.assertEqual(len(names),1)
         
-    def testRollingMin(self):
-        self._rollingTest('min')
-        
-    def testRollingMax(self):
-        self._rollingTest('max')
-            
     def testBinaryTreeWrapper(self):
         '''Test included in documentation'''
         ts = self.randomts(cols = 2, start = date(2010,1,1), size = 50)
@@ -166,4 +168,3 @@ class TestTS(TestCase):
         ts = res.ts()
         self.assertEqual(ts.count(),2)
         self.assertEqual(ts.names(),['AMZN:YAHOO','min(AMZN:YAHOO,window=20)'])
-        

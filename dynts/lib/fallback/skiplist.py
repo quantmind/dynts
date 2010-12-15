@@ -9,6 +9,7 @@ from itertools import islice
 
 __all__ = ['skiplist']
 
+
 class Node(object):
     __slots__ = 'value', 'next', 'width'
     def __init__(self, value, next, width):
@@ -27,8 +28,10 @@ class skiplist:
 
     def __init__(self, expected_size=100):
         self.size = 0
-        self.maxlevels = int(1 + log(expected_size, 2))
-        self.head = Node('HEAD', [NIL]*self.maxlevels, [1]*self.maxlevels)
+        self.maxlevels = int(2 + log(expected_size, 2))
+        self.head = Node('HEAD',
+                         [NIL]*self.maxlevels,
+                         [1]*self.maxlevels)
 
     def __repr__(self):
         return list(self).__repr__()
@@ -42,7 +45,8 @@ class skiplist:
     def __getitem__(self, i):
         node = self.head
         i += 1
-        for level in reversed(range(self.maxlevels)):
+        #for level in reversed(range(self.maxlevels)):
+        for level in xrange(self.maxlevels-1,-1,-1):
             while node.width[level] <= i:
                 i -= node.width[level]
                 node = node.next[level]
@@ -53,7 +57,8 @@ class skiplist:
         chain = [None] * self.maxlevels
         steps_at_level = [0] * self.maxlevels
         node = self.head
-        for level in reversed(range(self.maxlevels)):
+        #for level in reversed(range(self.maxlevels)):
+        for level in xrange(self.maxlevels-1,-1,-1):
             while node.next[level].value <= value:
                 steps_at_level[level] += node.width[level]
                 node = node.next[level]
@@ -70,7 +75,7 @@ class skiplist:
             newnode.width[level] = prevnode.width[level] - steps
             prevnode.width[level] = steps + 1
             steps += steps_at_level[level]
-        for level in range(d, self.maxlevels):
+        for level in xrange(d, self.maxlevels):
             chain[level].width[level] += 1
         self.size += 1
 
@@ -78,7 +83,7 @@ class skiplist:
         # find first node on each level where node.next[levels].value >= value
         chain = [None] * self.maxlevels
         node = self.head
-        for level in reversed(range(self.maxlevels)):
+        for level in xrange(self.maxlevels-1,-1,-1):
             while node.next[level].value < value:
                 node = node.next[level]
             chain[level] = node
@@ -87,11 +92,11 @@ class skiplist:
 
         # remove one link at each level
         d = len(chain[0].next[0].next)
-        for level in range(d):
+        for level in xrange(d):
             prevnode = chain[level]
             prevnode.width[level] += prevnode.next[level].width[level] - 1
             prevnode.next[level] = prevnode.next[level].next[level]
-        for level in range(d, self.maxlevels):
+        for level in xrange(d, self.maxlevels):
             chain[level].width[level] -= 1
         self.size -= 1
 

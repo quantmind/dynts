@@ -1,0 +1,1 @@
+from numpy import NaN, isnan

@@ -11,14 +11,15 @@ ts_bin_op = operators._handle_ts_or_scalar
 
 class TimeSeries(DynData):
     '''A :class:`dynts.DynData` specialisation for timeseries back-ends.
+This class expose all the main functionalities of a timeseries
+
+.. attribute:: type
+
+    string indicating the backend type (``zoo``, ``rmetrics``, ``numpy``, etc...)
     
-    .. attribute:: type
-    
-        string indicating the backend type (``zoo``, ``rmetrics``, ``numpy``, etc...)
-        
-    .. attribute:: shape
-    
-        tuple containing the timeseries dimensions.
+.. attribute:: shape
+
+    tuple containing the timeseries dimensions.
     '''
     type = None
     default_align = 'right'
@@ -55,25 +56,25 @@ which exposes hash-table like functionalities of ``self``.'''
     def dateinverse(self, key):
         return key
     
-    def max(self):
+    def max(self, fallback = False):
         '''Max values by series'''
-        return asarray(self.apply('max')[0])
+        return asarray(self.apply('max', fallback = fallback)[0])
     
-    def min(self):
+    def min(self, fallback = False):
         '''Max values by series'''
-        return asarray(self.apply('min')[0])
+        return asarray(self.apply('min', fallback = fallback)[0])
     
-    def mean(self):
+    def mean(self, fallback = False):
         '''Mean values by series'''
-        return asarray(self.apply('mean')[0])
+        return asarray(self.apply('mean', fallback = fallback)[0])
     
-    def median(self):
+    def median(self, fallback = False):
         '''Median values by series'''
-        return asarray(self.apply('median')[0])
+        return asarray(self.apply('median', fallback = fallback)[0])
     
-    def returns(self):
+    def returns(self, fallback = False):
         '''Calculate returns as delta(log(self)) by series'''
-        return self.logdelta()
+        return self.logdelta(fallback = fallback)
     
     def dates(self, desc = None):
         '''Returns an iterable over ``datetime.date`` instances in the timeseries.'''

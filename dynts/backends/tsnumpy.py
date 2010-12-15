@@ -7,7 +7,7 @@ from itertools import izip
 import numpy as ny
 
 import dynts
-from dynts.stats import rollingOperation
+from dynts import lib
 from dynts.utils import laggeddates, asarray
 
 
@@ -25,13 +25,31 @@ _functions = {'min':'min',
               }
 
 
-def rollsingle(self, func, window = 20, name = None, **kwargs):
+def rollsingle(self, func, window = 20, name = None,
+               fallback = False, **kwargs):
     '''Efficient rolling window calculation for min, max type functions'''
-    rolling = lambda serie : list(getattr(rollingOperation(serie,window),func)())
+    rfunc = 'roll_{0}'.format(func)
+    if fallback:
+        return rollsingle_fb(self, func, window = window,
+                             name = name, **kwargs)
+    
+    rfunc = getattr(lib,'roll_{0}'.format(func))
+    rolling = lambda serie : list(rfunc(serie,window))
     data = ny.array([rolling(serie) for serie in self.series()])
     name = name or self.makename(func,window=window)
     dates = asarray(self.dates())
     return self.clone(dates[window-1:], data.transpose(), name = name)
+        
+
+
+def rollsingle_fb(self, func, window = 20, name = None, **kwargs):
+    rfunc = getattr(lib.fallback,'roll_{0}'.format(func))
+    rolling = lambda serie : list(rfunc(serie,window))
+    data = ny.array([rolling(serie) for serie in self.series()])
+    name = name or self.makename(func,window=window)
+    dates = asarray(self.dates())
+    return self.clone(dates[window-1:], data.transpose(), name = name)
+    
 
 
 def days(d1,d0):
@@ -141,6 +159,7 @@ class TimeSeries(dynts.TimeSeries):
         return self.clone(self._date[lag:],v,name)
     
     def _rollapply(self, func, window = 20, **kwargs):
+        # NUMPY implementation of the rollapply function
         func = _functions.get(func,None) or func
         return rollsingle(self, func, window = window, **kwargs)
         

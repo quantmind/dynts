@@ -41,7 +41,9 @@ class TimeSeries(rts):
         #TODO: Not working since we did not set names
         return self.r['colnames'](self._ts)
     
-    def _rollapply(self, func, window = 20, name = None, **kwargs):
+    def _rollapply(self,
+                   func, window = 20, name = None,
+                   fallback = False, **kwargs):
         name = name or self.makename(func,window=window)
         # R does not like to evaluate function on the whole windows for some reasons
         merge = False

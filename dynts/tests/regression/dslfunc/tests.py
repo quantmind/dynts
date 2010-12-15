@@ -1,4 +1,5 @@
-from regression.functions import functions
+'''Test for rolling min/max/mean/median functions via DSL'''
+import functions
 
 class TestMeanFunction(functions.SimpleFunctionTest):
     function = 'ma'

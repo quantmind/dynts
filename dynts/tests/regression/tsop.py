@@ -3,9 +3,6 @@ from dynts.test import TestCase
 from dynts.backends import ops
 from dynts import exceptions 
 
-__all__ = ['TestOperators',
-           ]
-
 
 class TestOperators(TestCase):
 

@@ -110,7 +110,7 @@ def functions_docs():
 
 
 ################### For testings
-#    
+#
 def add2path():
     import os
     import sys
@@ -118,16 +118,26 @@ def add2path():
     if path not in sys.path:
         sys.path.insert(0,path)
         
-def runtests(tags = None, verbosity = 1):
+def runtests(tags = None, verbosity = 1, **kwargs):
     add2path()
     from dynts.tests.runtests import run
-    run(tags = tags, verbosity = verbosity)
+    run(tags = tags, verbosity = verbosity, **kwargs)
     
     
-def runbench(tags = None, verbosity = 1):
+def runbench(tags = None, verbosity = 1, **kwargs):
     '''Run benchmark suite'''
     add2path()
     from dynts import test
     loader = test.BenchLoader()
     suite  = loader.loadBenchFromModules(['dynts.bench.*'])
-    test.runbench(suite,tags,verbosity)
+    test.runbench(suite,tags,verbosity, **kwargs)
+    
+    
+def showtestlist(ld):
+    print('')
+    print('There are a total of {0} tests.'.format(len(ld)))
+    print('')
+    for name in sorted(ld.keys()):
+        mod = ld[name]
+        print('{0} :    {1}'.format(name,mod.__doc__))
+        

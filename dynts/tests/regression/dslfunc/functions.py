@@ -1,5 +1,5 @@
 #
-# NOT USED DIRECTLY - THIS MODULE IS IMPORTED BY dynts.tests
+# NOT USED DIRECTLY
 #
 import unittest
 import dynts

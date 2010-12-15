@@ -16,6 +16,7 @@ TextTestRunner = unittest.TextTestRunner
 
 class TestCase(unittest.TestCase):
     backend = None
+    fallback = False
     
     def __init__(self,*args,**kwargs):
         super(TestCase,self).__init__(*args,**kwargs)

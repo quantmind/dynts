@@ -6,6 +6,7 @@ dist/*
 build/*
 docs/build/*
 lib/src/*.c
+profile/*.prof
 parser.out
 parsetab.py
 MANIFEST

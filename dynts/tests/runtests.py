@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import dynts
 from dynts.test import TestSuiteRunner
 from dynts.utils.importlib import import_module 
 
@@ -37,7 +38,7 @@ def get_tests():
 
 
 def import_tests(tags):
-    apptests = []
+    apptests = {}
     for loc,app in get_tests():
         if tags and app not in tags:
             logger.debug("Skipping tests for %s" % app)
@@ -54,7 +55,7 @@ def import_tests(tags):
             raise
         
         logger.debug("Adding tests for %s" % app)
-        apptests.append(mod)
+        apptests[app] = mod
     return apptests
 
 
@@ -66,10 +67,18 @@ def setup_logging(verbosity):
         logger.addHandler(logging.StreamHandler())
         logger.setLevel(level)
         
+
+def showlist(modules):
+    for name in sorted(modules.keys()):
+        mod = modules[name]
+        print('{0} : {1}'.format(name,mod.__doc__))
         
-def run(tags = None, verbosity = 1):
+def run(tags = None, verbosity = 1, show_list = False):
     setup_logging(verbosity)
     modules = import_tests(tags)
-    runner  = TestSuiteRunner(verbosity = verbosity)
-    runner.run_tests(modules)
+    if show_list:
+        dynts.showtestlist(modules)
+    else:
+        runner  = TestSuiteRunner(verbosity = verbosity)
+        runner.run_tests(modules.values())
     
