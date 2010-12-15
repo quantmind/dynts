@@ -1,5 +1,5 @@
 from rpy2 import rinterface
-import numpy as ny
+from numpy import asarray, ndarray
 
 import dynts
 from dynts.utils import ascolumn
@@ -43,7 +43,7 @@ class rts(dynts.TimeSeries,rpyobject):
         
     def keys(self, desc = None):
         '''numpy asarray does not copy data'''
-        res = ny.asarray(self.rc('index'))
+        res = asarray(self.rc('index'))
         if desc == True:
             return reversed(res)
         else:
@@ -52,19 +52,24 @@ class rts(dynts.TimeSeries,rpyobject):
     def values(self, desc = None):
         '''numpy asarray does not copy data'''
         if self._ts:
-            res = ny.asarray(self._ts)
+            res = asarray(self._ts)
             if desc == True:
                 return reversed(res)
             else:
                 return res
         else:
-            return ny.ndarray([0,0])
+            return ndarray([0,0])
         
     def lag(self, k = 1, **kwargs):
         return self.rcts('lag',k)
     
     def delta(self, lag = 1, name = None, **kwargs):
-        return self.rcts('diff',lag, name or 'delta(%s,%s)' % (self.name,lag))
+        name = name or 'delta(%s,%s)' % (self.name,lag)
+        return self.rcts('diff', lag = lag, name = name)
+    
+    def delta2(self, lag = 1, name = None, **kwargs):
+        name = name or 'delta(%s,%s)' % (self.name,lag)
+        return self.rcts('diff', lag = lag, differences = 2, name = name)
     
     def log(self, name = None, **kwargs):
         return self.rcts('log', name = name or 'log(%s)' % self.name)

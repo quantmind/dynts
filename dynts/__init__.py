@@ -1,13 +1,9 @@
 '''Quantitative financial timeseries analysis'''
 
-VERSION = (0, 3, 4)
+VERSION = (0, 4, 'dev')
  
 def get_version():
-    if len(VERSION) == 3:
-            v = '%s.%s.%s' % VERSION
-    else:
-        v = '%s.%s' % VERSION[:2]
-    return v
+    return '.'.join(map(str,VERSION))
  
 __version__  = get_version()
 __license__  = "BSD"

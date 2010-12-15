@@ -1,9 +1,17 @@
 
 Version 0.4.0 - Development
 ================================
-* Added a ``profile`` suite.
+* Added a ``profile`` suite for analysing performance of different backends and impact of cython_.
+  To profile, move to the ``profile`` directory in the main distribution and type::
+  
+  	python runprofile.py --list
+  	
+  to have a list of available profile tests. To run a profile test::
+  
+  	python runprofile.py <name>
+  	
 * Added fallback tests and split ``zoo`` and ``numpy`` timeseries backend tests.
-* Added sphinx_ extension in mod:`dynts.web.dyntsx` for displaying the list of timeseries functions available.
+* Added sphinx_ extension in :mod:`dynts.web.dyntsx` for displaying the list of timeseries functions available.
 * Created the ``lib`` module where cython_ extensions will be placed. Cython extensions will be compiled only
   if cython is available, otherwise a fall-back pure python library will be used.
 * Redesign of test suite. You can now run tests for given tags::
@@ -13,7 +21,7 @@ Version 0.4.0 - Development
   Each tag is defined by a directory in the :mod:`dynts.tests.regression` module.
 * Added simple statistics pivot table.
 * Bug fixes.
-* **80 Tests**, **73% test coverage**
+* **86 Tests**, **70% test coverage**
 
 Version 0.3.3 - 2010 November 16
 ===================================

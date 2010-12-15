@@ -150,7 +150,19 @@ the greatest to the smallest date in the timeseries by passing ''desc=True``'''
         raise NotImplementedError
     
     def delta(self, lag = 1, **kwargs):
-        '''First order derivative with lag ``k``.'''
+        '''\
+First order derivative. Optimised.
+
+:parameter lag: backward lag
+'''
+        raise NotImplementedError
+    
+    def delta2(self, lag = 2, **kwargs):
+        '''\
+Second order derivative. Optimised.
+
+:parameter lag: backward lag
+'''
         raise NotImplementedError
     
     def lag(self, lag = 1):

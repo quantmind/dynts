@@ -1,12 +1,16 @@
 from datetime import date, timedelta
 from random import uniform, randint
-import numpy as ny
+
+from numpy import ndarray
 
 def_converter = lambda x: x
 def_generator = lambda x : uniform(0,1)
 
-__all__ = ['datepopulate','populate','randomts',
-           'randomwalk']
+__all__ = ['datepopulate',
+           'populate',
+           'randomts',
+           'randomwalk',
+           'polygen']
 
 class gdata(object):
     
@@ -28,9 +32,9 @@ def datepopulate(size = 10, start = None, delta = 1):
         s  += 1
     return gdata(data)
         
-def populate(size = 10, cols = 1, generator = None):
+def populate(size = 100, cols = 1, generator = None):
     generator = generator or def_generator
-    data = ny.ndarray([size,cols])
+    data = ndarray([size,cols])
     for c in xrange(0,cols):
         data[:,c] = [generator(i) for i in xrange(0,size)]
     return data
@@ -42,6 +46,23 @@ def randomts(size = 100, cols = 1, start = None, delta = 1,
     dates = datepopulate(size,start=start,delta=delta)
     data  = populate(size,cols=cols,generator=generator)
     return timeseries(name=name,backend=backend,date=dates,data=data)
+
+
+def polygen(*coefficients):
+    '''Polynomial generating function'''
+    if not coefficients:
+        return lambda i : 0
+    else:
+        c0 = coefficients[0]
+        coefficients = coefficients[1:]
+        def _(i):
+            v = c0
+            for c in coefficients:
+                v += c*i
+                i *= i
+            return v
+        return _
+
 
 def randomwalk(size = 100, cols = 1, start = None, delta = 1,
                backend=None, name='randomwalk', sigma = 1.0, mu = 1.0):
