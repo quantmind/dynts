@@ -1,3 +1,4 @@
+import numpy as np
 from collections import deque
 from itertools import islice
 
@@ -8,7 +9,8 @@ from skiplist import skiplist
 
 __all__ = ['roll_max',
            'roll_min',
-           'roll_median']
+           'roll_median',
+           'roll_sum']
 
 
 def roll_max(iterable, window, skiplist_class = skiplist):
@@ -77,3 +79,35 @@ def rollingOperation(iterable, window, op, skiplist_class = skiplist):
             ol.insert(newelem)
         yield op(ol,nobs)
 
+
+def roll_sum(input, window):
+    '''Apply a rolling sum function to an array'''
+    nobs, i, j, sum_x = 0,0,0,0.
+    N = len(input)
+
+    if window > N:
+        raise ValueError('Out of bound')
+    
+    output = np.ndarray(N-window+1,dtype=input.dtype)
+    
+    for val in input[:window]:
+        if val == val:
+            nobs += 1
+            sum_x += val
+        
+    output[j] = sum_x
+    
+    for val in input[window:]:
+        prev = input[j]
+        if prev == prev:
+            sum_x -= prev
+            nobs -= 1
+
+        if val == val:
+            nobs += 1
+            sum_x += val
+
+        j += 1
+        output[j] = sum_x
+
+    return output

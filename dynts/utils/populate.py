@@ -44,7 +44,7 @@ def randomts(size = 100, cols = 1, start = None, delta = 1,
     return timeseries(name=name,backend=backend,date=dates,data=data)
 
 def randomwalk(size = 100, cols = 1, start = None, delta = 1,
-               backend=None, name='randomwalk', sigma = 0.1, mu = 0.0):
+               backend=None, name='randomwalk', sigma = 1.0, mu = 1.0):
     '''Create a random walk timeseries'''
     pass
 

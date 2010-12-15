@@ -5,7 +5,7 @@
 # Pointer to a function operating on a skiplist
 ctypedef double_t (* skiplist_f)(skiplist sl, int n)
 
-
+@cython.boundscheck(False)
 cdef _roll_skiplist_op(ndarray arg, int window, skiplist_f op):
     '''Apply a rolling median/min/max function to an array'''
     cdef ndarray[double_t, ndim=1] input = arg
@@ -90,6 +90,7 @@ cdef double_t _get_min(skiplist sl, int nobs):
 #-------------------------------------------------------------------------------
 # Rolling sum
 
+@cython.boundscheck(False)
 def roll_sum(ndarray[double_t, ndim=1] input, int window):
     '''Apply a rolling sum function to an array'''
     cdef double val, prev, sum_x = 0
@@ -98,7 +99,7 @@ def roll_sum(ndarray[double_t, ndim=1] input, int window):
     cdef int j = 0
     cdef int N = len(input)
 
-    cdef ndarray[double_t, ndim=1] output = np.empty(N-window, dtype=float)
+    cdef ndarray[double_t, ndim=1] output = np.empty(N-window+1, dtype=float)
 
     for i in range(window):
         val = input[i]
@@ -107,7 +108,7 @@ def roll_sum(ndarray[double_t, ndim=1] input, int window):
             nobs += 1
             sum_x += val
     
-    output[j] = sum_x
+    output[j] = sum_x / nobs
 
     for i in xrange(window,N):
         val = input[i]
@@ -121,6 +122,7 @@ def roll_sum(ndarray[double_t, ndim=1] input, int window):
             nobs += 1
             sum_x += val
 
-        output[++j] = sum_x
+        j += 1
+        output[j] = sum_x / nobs
 
     return output

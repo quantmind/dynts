@@ -43,8 +43,9 @@ def get_tests():
         if d.startswith('_'):
             continue
         name = d.split('.')[0]
-        mod  = import_module('ptests.{0}'.format(name))
-        tests[name] = mod
+        if name not in tests:
+            mod  = import_module('ptests.{0}'.format(name))
+            tests[name] = mod
     return tests
         
 
