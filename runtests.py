@@ -49,7 +49,8 @@ if __name__ == '__main__':
     from runtests import run
         
     run(tags,
+        options.test_type,
+        path,
         verbosity=options.verbosity,
-        test_type=options.test_type,
         show_list=options.show_list)
     

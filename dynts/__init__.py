@@ -128,12 +128,4 @@ def runbench(tags = None, verbosity = 1, **kwargs):
     suite  = loader.loadBenchFromModules(['dynts.bench.*'])
     test.runbench(suite,tags,verbosity, **kwargs)
     
-    
-def showtestlist(ld):
-    print('')
-    print('There are a total of {0} tests.'.format(len(ld)))
-    print('')
-    for name in sorted(ld.keys()):
-        mod = ld[name]
-        print('{0} :    {1}'.format(name,mod.__doc__))
         

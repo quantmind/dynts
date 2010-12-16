@@ -1,20 +1,13 @@
 import logging
 import os
 import sys
+import pstats
+
 import dynts
-from dynts.test import TestSuiteRunner
+from dynts.test import TestSuiteRunner, runbench
 from dynts.utils.importlib import import_module 
 
 logger = logging.getLogger('dynts')
-
-# directories for testing
-LIBRARY        = 'dynts'
-TEST_FOLDERS   = ('regression',)
-
-CUR_DIR        = os.path.split(os.path.abspath(__file__))[0]
-ALL_TEST_PATHS = [os.path.join(CUR_DIR,td) for td in TEST_FOLDERS]
-if CUR_DIR not in sys.path:
-    sys.path.insert(0,CUR_DIR)
 
 LOGGING_MAP = {1: logging.CRITICAL,
                2: logging.INFO,
@@ -26,36 +19,56 @@ class Silence(logging.Handler):
         pass 
 
 
-def get_tests():
+def showtestlist(ld):
+    print('')
+    print('There are a total of {0} tests.'.format(len(ld)))
+    print('')
+    for name in sorted(ld.keys()):
+        mod = ld[name]
+        print('{0} :    {1}'.format(name,mod.__doc__))
+
+
+def get_tests(paths, dirs = False, filename = None):
     tests = []
     join  = os.path.join
-    for dirpath in ALL_TEST_PATHS:
+    filename = filename or 'tests'
+    for dirpath in paths:
         loc = os.path.split(dirpath)[1]
         for d in os.listdir(dirpath):
-            if os.path.isdir(join(dirpath,d)):
-                tests.append((loc,d))
+            if d.startswith('_'):
+                continue
+            modname = None  
+            elem = join(dirpath,d)
+            if dirs and os.path.isdir(elem):
+                name = d
+                modname = '{0}.{1}.{2}'.format(loc,d,filename)
+            elif not dirs and os.path.isfile(elem):
+                name,ext = d.split('.')
+                if ext == 'pyc':
+                    continue
+                modname = '{0}.{1}'.format(loc,name)
+            
+            if name and modname:
+                tests.append((name,modname))
+                
     return tests
 
 
-def import_tests(tags):
+def import_tests(tags, paths, dirs = False, filename = None):
     apptests = {}
-    for loc,app in get_tests():
-        if tags and app not in tags:
-            logger.debug("Skipping tests for %s" % app)
+    for name,modname in get_tests(paths, dirs = dirs, filename = filename):
+        if tags and name not in tags:
+            logger.debug("Skipping tests for %s" % name)
             continue
-        logger.debug("Try to import tests for %s" % app)
-        test_module = '{0}.{1}.tests'.format(loc,app)
-        if loc == 'contrib':
-            test_module = '{0}.{1}'.format(LIBRARY,test_module)
+        logger.debug("Try to import tests for %s" % name)
             
         try:
-            mod = import_module(test_module)
-        except ImportError, e:
-            logger.debug("Could not import tests for %s: %s" % (test_module,e))
-            raise
+            mod = import_module(modname)
+        except ImportError as e:
+            logger.critical("Could not import tests for %s: %s" % (modname,e))
         
-        logger.debug("Adding tests for %s" % app)
-        apptests[app] = mod
+        logger.debug("Adding tests for %s" % name)
+        apptests[name] = mod
     return apptests
 
 
@@ -74,34 +87,43 @@ def showlist(modules):
         print('{0} : {1}'.format(name,mod.__doc__))
         
 
-def run_regression(tags, verbosity, show_list):
+def run_regression(tags, paths, verbosity, show_list):
     '''Run regression tests'''
-    modules = import_tests(tags)
+    modules = import_tests(tags, paths, dirs=True, filename='tests')
     if show_list:
-        dynts.showtestlist(modules)
+        showtestlist(modules)
     else:
         runner  = TestSuiteRunner(verbosity = verbosity)
         runner.run_tests(modules.values())
         
 
-def run_bench(tags, verbosity, show_list):
+def run_bench(tags, paths, verbosity, show_list):
     '''Run benchmark tests'''
-    modules = import_tests(tags)
+    modules = import_tests(tags, paths)
     if show_list:
-        dynts.showtestlist(modules)
+        showtestlist(modules)
     else:
-        runner  = TestSuiteRunner(verbosity = verbosity)
-        runner.run_tests(modules.values())
+        runbench(modules.values(), tags, verbosity)
         
 
-def run_profile(tags, verbosity, show_list):
+def run_profile(tags, paths, verbosity, show_list):
     '''Run profile tests'''
-    modules = import_tests(tags)
+    modules = import_tests(tags, paths)
     if show_list:
-        dynts.showtestlist(modules)
+        showtestlist(modules)
     else:
-        runner  = TestSuiteRunner(verbosity = verbosity)
-        runner.run_tests(modules.values())
+        if not tags:
+            print('You need to pass a profile test name to profile.')
+            print('Check the list by typing runprofile --list.')
+        else:
+            name = tags[0]
+            mod = modules.get(name,None)
+            if mod:
+                mod.run()
+                s = pstats.Stats("Profile.prof")
+                s.strip_dirs().sort_stats("time").print_stats()
+            else:
+                print('Unknonw test {0}.'.format(name))
         
 
 TEST_TYPES = {'regression': run_regression,
@@ -112,12 +134,15 @@ def test_names():
     return ', '.join(TEST_TYPES)
 
     
-def run(tags, test_type,
+def run(tags,
+        test_type,
+        path,
         verbosity = 1,
         show_list = False):
     runner = TEST_TYPES.get(test_type,None)
     if not runner:
         print('Unknow test type {0}. Choose one from {1}'.format(test_type,test_names()))
     setup_logging(verbosity)
-    runner(tags,verbosity,show_list)
+    tpath = os.path.join(path,test_type)
+    runner(tags,[tpath],verbosity,show_list)
 

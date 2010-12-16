@@ -1,6 +1,7 @@
 
 Version 0.4.0 - Development
 ================================
+* Dropped python 2.5 compatibility and moved towards python 3 support.
 * Added a ``profile`` suite for analysing performance of different backends and impact of cython_.
   To profile, move to the ``profile`` directory in the main distribution and type::
   
