@@ -14,11 +14,11 @@ def makeoptions():
                       dest="verbosity",
                       default=1,
                       help="Tests verbosity level, one of 0, 1, 2 or 3")
-    parser.add_option("-b", "--bench",
-                      action="store_true",
-                      dest="bench",
-                      default=False,
-                      help="Run benchmarks")
+    parser.add_option("-t", "--type",
+                      action="store",
+                      dest="test_type",
+                      default='regression',
+                      help="Test type, possible choices are: regression, bench and profile")
     parser.add_option("-l", "--list",
                       action="store_true",
                       dest="show_list",
@@ -41,12 +41,15 @@ if __name__ == '__main__':
     if options.proxy:
         from dynts.conf import settings
         settings.proxies['http'] = options.proxy
-    if options.bench:
-        runner = dynts.runbench
-    else:
-        runner = dynts.runtests
+    
+    # add the tests directory to the Python Path
+    p = os.path
+    path = p.join(p.split(p.abspath(__file__))[0],'tests')
+    sys.path.insert(0, path)
+    from runtests import run
         
-    runner(tags,
-           verbosity=options.verbosity,
-           show_list=options.show_list)
+    run(tags,
+        verbosity=options.verbosity,
+        test_type=options.test_type,
+        show_list=options.show_list)
     
