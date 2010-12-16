@@ -10,7 +10,7 @@ from skiplist import skiplist
 __all__ = ['roll_max',
            'roll_min',
            'roll_median',
-           'roll_sum']
+           'roll_mean']
 
 
 def roll_max(iterable, window, skiplist_class = skiplist):
@@ -43,19 +43,16 @@ def smin(olist,nobs):
 
 
 def smedian(olist,nobs):
+    '''Generalised media for odd and even number of samples'''
     if nobs:
+        rem = nobs % 2
         midpoint = nobs // 2
-        return olist[midpoint]
+        me = olist[midpoint]
+        if not rem:
+            me = 0.5 * (me + olist[midpoint-1])
+        return me
     else:
         return NaN
-
-
-def smean(olist,missing):
-    if olist:
-        mean = sum(olist) / len(olist)
-        return mean
-    else:
-        return missing
 
 
 def rollingOperation(iterable, window, op, skiplist_class = skiplist):
@@ -80,8 +77,8 @@ def rollingOperation(iterable, window, op, skiplist_class = skiplist):
         yield op(ol,nobs)
 
 
-def roll_sum(input, window):
-    '''Apply a rolling sum function to an array'''
+def roll_mean(input, window):
+    '''Apply a rolling mean function to an array'''
     nobs, i, j, sum_x = 0,0,0,0.
     N = len(input)
 
@@ -95,7 +92,7 @@ def roll_sum(input, window):
             nobs += 1
             sum_x += val
         
-    output[j] = sum_x
+    output[j] = NaN if not nobs else sum_x / nobs
     
     for val in input[window:]:
         prev = input[j]
@@ -108,6 +105,6 @@ def roll_sum(input, window):
             sum_x += val
 
         j += 1
-        output[j] = sum_x
+        output[j] = NaN if not nobs else sum_x / nobs
 
     return output

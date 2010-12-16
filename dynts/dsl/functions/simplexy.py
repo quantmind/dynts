@@ -12,10 +12,6 @@ class SimpleFunctionXY(FunctionBase):
 
 class scatter(SimpleFunctionXY):
     """\
-    
-scatter
-============
-
 A two-dimensional scatter plot::
 
     scatter(GOOG,YHOO)

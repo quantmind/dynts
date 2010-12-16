@@ -100,32 +100,18 @@ def functions_docs():
     names = sorted(function_registry.keys())
     docs = ''
     for name in names:
+        t = (1+len(name))*'='
+        title = '\n{0}\n{1}\n'.format(name,t)
+        docs += title
         func = function_registry[name]
-        docs += func.__doc__
+        fdoc = func.__doc__
+        docs += fdoc
     return docs
 
-
-################### For testings
-#
-def add2path():
-    import os
-    import sys
-    path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
-    if path not in sys.path:
-        sys.path.insert(0,path)
-        
-def runtests(tags = None, verbosity = 1, **kwargs):
-    add2path()
-    from dynts.tests.runtests import run
-    run(tags = tags, verbosity = verbosity, **kwargs)
-    
-    
-def runbench(tags = None, verbosity = 1, **kwargs):
-    '''Run benchmark suite'''
-    add2path()
-    from dynts import test
-    loader = test.BenchLoader()
-    suite  = loader.loadBenchFromModules(['dynts.bench.*'])
-    test.runbench(suite,tags,verbosity, **kwargs)
-    
+def dump_docs(filename = 'dyntslist.rst'):
+    docs = functions_docs()
+    f = open(filename,'w')
+    f.write(docs)
+    f.close()
+    print(('Saved function documentations in {0}'.format(filename)))
         

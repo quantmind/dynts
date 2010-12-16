@@ -1,9 +1,6 @@
 import time
 from datetime import date, datetime
-try:
-    import json
-except:
-    import simplejson as json
+import json
     
 date2timestamp = lambda dte : int(time.mktime(dte.timetuple()))
     

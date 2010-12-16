@@ -19,7 +19,6 @@ arrayfunc = lambda func, *args : [func(*items) for items in izip()]
 
 _functions = {'min':'min',
               'max':'max',
-              ###Ned to check these functions
               'mean': 'mean',
               'med': 'median',
               }
@@ -39,7 +38,6 @@ def rollsingle(self, func, window = 20, name = None,
     name = name or self.makename(func,window=window)
     dates = asarray(self.dates())
     return self.clone(dates[window-1:], data.transpose(), name = name)
-        
 
 
 def rollsingle_fb(self, func, window = 20, name = None, **kwargs):
@@ -151,6 +149,14 @@ class TimeSeries(dynts.TimeSeries):
         v = self._data[lag:] - self._data[:-lag]
         name = name or 'delta(%s,%s)' % (self.name,lag)
         return self.clone(self._date[lag:],v,name)
+    
+    def delta2(self, lag = 1, name = None, **kwargs):
+        lag2 = 2*lag
+        self.precondition(lag2<len(self) and lag2 > 0,dynts.DyntsOutOfBound)
+        d = self._data
+        v = d[lag2:] + d[:-lag2] - 2*d[lag:-lag]
+        name = name or 'delta2(%s,%s)' % (self.name,lag)
+        return self.clone(self._date[lag2:],v,name)
     
     def logdelta(self, lag = 1, name = None, **kwargs):
         self.precondition(lag<len(self) and lag > 0,dynts.DyntsOutOfBound)

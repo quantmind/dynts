@@ -69,7 +69,15 @@ which exposes hash-table like functionalities of ``self``.'''
         return asarray(self.apply('mean', fallback = fallback)[0])
     
     def median(self, fallback = False):
-        '''Median values by series'''
+        '''Median values by series. A median value of a serie
+is defined as the the numeric value separating the higher half,
+from the lower half. It is therefore differnt from the :meth:`TimeSeries.mean` value.
+
+The median of a finite list of numbers can be found by arranging all the
+observations from lowest value to highest value and picking the middle one.
+
+If there is an even number of observations, then there is no single middle value;
+the median is then usually defined to be the mean of the two middle values'''
         return asarray(self.apply('median', fallback = fallback)[0])
     
     def returns(self, fallback = False):

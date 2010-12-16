@@ -59,9 +59,9 @@ Requirements
 =====================
 There are several requirements that must be met:
 
-* python_ 2.5 or later. Note that Python 3 series are not supported yet.
-* numpy_ for arrays and matrices.
-* ply_ the building block of the DSL_.
+* python_ 2.6 or later. Support for Python 3 series is under development and should be completed soon.
+* numpy_ version 1.5.1 or higher for arrays and matrices.
+* ply_ version 3.3 or higher, the building block of the DSL_.
 * rpy2_ if an R_ TimeSeries back-end is used (default).
 * ccy_ for date and currency manipulation.
 
@@ -87,28 +87,46 @@ Optional Requirements
 __ http://sourceforge.net/projects/pywin32/files/
 
 
+.. _running-tests:
+
 Running Tests
 =================
+There are three types of tests available:
+
+* ``regression`` for unit and regression tests.
+* ``profile`` for analysing performance of different backends and impact of cython_.
+* ``bench`` same as ``profile`` but geared towards speed rather than profiling.
+  
 From the distribution directory type::
 	
 	python runtests.py
 	
-or, once installed::
+This will run by default the regression tests. To run a profile test
+type::
 
-	from dynts import runtests
-	runtests()
+	python runtests.py -t profile <test-name>
 	
-If you are behind a proxy, some tests will fail unless you write a little script
-which looks like this::
+where ``<test-name>`` is the name of a profile test.
+To obtain a list of available tests for each test type, run::
 
-	from dynts.conf import settings
-	from dynts import runtests
-	settings.proxies['http'] = 'http://your.proxy.com:80'
+	python runtests.py --list
 
-	if __name__ == '__main__':
-	    runtests()
-	    
-	    
+for regression, or:: 
+
+	python runtests.py -t profile --list
+	
+for profile, or::
+
+	python runtests.py -t bench --list
+	
+from benchmarks.
+	
+If you access the internet behind a proxy server, pass the ``-p`` option, for example::
+
+	python runtests.py -p http://myproxy.com:80
+
+It is needed since during tests some data is fetched from google finance.
+
 To access coverage of tests you need to install the coverage_ package and run the tests using::
 
 	coverage run --source=dynts runtests.py

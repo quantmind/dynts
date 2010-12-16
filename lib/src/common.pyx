@@ -9,6 +9,8 @@ cdef extern from "numpy/arrayobject.h":
 cdef extern from "math.h":
     double log(double x)
     double sqrt(double x)
+    double min(double,double)
+    double max(double,double)
 
 # Not a number
 isnan = np.isnan

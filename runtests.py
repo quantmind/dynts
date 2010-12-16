@@ -29,6 +29,11 @@ def makeoptions():
                       dest="proxy",
                       default='',
                       help="Set the HTTP_PROXY environment variable")
+    parser.add_option("-d", "--docs",
+                      action="store_true",
+                      dest="docs",
+                      default=False,
+                      help="Dump function documentation.")
     return parser
 
     
@@ -42,15 +47,18 @@ if __name__ == '__main__':
         from dynts.conf import settings
         settings.proxies['http'] = options.proxy
     
-    # add the tests directory to the Python Path
-    p = os.path
-    path = p.join(p.split(p.abspath(__file__))[0],'tests')
-    sys.path.insert(0, path)
-    from runtests import run
+    if options.docs:
+        dynts.dump_docs()
+    else:
+        # add the tests directory to the Python Path
+        p = os.path
+        path = p.join(p.split(p.abspath(__file__))[0],'tests')
+        sys.path.insert(0, path)
+        from testsrunner import run
+            
+        run(tags,
+            options.test_type,
+            path,
+            verbosity=options.verbosity,
+            show_list=options.show_list)
         
-    run(tags,
-        options.test_type,
-        path,
-        verbosity=options.verbosity,
-        show_list=options.show_list)
-    

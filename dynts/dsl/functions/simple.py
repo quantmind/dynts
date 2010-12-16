@@ -16,16 +16,8 @@ class ScalarFunction(FunctionBase):
 
 class Log(ScalarFunction):
     """\
-
-log
-========
-
 Calculate the natural logarithm of a timeseries. It applies to each
 value and return a timeseries with exactly the same dimensions.
-
-.. math::
-
-    \log{(ts)}
 """
     def apply(self, ts, **kwargs):
         return ts.log(**kwargs)
@@ -33,35 +25,63 @@ value and return a timeseries with exactly the same dimensions.
     
 class Delta(ScalarFunction):
     """\
-
-delta
-===========
-
-First order difference evaluated as
+It evaluates the first order difference evaluated as
 
 .. math::
 
-    \Delta y_t = y_t - y_{t-lag}
+    \\Delta y_t = y_t - y_{t-lag}
 
+Typical usage::
+
+    delta(tiker)
+    delta(tiker,lag=5)
+    
+:parameter lag: backward lag. Default ``1``.
 """
     def apply(self, ts, **kwargs):
         return ts.delta(**kwargs)
     
     
+class Delta2(ScalarFunction):
+    """\   
+Second order difference evaluated as
+
+.. math::
+
+    \\Delta_{\\tt lag}^2 y_t &= \\Delta_{\\tt lag} \\left( \\Delta_{\\tt lag} y_t \\right)\\\\
+                             &= y_t - 2 y_{t-{\\tt lag}} + y_{t-2{\\tt lag}}
+
+Typical usage::
+
+    delta2(tiker)
+    delta2(tiker,lag=5)
+    
+It is an optimised shortcut function equivalent to::
+
+    delta(delta(tiker))
+    delta(delta(tiker,lag=5),lag=5)
+
+:parameter lag: backward lag. Default ``1``.
+"""
+    def apply(self, ts, **kwargs):
+        return ts.delta2(**kwargs)
+    
+    
 class LDelta(ScalarFunction):
     """\
-
-ldelta
-============
-
 Calculate the log-delta of a timeseries. This is the first order difference
 in log-space useful for evaluationg percentage moments
     
 .. math::
 
-    {\tt ldelta}(y_t) = \frac{y_t}{y_{t-1}}
-    
+    {\\tt ldelta} (y, lag=1) = \\log{\\frac{y_t}{y_{t-{\\tt lag}}}}   
 
+Typical usage::
+
+    ldelta(tiker)
+    ldelta(tiker,lag=5)
+    
+:parameter lag: backward lag. Default ``1``.
 """
     def apply(self, ts, **kwargs):
         return ts.logdelta(**kwargs)
@@ -69,10 +89,6 @@ in log-space useful for evaluationg percentage moments
 
 class Ma(ScalarFunction):
     """\
-
-ma
-=============
-
 Arithmetic moving average function.
 """
     def apply(self, ts, **kwargs):
@@ -81,10 +97,6 @@ Arithmetic moving average function.
     
 class Max(ScalarFunction):
     """\
-
-max
-=============
-
 Moving max function.
 """
     def apply(self, ts, **kwargs):
@@ -93,10 +105,6 @@ Moving max function.
 
 class Med(ScalarFunction):
     """\
-    
-med
-=============
-
 Moving median function.
 """
     def apply(self, ts, **kwargs):
@@ -105,10 +113,6 @@ Moving median function.
     
 class Min(ScalarFunction):
     """\
-
-min
-===========
-
 Moving min function.
 """
     def apply(self, ts, **kwargs):
@@ -117,10 +121,6 @@ Moving min function.
     
 class zscore(ScalarFunction):
     """\
-    
-zscore
-=============
-
 Rolling Z-Score function:
 
 .. math::
@@ -134,23 +134,35 @@ Rolling Z-Score function:
 
 class prange(ScalarFunction):
     """\
-    
-prange
-=========
-
 Rolling Percentage range function.
 """
     def apply(self, ts, **kwargs):
         return tsfunctions.prange(ts, **kwargs)
     
+
+
+class StDev(ScalarFunction):
+    '''\
+Rolling standard deviation as given by:
+
+.. math::
+
+    {\\tt stdev}(y_t) = \\sqrt{\\sum_{i=0}^{w-1} (\\Delta y_{t-i})^2}
+    
+Typical usage::
+
+    stdev(tiker)
+    stdev(tiker,window=40)
     
     
+:parameter window: the rolling window in units. Default ``20``.
+'''
+    def apply(self, ts, **kwargs):
+        return ts.rollavol(**kwargs)
+    
+
 class Avol(ScalarFunction):
     '''\
-    
-avol
-=======
-
 Annualised volatility.
 '''
     def apply(self, ts, **kwargs):
@@ -159,10 +171,6 @@ Annualised volatility.
     
 class reg(FunctionBase):
     """\
-
-regr
-==========
-
 Calculate the **linear regression** of one series with respect
 to one or more series. For example::
 

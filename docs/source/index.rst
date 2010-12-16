@@ -37,7 +37,6 @@ Contents
    backends/index
    provider/index
    functions
-   dev
    formatters
    internals/index
    maths/index

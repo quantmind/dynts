@@ -15,10 +15,6 @@ class Zoo_Min(test.BenchMark):
     
     def run(self):
         self.ts.min()
-        
-        
-class Numpy_Min(Zoo_Min):
-    backend = 'numpy'
     
     
 class Zoo_RollingMin(Zoo_Min):
@@ -28,6 +24,11 @@ class Zoo_RollingMin(Zoo_Min):
         self.ts.rollmin(window = self.window)
         
         
+        
+class Numpy_Min(Zoo_Min):
+    backend = 'numpy'
+    
+    
 class Numpy_RollingMin(Zoo_RollingMin):
     backend = 'numpy'
     

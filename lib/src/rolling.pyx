@@ -91,7 +91,8 @@ cdef double_t _get_min(skiplist sl, int nobs):
 # Rolling sum
 
 @cython.boundscheck(False)
-def roll_sum(ndarray[double_t, ndim=1] input, int window):
+@cython.wraparound(False)
+def roll_mean(ndarray[double_t, ndim=1] input, int window):
     '''Apply a rolling sum function to an array'''
     cdef double val, prev, sum_x = 0
     cdef int nobs = 0
@@ -108,7 +109,7 @@ def roll_sum(ndarray[double_t, ndim=1] input, int window):
             nobs += 1
             sum_x += val
     
-    output[j] = sum_x / nobs
+    output[j] = NaN if not nobs else sum_x / nobs
 
     for i in xrange(window,N):
         val = input[i]
@@ -123,6 +124,6 @@ def roll_sum(ndarray[double_t, ndim=1] input, int window):
             sum_x += val
 
         j += 1
-        output[j] = sum_x / nobs
+        output[j] = NaN if not nobs else sum_x / nobs
 
     return output

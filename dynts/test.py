@@ -1,7 +1,7 @@
 import os
 import unittest
 from datetime import date
-from itertools import izip
+
 import types
 
 import numpy as np
@@ -52,7 +52,7 @@ class TestCase(unittest.TestCase):
         if self.isiterable(a):
             np.testing.assert_(self.isiterable(b))
             np.testing.assert_equal(len(a), len(b))
-            for i in xrange(len(a)):
+            for i in range(len(a)):
                 self.assertAlmostEqual(a[i], b[i])
             return True
 
@@ -86,7 +86,7 @@ class TestCase(unittest.TestCase):
         lv2 = len(v2)
         self.assertEqual(lv1, lv2, "Vectors are of different lengths %s, %s" %(lv1, lv2))
 
-        for a,b  in izip(v1,v2):
+        for a,b  in zip(v1,v2):
             if equal:
                 self.assertEqual(a, b)
             else:
@@ -140,7 +140,7 @@ class TestLoader(unittest.TestLoader):
         for module in modules:
             for name in dir(module):
                 obj = getattr(module, name)
-                if (isinstance(obj, (type, types.ClassType)) and
+                if (isinstance(obj, type) and
                     issubclass(obj, unittest.TestCase)):
                     tests.append(self.loadTestsFromTestCase(obj))
         return self.suiteClass(tests)
@@ -164,7 +164,7 @@ class BenchLoader(TestLoader):
         tests = self.tests
         for name in dir(module):
             cls = getattr(module, name)
-            if (isinstance(cls, (type, types.ClassType)) and
+            if (isinstance(cls, type) and
                 issubclass(cls, self.bclass)):
                 tests.append(cls())
     
@@ -176,16 +176,18 @@ class BenchLoader(TestLoader):
         return self.tests
 
     
-def runbench(benchs, tags, verbosity):
+def runbench(benchs, tags, verbosity, bclass = BenchMark):
     from timeit import Timer
     t = Timer("test()", "from __main__ import test")
-    for elem in benchs:
-        path = elem.__module__
-        label = path.split('.')[-1].lower()
-        if tags and label not in tags:
-            continue
-        name = elem.__class__.__name__
-        t = Timer("b.run()", 'from %s import %s\nb = %s()\nb.setUp()' % (path,name,name))
-        t = t.timeit(elem.number)
-        print('Run %15s --> %s' % (elem,t))
+    for mod in benchs:
+        for name in dir(mod):
+            cls = getattr(mod, name)
+            if (isinstance(cls, type) and issubclass(cls, bclass)):
+                name = cls.__name__
+                path = cls.__module__
+                t = Timer("b.run()",
+                          'from %s import %s\nb = %s()\nb.setUp()' % (path,name,name))
+                t = t.timeit(cls.number)
+                nice_name = name.replace('_',' ')
+                print(('Run %15s --> %s' % (nice_name,t)))
         

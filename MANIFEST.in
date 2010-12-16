@@ -9,7 +9,7 @@ recursive-include dynts/templates *
 recursive-include dynts/media *
 recursive-include lib *.py
 recursive-include lib/src *.pyx
-recursive-include profile *.py
+recursive-include tests *.py
 include docs/make.bat
 include docs/Makefile
 include docs/source/conf.py
