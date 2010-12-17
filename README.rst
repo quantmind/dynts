@@ -80,7 +80,6 @@ Optional Requirements
 * cython_ for performance. The library is not strictly dependent on cython, however its usage
   is highly recommended. If available several python modules will be replaced by more efficient compiled C code.
 * xlwt_ to create spreadsheet from timeseries.
-* simplejson_ if python_ version is less then 2.6
 * matplotlib_ for plotting.
 * djpcms_ for the ``web.views`` module.
 
@@ -156,7 +155,6 @@ __ http://github.com/quantmind/dynts/issues
 .. _timeSeries: http://cran.r-project.org/web/packages/timeSeries/index.html
 .. _Python: http://www.python.org/
 .. _xlwt: http://pypi.python.org/pypi/xlwt
-.. _simplejson: http://pypi.python.org/pypi/simplejson/
 .. _matplotlib: http://matplotlib.sourceforge.net/
 .. _djpcms: http://djpcms.com
 .. _coverage: http://nedbatchelder.com/code/coverage/

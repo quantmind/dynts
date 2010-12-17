@@ -1,6 +1,21 @@
+Authors
+============
+
+* Luca Sbardella <luca@quantmind.com>
+
+
+Contributors
+==============
+
 Ordered by date of first contribution:
-  Luca Sbardella <luca@quantmind.com>
-  Nick Marshall <marshall.nic@gmail.com>
+
+* Nick Marshall <marshall.nic@gmail.com>
   
-Thrid party modules
-  IOLA and Ole Laursen for the Flot library
+  
+Third party modules
+=====================
+
+* IOLA and Ole Laursen for the flot_ jQuery plugin.
+
+
+.. _flot: http://code.google.com/p/flot/

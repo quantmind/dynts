@@ -1,7 +1,7 @@
 try:
     from cts import *
     hasextensions = True
-except ImportError, e:
+except ImportError as e:
     hasextensions = False
     from .fallback import *
 else:

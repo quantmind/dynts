@@ -9,8 +9,6 @@ cdef extern from "numpy/arrayobject.h":
 cdef extern from "math.h":
     double log(double x)
     double sqrt(double x)
-    double min(double,double)
-    double max(double,double)
 
 # Not a number
 isnan = np.isnan
@@ -24,5 +22,5 @@ cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline int int_min(int a, int b): return a if a >= b else b
 
 # MSVC does not have log2!
-cdef double Log2(double x):
+cdef inline double Log2(double x):
     return log(x) / clog2

@@ -4,27 +4,20 @@
 DynTS
 =================================
 
-.. rubric:: A domain specific language for timeseries analysis and manipulation.
+.. rubric:: Timeseries analysis and manipulation including a domain specific language
+			for building and evaluating timeseries expressions. It includes abstract
+			classes for loading data when evaluating expressions.
 
-**Get it**
+**Getting Started**
 :ref:`Overview, Installation and Development <intro-overview>`
-
-**What is it?**
-Assuming you are familiar with timeseries, this is the idea::
-
-	>>> import dynts
-	>>> ts1 = dynts.evaluate('GOOG')
-	>>> # evaluate rolling annualised volatility on a 30 days windows
-	... ts2 = dynts.evaluate('avol(GOOG,window=30)')
-	>>> # specify start and end date
-	... ts3 = dynts.evaluate('avol(GOOG,window=30)', start = date(2007,1,1), end = date(2010,1,1))
 	
 **Where does it get the data?**
 Pluggable :class:`dynts.data.DataProvider`.
 
-**How econometric calculations are performed?** Extendible :class:`dynts.TimeSeries` backend classes.
+**How econometric calculations are performed?**
+Extendible :class:`dynts.TimeSeries` backend classes.
 
-Dynts is in constant development, with new functionalities added on a daily basis.
+**Dynts is in constant development, with new functionalities added on a daily basis.**
 
 Contents						
 ==================

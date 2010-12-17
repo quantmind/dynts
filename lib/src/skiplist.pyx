@@ -1,12 +1,11 @@
-# Cython version of skiplist
-# with O(log n) updates
+# Cython version of skiplist with O(log n) updates
 # Original author: Raymond Hettinger
+# Original cython version: Wes McKinney
 # Original license: MIT
 # Link: http://code.activestate.com/recipes/576930/
 
-# Cython version: Wes McKinney
-
 from random import random
+
 
 cdef class Node:
 
@@ -64,7 +63,7 @@ cdef class skiplist:
 
     def __init__(self, expected_size=100):
         self.size = 0
-        self.maxlevels = int(1 + Log2(expected_size))
+        self.maxlevels = 1 + int(Log2(expected_size))
 
         self.head = Node(np.NaN, [NIL] * self.maxlevels,
                          np.ones(self.maxlevels, dtype=int))
