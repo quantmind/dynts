@@ -314,9 +314,20 @@ $.extend({
 		function _set_default_dates($this)  {
 			var options = $this[0].options;
 			var dates = options.dates;
-	    	var td = new Date();
+			var td
+			if(options.end) {
+				td = new Date(options.end);
+			}
+			else {
+				td = new Date();
+			}
 	    	var v2 = $.datepicker.formatDate(dates.format, td);
-	    	td.setMonth(td.getMonth() - options.default_month_interval);
+	    	if(!options.start) {
+	    		td.setMonth(td.getMonth() - options.default_month_interval);
+	    	}
+	    	else {
+	    		td = new Date(options.start);
+	    	}
 	    	var v1 = $.datepicker.formatDate(dates.format, td);
 	    	dates.start.val(v1);
 	    	dates.end.val(v2);

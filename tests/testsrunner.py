@@ -66,6 +66,7 @@ def import_tests(tags, paths, dirs = False, filename = None):
             mod = import_module(modname)
         except ImportError as e:
             logger.critical("Could not import tests for %s: %s" % (modname,e))
+            continue
         
         logger.debug("Adding tests for %s" % name)
         apptests[name] = mod

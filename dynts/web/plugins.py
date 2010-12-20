@@ -32,12 +32,14 @@ __ http://packages.python.org/djpcms/'''
               'dynts/ecoplot/ecoplot.js',
               'dynts/decorator.js']
     
-    def render(self, djp, wrapper, prefix, height = 400, default_show = True, url = '', **kwargs):
+    def render(self, djp, wrapper, prefix, height = 400,
+               default_show = True, url = '', start = None, **kwargs):
         height = abs(int(height))
         ctx = {'url':    url,
                'height': height,
                'default_show': default_show,
-               'item':   djp.instancecode()}
+               'item':   djp.instancecode(),
+               'start': start}
         return loader.render_to_string('dynts/econometric-plot.html', ctx)
     
 

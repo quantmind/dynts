@@ -10,9 +10,17 @@
     
     $.start_ecoplot = function(elem,poptions,parsedata) {
     	$(".econometric-plot",elem).each(function() {
+    		var start;
     		var el   = $(this);
     		var url  = $('a',el).attr('href');
     		var height = parseInt($('.height',el).html());
+    		try {
+    			start  = parseInt($('.start',el).html());
+    			start  = new Date(start);
+    		}
+    		catch(e) {
+    			start = null;
+    		}
     		var item = $('.item',el);
     		var dshow = $('.show',el);
     		el.height(height);
@@ -37,7 +45,8 @@
         			commandline:    cmline,
         			elems:		    elems_,
         			flot_options:   poptions,
-        			parse: 		    parsedata
+        			parse: 		    parsedata,
+        			start:			start
         		}; 
     		if(!dshow.length) {
     			options.showplot = function(i) {return i<=1;}
