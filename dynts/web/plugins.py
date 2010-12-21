@@ -29,6 +29,7 @@ __ http://packages.python.org/djpcms/'''
         js = ['dynts/flot/excanvas.min.js',
               'dynts/flot/jquery.flot.min.js',
               'dynts/flot/jquery.flot.selection.min.js',
+              'dynts/jquery.flot.text.js',
               'dynts/ecoplot/ecoplot.js',
               'dynts/decorator.js']
     

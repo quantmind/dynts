@@ -134,7 +134,12 @@ and to check out the coverage report::
 
 	coverage report -m
 	
-	
+
+Kudos
+===========
+* numpy_ developers.
+
+
 Community
 =================
 Trying to use an IRC channel **#dynts** on ``irc.freenode.net``
