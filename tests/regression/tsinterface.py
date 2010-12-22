@@ -64,8 +64,11 @@ class TestFunctionTS(TestCase):
     def testRollingMedian(self):
         self._rollingTest('median')
         
-    def testRollingMedian(self):
+    def testRollingMean(self):
         self._rollingTest('mean')
+        
+    def testRollingSd(self):
+        self._rollingTest('sd')
                     
 
 class TestTS(TestFunctionTS):

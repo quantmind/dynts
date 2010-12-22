@@ -16,9 +16,6 @@ class Expr(object):
         '''Number of nodes'''
         return 1
     
-    def __unicode__(self):
-        return u'%s' % self.info()
-    
     @property
     def type(self):
         return self.__class__.__name__.lower()

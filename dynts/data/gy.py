@@ -1,6 +1,11 @@
 import os
 import csv
-from urllib import urlopen
+
+try:
+    from urllib2 import urlopen, ProxyHandler, build_opener
+except ImportError:
+    from urllib.request import urlopen, ProxyHandler, build_opener
+    
 try:
     import httplib2
 except:
@@ -8,7 +13,7 @@ except:
 
 from dynts.conf import settings
 
-from base import DataProvider
+from .base import DataProvider
 
 
 short_month = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')
@@ -23,6 +28,11 @@ class WebCsv(DataProvider):
             self.h = None
         self.h = None
         
+    @property
+    def http(self):
+        proxy = ProxyHandler(settings.proxies)
+        return build_opener(proxy)
+        
     def string_to_date(self, sdte):
         from ccy import dateFromString
         return dateFromString(sdte)
@@ -33,7 +43,7 @@ class WebCsv(DataProvider):
             if resp.status == 200:
                 return resp
         else:
-            return urlopen(url, proxies = settings.proxies)
+            return self.http.open(url)
     
     def rowdata(self, ticker, startdate, enddate):
         url = self.hystory_url(str(ticker), startdate, enddate)

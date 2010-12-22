@@ -31,7 +31,7 @@ def binOp(op, indx, amap, bmap, fill_vec):
         else:
             try:
                 result = op(va, vb)
-            except Exception, e:
+            except Exception as e:
                 result = None
             if result == None:
                 result = fill_vec
@@ -45,7 +45,7 @@ def applyfn(op, v1, v2, fill_vec):
     def op_or_missing(a,b):
         try:
             result = op(a,b)
-        except Exception, e:
+        except Exception as e:
             result = None
         if result is None:
                 result = fill_vec

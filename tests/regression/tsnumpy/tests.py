@@ -1,6 +1,6 @@
 '''Timeseries Numpy implementation'''
 import dynts
-from regression import tsinterface, tsop, tsdelta
+from regression import tsinterface, tsop, tsdelta, tsscalar
 
 
 class TestNumpyTS(tsinterface.TestTS):
@@ -12,6 +12,10 @@ class TestOpNumpyTS(tsop.TestOperators):
     
 
 class TestDeltaNumpy(tsdelta.TestCase):
+    backend = 'numpy'
+
+
+class TestDeltaNumpy(tsscalar.TestCase):
     backend = 'numpy'
 
 

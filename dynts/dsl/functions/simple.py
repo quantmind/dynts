@@ -22,6 +22,24 @@ value and return a timeseries with exactly the same dimensions.
     def apply(self, ts, **kwargs):
         return ts.log(**kwargs)
     
+
+class Sqrt(ScalarFunction):
+    """\
+Calculate the square root of a timeseries. It applies to each
+value and return a timeseries with exactly the same dimensions.
+"""
+    def apply(self, ts, **kwargs):
+        return ts.sqrt(**kwargs)
+    
+    
+class Square(ScalarFunction):
+    """\
+Calculate the square of a timeseries. It applies to each
+value and return a timeseries with exactly the same dimensions.
+"""
+    def apply(self, ts, **kwargs):
+        return ts.square(**kwargs)
+    
     
 class Delta(ScalarFunction):
     """\
@@ -141,13 +159,13 @@ Rolling Percentage range function.
     
 
 
-class StDev(ScalarFunction):
+class SD(ScalarFunction):
     '''\
 Rolling standard deviation as given by:
 
 .. math::
 
-    {\\tt stdev}(y_t) = \\sqrt{\\sum_{i=0}^{w-1} (\\Delta y_{t-i})^2}
+    {\\tt sd}(y_t) = \\sqrt{\\sum_{i=0}^{w-1} (\\Delta y_{t-i})^2}
     
 Typical usage::
 
@@ -158,7 +176,7 @@ Typical usage::
 :parameter window: the rolling window in units. Default ``20``.
 '''
     def apply(self, ts, **kwargs):
-        return ts.rollavol(**kwargs)
+        return ts.rollsd(**kwargs)
     
 
 class Avol(ScalarFunction):

@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from dynts.conf import settings
 from dynts.exceptions import *
 
-from gy import DataProvider, google, yahoo
+from .gy import DataProvider, google, yahoo
 
 
 class Silence(logging.Handler):

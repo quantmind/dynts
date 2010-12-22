@@ -1,6 +1,9 @@
-from itertools import izip
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass
 
-crossoperator = lambda func,*args : [func(*vals) for vals in izip(*args)]
+crossoperator = lambda func,*args : [func(*vals) for vals in zip(*args)]
 
 scalarasiter = lambda x: x if hasattr(x,'__iter__') else [x] 
 
@@ -53,13 +56,13 @@ class cross(object):
         return iter(self.elem)
     
     def __eq__(self, other):
-        return reduce(lambda x,y : x and y[0] == y[1], izip(self.elem,asarray(other)), True)
+        return reduce(lambda x,y : x and y[0] == y[1], zip(self.elem,asarray(other)), True)
     
     def __ge__(self, other):
-        return reduce(lambda x,y : x and y[0] >= y[1], izip(self.elem,asarray(other)), True)
+        return reduce(lambda x,y : x and y[0] >= y[1], zip(self.elem,asarray(other)), True)
     
     def __le__(self, other):
-        return reduce(lambda x,y : x and y[0] <= y[1], izip(self.elem,asarray(other)), True)
+        return reduce(lambda x,y : x and y[0] <= y[1], zip(self.elem,asarray(other)), True)
 
     def __gt__(self, other):
         return not (self <= other)

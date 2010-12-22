@@ -15,7 +15,7 @@ Ver. 0.4.0 - Development
   if cython is available, otherwise a fall-back pure python library will be used.
 * Added simple statistics pivot table.
 * Bug fixes.
-* **95 Tests**, **70% test coverage**
+* **101 Tests**, **70% test coverage**
 
 Ver. 0.3.3 - 2010 Nov 16
 ===================================

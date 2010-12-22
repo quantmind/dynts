@@ -1,16 +1,18 @@
 
-.. rubric:: A Domain Specific Language for Timeseries Analysis.
+.. rubric:: A statistic package for python with enphasis on timeseries analysis.
+            Built around numpy_, it provides several back-end timeseries classes
+            including R-based objects via rpy2_.
+            It is shipped with a domain specific language for timeseries analysis
+            and manipulation.
 
 --
 
 :Documentation: http://packages.python.org/dynts/
 :Dowloads: http://pypi.python.org/pypi/dynts/
 :Source: http://github.com/quantmind/dynts
-:Keywords: timeserie, quantitative, finance, statistics, web
+:Keywords: timeseries, quantitative, finance, statistics, numpy, R, web
 
 --
-
-Timeseries analysis and a timeseries domain specific language written in Python.
 
 
 .. contents::

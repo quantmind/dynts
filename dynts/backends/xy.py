@@ -1,10 +1,14 @@
-from UserDict import UserDict
-
 from dynts.conf import settings
 from dynts.exceptions import *
 
+__all__ = ['FormatterDict',
+           'Formatters',
+           'DynData',
+           'xyserie',
+           'xydata']
 
-class FormatterDict(UserDict):
+
+class FormatterDict(dict):
     
     def oftype(self, typ):
         '''Return a generator of formatters codes of type typ'''

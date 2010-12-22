@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
-import cStringIO
 import csv
-from itertools import izip
+
+from io import BytesIO as StreamIO
+
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass
 
 from dynts.exceptions import FormattingException
 from dynts.backends import istimeseries
@@ -28,7 +33,7 @@ class ToCsv(BaseFormatter):
     
     def __call__(self, ts, filename = None, **kwargs):
         '''Returns CSV representation of a :class:`dynts.TimeSeries`.'''
-        stream = cStringIO.StringIO()
+        stream = StreamIO()
         _csv = csv.writer(stream)
     
         for row in tsiterator(ts):
@@ -53,18 +58,18 @@ class ToFlot(BaseFormatter):
             res = flot.Flot(ts.name, type = 'timeseries', **series_info)
             dates  = asarray(ts.dates())
             missing = settings.ismissing
-            for name,serie in izip(ts.names(),ts.series()):
+            for name,serie in zip(ts.names(),ts.series()):
                 info = series_info.get(name,df) 
                 data = []
                 append = data.append
-                for dt,val in izip(dates,serie):
+                for dt,val in zip(dates,serie):
                     if not missing(val):
                         append([pydate2flot(dt),val])
                 serie = flot.Serie(label = name, data = data, **info)
                 res.add(serie)
         else:
             res = flot.Flot(ts.name)
-            for name,serie in izip(ts.names(),ts.series()):
+            for name,serie in zip(ts.names(),ts.series()):
                 serie = flot.Serie(label = serie.name,
                                    data = serie.data,
                                    lines = {'show':serie.lines},
@@ -110,7 +115,7 @@ __ http://pypi.python.org/pypi/xlwt'''
         else:
             wb = xlwt.Workbook()
         title = title or ts.name
-        stream = cStringIO.StringIO()
+        stream = StreamIO()
         sheet = wb.add_sheet(title)
         for i,row in enumerate(tsiterator(ts)):
             for j,col in enumerate(row):
@@ -119,7 +124,7 @@ __ http://pypi.python.org/pypi/xlwt'''
         if raw:
             return wb
         else:
-            stream = cStringIO.StringIO()
+            stream = StreamIO()
             wb.save(stream)
             return stream.getvalue()
     

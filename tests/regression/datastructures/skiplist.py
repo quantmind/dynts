@@ -1,5 +1,9 @@
 import unittest
-from itertools import izip
+
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass
 
 import dynts
 from dynts import lib
@@ -24,7 +28,7 @@ class RollingFunctionSkipList(unittest.TestCase):
         rmin  = roll.min()
         rmax  = roll.max()
         rmed  = roll.median()
-        for m0,m1,m2 in izip(rmin,rmed,rmax):
+        for m0,m1,m2 in zip(rmin,rmed,rmax):
             self.assertTrue(m1>=m0)
             self.assertTrue(m2>=m1)
         

@@ -108,3 +108,4 @@ def roll_mean(input, window):
         output[j] = NaN if not nobs else sum_x / nobs
 
     return output
+

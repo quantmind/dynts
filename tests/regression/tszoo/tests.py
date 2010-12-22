@@ -1,5 +1,5 @@
 '''Timeseries Zoo R package implementation'''
-from regression import tsinterface, tsop, tsdelta
+from regression import tsinterface, tsop, tsdelta, tsscalar
 
 
 class TestNumpyTS(tsinterface.TestTS):
@@ -11,4 +11,8 @@ class TestOpNumpyTS(tsop.TestOperators):
     
 
 class TestDeltaZoo(tsdelta.TestCase):
+    backend = 'zoo'
+    
+
+class TestScalarZoo(tsscalar.TestCase):
     backend = 'zoo'

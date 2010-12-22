@@ -1,5 +1,9 @@
 import unittest
-from itertools import izip
+
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass
 
 import dynts
 from dynts import dsl
@@ -60,7 +64,7 @@ class TestDsl(unittest.TestCase):
         self.assertEqual(data.count(),2)
         ts1 = data.serie(0)
         ts2 = data.serie(1)
-        for v1,v2 in izip(ts1,ts2):
+        for v1,v2 in zip(ts1,ts2):
             self.assertAlmostEqual(v1,2.*v2)
         
     def testTSName(self):

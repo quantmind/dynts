@@ -25,14 +25,18 @@ CLASSIFIERS  = [
                 'Topic :: Office/Business :: Financial'
                 ]
 
-
+try:
+    strtype = basestring
+except NameError:
+    strtype = str
+    
 from dynts.exceptions import *
-from backends import timeseries, xydata, TimeSeries, DynData, tsfunctions
-from backends import istimeseries, Formatters, BACKENDS, ts_bin_op
-from dsl import parse, merge, dslresult, function_registry, functions
-from maths import BasicStatistics, pivottable
-from data import providers
-import formatters
+from .backends import timeseries, xydata, TimeSeries, DynData, tsfunctions
+from .backends import istimeseries, Formatters, BACKENDS, ts_bin_op
+from .dsl import parse, merge, dslresult, function_registry, functions
+from .maths import BasicStatistics, pivottable
+from .data import providers
+from dynts import formatters
 Formatters['flot'] = formatters.ToFlot()
 Formatters['jsonvba'] = formatters.ToJsonVba()
 Formatters['csv']  = formatters.ToCsv()
@@ -65,7 +69,7 @@ Typical usage::
     min(GS,window=30)
     >>> ts = r.unwind()
     '''
-    if isinstance(expression,basestring):
+    if isinstance(expression,strtype):
         expression = parse(expression)
     symbols = expression.symbols()
     data = providers.load(symbols, start, end, loader = loader,
@@ -87,8 +91,18 @@ def statistics(expression,
 
 def tsname(*names):
     from dynts.conf import settings
-    return reduce(lambda x,y: '%s%s%s' % (x,settings.splittingnames,y), names)
+    sp = settings.splittingnames
+    return reduce(lambda x,y: '%s%s%s' % (x,sp,y), names)
 
+
+def composename(name, *names, **kwargs):
+    from dynts.conf import settings
+    sp = settings.splittingnames
+    kw = ','.join(('{0}={1}'.format(*v) for v in kwargs.items()))
+    if kw:
+        kw = ','+kw
+    return sp.join(('{0}({1}{2})'.format(name,x,kw) for x in names))
+    
 
 def hasextensions():
     '''True if cython extensions are available'''

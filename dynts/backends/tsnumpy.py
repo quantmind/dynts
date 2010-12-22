@@ -4,14 +4,14 @@
 #
 from collections import deque
 from itertools import izip
-import numpy as ny
+import numpy as np
 
 import dynts
-from dynts import lib
+from dynts import lib, composename
 from dynts.utils import laggeddates, asarray
 
 
-arraytype = ny.ndarray
+arraytype = np.ndarray
 
 
 arrayfunc = lambda func, *args : [func(*items) for items in izip()]
@@ -21,6 +21,7 @@ _functions = {'min':'min',
               'max':'max',
               'mean': 'mean',
               'med': 'median',
+              'sd': 'sd'
               }
 
 
@@ -34,7 +35,7 @@ def rollsingle(self, func, window = 20, name = None,
     
     rfunc = getattr(lib,'roll_{0}'.format(func))
     rolling = lambda serie : list(rfunc(serie,window))
-    data = ny.array([rolling(serie) for serie in self.series()])
+    data = np.array([rolling(serie) for serie in self.series()])
     name = name or self.makename(func,window=window)
     dates = asarray(self.dates())
     return self.clone(dates[window-1:], data.transpose(), name = name)
@@ -43,12 +44,11 @@ def rollsingle(self, func, window = 20, name = None,
 def rollsingle_fb(self, func, window = 20, name = None, **kwargs):
     rfunc = getattr(lib.fallback,'roll_{0}'.format(func))
     rolling = lambda serie : list(rfunc(serie,window))
-    data = ny.array([rolling(serie) for serie in self.series()])
+    data = np.array([rolling(serie) for serie in self.series()])
     name = name or self.makename(func,window=window)
     dates = asarray(self.dates())
     return self.clone(dates[window-1:], data.transpose(), name = name)
     
-
 
 def days(d1,d0):
     t = d1 - d0
@@ -128,20 +128,30 @@ class TimeSeries(dynts.TimeSeries):
             tserie = [tserie]
         alldates = set(self.dates())
         hash     = self.ashash()
-        thashes  = [(hash,ny.array([fill]*self.count()))]
+        thashes  = [(hash,np.array([fill]*self.count()))]
         for ts in tserie:
             alldates = alldates.union(ts.dates())
             hash.names.extend(ts.names())
-            thashes.append((ts.ashash(),ny.array([fill]*ts.count())))
-        stack = ny.hstack
+            thashes.append((ts.ashash(),np.array([fill]*ts.count())))
+        stack = np.hstack
         mdt = lambda dt: stack((h.get(dt,ln) for h,ln in thashes))
         for dt in alldates:
             hash[dt] = mdt(dt)
         return hash.getts()
     
     def log(self, name = None, **kwargs):
-        v = ny.log(self._data)
-        name = name or 'log(%s,%s)' % (self.name,lag)
+        v = np.log(self._data)
+        name = name or composename('log',*self.names())
+        return self.clone(self._date,v,name)
+    
+    def sqrt(self, name = None, **kwargs):
+        v = np.sqrt(self._data)
+        name = name or composename('sqrt',*self.names())
+        return self.clone(self._date,v,name)
+    
+    def square(self, name = None, **kwargs):
+        v = np.square(self._data)
+        name = name or composename('square',*self.names())
         return self.clone(self._date,v,name)
             
     def delta(self, lag = 1, name = None, **kwargs):
@@ -160,7 +170,7 @@ class TimeSeries(dynts.TimeSeries):
     
     def logdelta(self, lag = 1, name = None, **kwargs):
         self.precondition(lag<len(self) and lag > 0,dynts.DyntsOutOfBound)
-        v = ny.log(self._data[lag:] - self._data[:-lag])
+        v = np.log(self._data[lag:] - self._data[:-lag])
         name = name or 'logdelta(%s,%s)' % (self.name,lag)
         return self.clone(self._date[lag:],v,name)
     

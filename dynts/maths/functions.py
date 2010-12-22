@@ -1,5 +1,5 @@
 from jflow.lib import tablefunction
-from data import qpqn
+from .data import qpqn
 
 __all__ = ['qp','qn','calmar','calmarnorm']
 

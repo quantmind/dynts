@@ -1,4 +1,7 @@
-from itertools import izip
+try:
+    from itertools import izip as zip
+except:
+    pass
 
 from dynts import tsfunctions
 
@@ -32,7 +35,7 @@ class BasicStatistics(object):
             if func:
                 try:
                     data[name] = list(func())
-                except Exception, e:
+                except Exception:
                     pass
         return data
     
@@ -46,7 +49,7 @@ class pivottable(object):
             self.names = data['names']
             self.defaultname = self.names[0]
             d = self.default
-            self._names = dict(((name,{d:v}) for name,v in izip(data['names'],data[d])))
+            self._names = dict(((name,{d:v}) for name,v in zip(data['names'],data[d])))
         else:
             self._names = None
         
@@ -78,7 +81,7 @@ class pivottable(object):
         
         v = self.data.get(code,None)
         if v:
-            for nam,val in izip(self.names,v):
+            for nam,val in zip(self.names,v):
                 dnames[nam][code] = val
         
         v = nd.get(code,None)
@@ -117,7 +120,7 @@ class SimpleStatisticsTable(object):
     def table(self):
         data = self.data
         if data:
-            iterator = izip(data['names'],data['latest'],data['min'],data['mean'],data['max'])
+            iterator = zip(data['names'],data['latest'],data['min'],data['mean'],data['max'])
             for name,lat,min,mea,max in iterator:
                 range = max - min
                 prange = 0 if not range else 100*(lat-min)/(max-min)

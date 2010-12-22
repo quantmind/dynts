@@ -35,9 +35,6 @@ class dslresult(object):
         self.expression = expression
         self.data = data
         self.backend = backend or settings.backend
-        
-    def __unicode__(self):
-        return u'%s' % self.expression
     
     def __repr__(self):
         return self.expression.__repr__()

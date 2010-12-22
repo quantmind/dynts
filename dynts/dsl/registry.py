@@ -1,11 +1,6 @@
 import inspect
-from UserDict import UserDict
 
-
-class FunctionRegistry(UserDict):
-    
-    def __init__(self):
-        self.data = {}
+class FunctionRegistry(dict):
         
     def register(self, function):
         """Register a function in the function registry.
@@ -14,7 +9,7 @@ class FunctionRegistry(UserDict):
         """
         function = inspect.isclass(function) and function() or function
         name = function.name
-        self.data[name] = function
+        self[name] = function
 
     def unregister(self, name):
         """Unregister function by name.

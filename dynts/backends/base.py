@@ -1,7 +1,12 @@
-from itertools import izip
+try:
+    from itertools import izip as zip
+except:
+    pass
 
+import numpy as np
 from dynts.utils import laggeddates, ashash, asbtree, asarray
 from dynts.backends.xy import *
+from dynts.exceptions import *
 from dynts.backends import operators 
 
 
@@ -107,7 +112,7 @@ can be used to access the timeseries as if it was a matrix.'''
 tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
 function. The additional input parameter *desc* can be used to iterate from
 the greatest to the smallest date in the timeseries by passing ''desc=True``'''
-        for d,v in izip(self.dates(desc = desc),self.values(desc = desc)):
+        for d,v in zip(self.dates(desc = desc),self.values(desc = desc)):
             yield d,v
             
     def series(self):
@@ -179,12 +184,32 @@ Second order derivative. Optimised.
     def log(self):
         raise NotImplementedError
     
+    def sqrt(self):
+        raise NotImplementedError
+    
+    def square(self):
+        raise NotImplementedError
+    
     def logdelta(self, lag = 1, **kwargs):
         '''Delta in log-space. Used for percentage changes.'''
         raise NotImplementedError
     
-    def stddev(self):
-        raise NotImplementedError
+    def var(self):
+        '''Calculate variance of timeseries'''
+        N = len(self)
+        if N:
+            v = self.values()
+            return sum(v)/N
+        else:
+            return None
+        
+    def sd(self):
+        '''Calculate standard deviation of timeseries'''
+        v = self.var()
+        if v:
+            return np.sqrt(v)
+        else:
+            return None
     
     def apply(self, func,
               window = None,
@@ -243,7 +268,7 @@ Same as::
     self.rollapply('mean',**kwargs)'''
         return self.rollapply('mean',**kwargs)
     
-    def rollstddev(self, **kwargs):
+    def rollsd(self, **kwargs):
         '''A :ref:`rolling function <rolling-function>` for stadard-deviation values:
 Same as::
 

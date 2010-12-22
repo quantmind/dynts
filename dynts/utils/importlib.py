@@ -88,6 +88,6 @@ def import_modules(modules):
         for module in to_load:
             try:
                 mods.append(import_module(module))
-            except ImportError, e:
+            except ImportError:
                 pass
     return mods

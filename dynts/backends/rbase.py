@@ -2,6 +2,7 @@ from rpy2 import rinterface
 from numpy import asarray, ndarray
 
 import dynts
+from dynts import composename
 from dynts.utils import ascolumn
 from dynts.utils.rutils import rpyobject, py2rdate, r2pydate, isoformat
 
@@ -72,15 +73,22 @@ class rts(dynts.TimeSeries,rpyobject):
         return self.rcts('diff', lag = lag, differences = 2, name = name)
     
     def log(self, name = None, **kwargs):
-        return self.rcts('log', name = name or 'log(%s)' % self.name)
+        name = name or composename('log',*self.names())
+        return self.rcts('log', name = name)
+    
+    def sqrt(self, name = None, **kwargs):
+        name = name or composename('sqrt',*self.names())
+        return self.rcts('sqrt', name = name)
+    
+    def square(self, name = None, **kwargs):
+        self.r('''square <- function(x){x*x}''')
+        name = name or composename('square',*self.names())
+        return self.rcts('square', name = name)
     
     def logdelta(self, lag = 1, name = None, **kwargs):
         self.r('''logdelta <- function(df,lag){ diff(log(df),lag)}''')
         name = name or 'logdelta(%s,%s)' % (self.name,lag)
         return self.rcts('logdelta',lag, name = name)
-    
-    def stddev(self):
-        raise self.rcts('sd')
     
     def isregular(self):
         return self.rc('is.regular')[0]
