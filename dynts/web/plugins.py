@@ -1,8 +1,6 @@
-from django.conf import settings
-from django import forms
-from django.template import loader
-
-from djpcms.utils import mark_safe
+from djpcms.conf import settings
+from djpcms import forms
+from djpcms.template import loader
 from djpcms.plugins import DJPplugin
 from djpcms.views import appsite
 
@@ -13,6 +11,7 @@ class EcoForm(forms.Form):
     url    = forms.CharField()
     default_show = forms.BooleanField(initial = True, required = False)
     height = forms.IntegerField()
+    
     
 class EcoPlot(DJPplugin):
     '''Plugin for djpcms__ content management system.

@@ -1,12 +1,7 @@
-from django import http
-
+from djpcms import http
 from djpcms.views import appview
 
-from ccy import date2yyyymmdd, dateFromString
-
-
-def date2yyyymmdd(dte):
-    return dte.day + 100*(dte.month + 100*dte.year)
+from ccy import dateFromString
 
 
 class TimeSeriesView(appview.ModelView):
