@@ -1,10 +1,12 @@
-from djpcms.conf import settings
-from djpcms import forms
+'''Web plugins for djpcms
+https://github.com/lsbardel/djpcms
+'''
+from djpcms import sites, forms
 from djpcms.template import loader
 from djpcms.plugins import DJPplugin
 from djpcms.views import appsite
 
-skin = getattr(settings,'DYNTS_SKIN','dynts/ecoplot/skins/smooth.css')
+skin = getattr(sites.settings,'DYNTS_SKIN','dynts/ecoplot/skins/smooth.css')
 
 
 class EcoForm(forms.Form):

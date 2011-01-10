@@ -1,4 +1,6 @@
-from djpcms import http
+'''Web views for djpcms 
+https://github.com/lsbardel/djpcms
+'''
 from djpcms.views import appview
 
 from ccy import dateFromString
@@ -14,7 +16,7 @@ Available as Ajax Get response.'''
         if not request.is_ajax():
             raise http.Http404
         sdata = self.econometric_data(djp.request, dict(request.GET.items()))
-        return http.HttpResponse(sdata, mimetype='application/javascript')
+        return djp.http.HttpResponse(sdata, mimetype='application/javascript')
     
     def get_object(self, code):
         '''Check if the code is an instance of a model.'''
