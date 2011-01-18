@@ -2,7 +2,7 @@ from dynts.dsl.grammar import *
 from dynts.conf import settings
 from dynts.exceptions import DyntsException
 from dynts.backends import istimeseries, isxy
-from dynts.dsl.registry import FunctionBase, function_registry
+from dynts.dsl.registry import FunctionBase, ComposeFunction, function_registry
 from dynts.utils import smart_str
 
 

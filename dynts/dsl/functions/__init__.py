@@ -1,5 +1,4 @@
 from .simple import *
 from .simplexy import *
+from .composite import *
 
-
-#FUNCTIONS = ['log', 'delta', 'ldelta', 'ma', 'max', 'med', 'min', 'zscore', 'prange', 'avol']

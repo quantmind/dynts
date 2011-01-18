@@ -43,7 +43,8 @@ class Expr(object):
         return None
     
     def unwind(self, values, backend, **kwargs):
-        '''Unwind expression by applying *values* to the abstract nodes'''
+        '''Unwind expression by applying *values* to the abstract nodes.
+the ``kwargs`` dictionary can contain data which can be used to override values'''
         if not hasattr(self, "_unwind_value"):
             self._unwind_value = self._unwind(values, backend, **kwargs)
         return self._unwind_value
@@ -228,7 +229,7 @@ class ConcatenationOp(ConcatOp):
     def _unwind(self, values, backend, sametype = True, **kwargs):
         result = []
         for child in self:
-            result.append(child.unwind(values, backend))
+            result.append(child.unwind(values, backend, **kwargs))
         return result
     
     
@@ -280,8 +281,11 @@ The left hand side is **never** a symbol.
         super(EqualOp,self).__init__(left,right,"=")
         
     def _unwind(self, values, backend, **kwargs):
-        data = self.right.unwind(values, backend, **kwargs)
-        return {str(self.left):data}
+        name = str(self.left)
+        if name in kwargs:
+            return {name:kwargs[name]}
+        else:
+            return {name:self.right.unwind(values, backend, **kwargs)}
  
  
 class Bracket(Expression):

@@ -10,7 +10,10 @@ from skiplist import skiplist
 __all__ = ['roll_max',
            'roll_min',
            'roll_median',
-           'roll_mean']
+           'roll_mean',
+           'roll_sd',
+           'roll_sharpe',
+           'rollingOperation']
 
 
 def roll_max(iterable, window, skiplist_class = skiplist):
@@ -78,7 +81,8 @@ def rollingOperation(iterable, window, op, skiplist_class = skiplist):
 
 
 def roll_mean(input, window):
-    '''Apply a rolling mean function to an array'''
+    '''Apply a rolling mean function to an array.
+This is a simple rolling aggregation.'''
     nobs, i, j, sum_x = 0,0,0,0.
     N = len(input)
 
@@ -106,6 +110,81 @@ def roll_mean(input, window):
 
         j += 1
         output[j] = NaN if not nobs else sum_x / nobs
+
+    return output
+
+
+def roll_sd(input, window, scale = 1.0):
+    '''Apply a rolling standard deviation function
+to an array. This is a simple rolling aggregation of squared
+sums.'''
+    nobs, i, j, sum_x, sum_xx = 0,0,0,0.,0.
+    N = len(input)
+    sqrt = np.sqrt
+
+    if window > N:
+        raise ValueError('Out of bound')
+    
+    output = np.ndarray(N-window+1,dtype=input.dtype)
+    
+    for val in input[:window]:
+        if val == val:
+            nobs += 1
+            sum_x += val*val
+        
+    output[j] = NaN if not nobs else sqrt(scale * sum_x / nobs)
+    
+    for val in input[window:]:
+        prev = input[j]
+        if prev == prev:
+            sum_x -= prev*prev
+            nobs -= 1
+
+        if val == val:
+            nobs += 1
+            sum_x += val*val
+
+        j += 1
+        output[j] = NaN if not nobs else sqrt(scale * sum_x / nobs)
+
+    return output
+
+
+def roll_sharpe(input, window, scale = 1.0):
+    '''Apply a rolling mean function to an array.
+This is a simple rolling aggregation.'''
+    nobs, i, j, sx, sxx = 0,0,0,0.,0.
+    N = len(input)
+    sqrt = np.sqrt
+
+    if window > N:
+        raise ValueError('Out of bound')
+    
+    output = np.ndarray(N-window+1,dtype=input.dtype)
+    
+    for val in input[:window]:
+        if val == val:
+            nobs += 1
+            sx += val
+            sxx += val*val
+        
+    output[j] = NaN if not nobs else sx * sqrt(scale / ( nobs * sxx ))
+    
+    for val in input[window:]:
+        prev = input[j]
+        if prev == prev:
+            sx -= prev
+            sxx -= prev*prev
+            nobs -= 1
+
+        if val == val:
+            nobs += 1
+            sx += val
+            sxx += val*val
+
+        j += 1
+        
+        output[j] = NaN if not nobs else sx * sqrt(scale / ( nobs * sxx ))
 
     return output
 

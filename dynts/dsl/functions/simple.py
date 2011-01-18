@@ -4,14 +4,23 @@ from dynts import TimeSeries, tsfunctions
 
 class ScalarFunction(FunctionBase):
     abstract = True
+    def get_name(self, arg, window, **kwargs):
+        return '%s(%s)' % (self.name,arg)
+    
     def __call__(self, args, window = 20, **kwargs):
         result = []
         for arg in args:
-            name = '%s(%s,window=%s)' % (self.name,arg,window)
+            name = self.get_name(arg,window,**kwargs)
             ts = self.apply(arg, window = window, name = name, **kwargs)
             result.append(ts)
         if result:
             return result if len(result)>1 else result[0]
+        
+
+class ScalarWindowFunction(ScalarFunction):
+    abstract = True
+    def get_name(self, arg, window, **kwargs):
+        return '%s(%s,window=%s)' % (self.name,arg,window)
         
 
 class Log(ScalarFunction):
@@ -105,7 +114,7 @@ Typical usage::
         return ts.logdelta(**kwargs)
 
 
-class Ma(ScalarFunction):
+class Ma(ScalarWindowFunction):
     """\
 Arithmetic moving average function.
 """
@@ -113,7 +122,7 @@ Arithmetic moving average function.
         return ts.rollmean(**kwargs)
     
     
-class Max(ScalarFunction):
+class Max(ScalarWindowFunction):
     """\
 Moving max function.
 """
@@ -121,7 +130,7 @@ Moving max function.
         return ts.rollmax(**kwargs)
 
 
-class Med(ScalarFunction):
+class Med(ScalarWindowFunction):
     """\
 Moving median function.
 """
@@ -129,62 +138,54 @@ Moving median function.
         return ts.rollmedian(**kwargs)    
     
     
-class Min(ScalarFunction):
+class Min(ScalarWindowFunction):
     """\
 Moving min function.
 """
     def apply(self, ts, **kwargs):
-        return ts.rollmin(**kwargs)
-    
-    
-class zscore(ScalarFunction):
-    """\
-Rolling Z-Score function:
-
-.. math::
-
-    zs = \frac{x_n - x_{n-w}}{\sigma_n}
-    
-"""
-    def apply(self, ts, **kwargs):
-        return tsfunctions.zscore(ts, **kwargs)
-    
-
-class prange(ScalarFunction):
-    """\
-Rolling Percentage range function.
-"""
-    def apply(self, ts, **kwargs):
-        return tsfunctions.prange(ts, **kwargs)
-    
+        return ts.rollmin(**kwargs)    
 
 
-class SD(ScalarFunction):
+class SD(ScalarWindowFunction):
     '''\
 Rolling standard deviation as given by:
 
 .. math::
 
-    {\\tt sd}(y_t) = \\sqrt{\\sum_{i=0}^{w-1} (\\Delta y_{t-i})^2}
+    {\\tt sd}(y_t) = \\sqrt{{\\t scale}} \\frac{1}{w}\\sum_{i=0}^{w-1} (\\Delta y_{t-i})^2}
     
 Typical usage::
 
     stdev(tiker)
     stdev(tiker,window=40)
-    
+    stdev(tiker, window=40, scale = 252)
     
 :parameter window: the rolling window in units. Default ``20``.
+:parameter scale: Scaling constant. Default ``1``.
 '''
     def apply(self, ts, **kwargs):
         return ts.rollsd(**kwargs)
     
 
-class Avol(ScalarFunction):
+class Sharpe(ScalarWindowFunction):
     '''\
-Annualised volatility.
+Rolling Sharpe Ratio as given by:
+
+.. math::
+
+    {\\tt sd}(y_t) = \\sqrt{{\\t scale}} \\frac{1}{w}\\sum_{i=0}^{w-1} (\\Delta y_{t-i})^2}
+    
+Typical usage::
+
+    stdev(tiker)
+    stdev(tiker,window=40)
+    stdev(tiker, window=40, scale = 252)
+    
+:parameter window: the rolling window in units. Default ``20``.
+:parameter scale: Scaling constant. Default ``1``.
 '''
     def apply(self, ts, **kwargs):
-        return ts.rollavol(**kwargs)
+        return ts.rollapply('sharpe',**kwargs)
     
     
 class reg(FunctionBase):
@@ -209,4 +210,3 @@ There are two optional parameters:
     def __call__(self, input, **kwargs):
         pass
         
-    

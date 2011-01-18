@@ -28,21 +28,13 @@ _functions = {'min':'min',
 def rollsingle(self, func, window = 20, name = None,
                fallback = False, **kwargs):
     '''Efficient rolling window calculation for min, max type functions'''
-    rfunc = 'roll_{0}'.format(func)
+    rname = 'roll_{0}'.format(func)
     if fallback:
-        return rollsingle_fb(self, func, window = window,
-                             name = name, **kwargs)
-    
-    rfunc = getattr(lib,'roll_{0}'.format(func))
-    rolling = lambda serie : list(rfunc(serie,window))
-    data = np.array([rolling(serie) for serie in self.series()])
-    name = name or self.makename(func,window=window)
-    dates = asarray(self.dates())
-    return self.clone(dates[window-1:], data.transpose(), name = name)
-
-
-def rollsingle_fb(self, func, window = 20, name = None, **kwargs):
-    rfunc = getattr(lib.fallback,'roll_{0}'.format(func))
+        rfunc = getattr(lib.fallback,rname)
+    else:
+        rfunc = getattr(lib,rname,None)
+        if not rfunc:
+            rfunc = getattr(lib.fallback,rname)
     rolling = lambda serie : list(rfunc(serie,window))
     data = np.array([rolling(serie) for serie in self.series()])
     name = name or self.makename(func,window=window)
@@ -170,13 +162,20 @@ class TimeSeries(dynts.TimeSeries):
     
     def logdelta(self, lag = 1, name = None, **kwargs):
         self.precondition(lag<len(self) and lag > 0,dynts.DyntsOutOfBound)
-        v = np.log(self._data[lag:] - self._data[:-lag])
+        v = np.log(self._data[lag:]/self._data[:-lag])
         name = name or 'logdelta(%s,%s)' % (self.name,lag)
         return self.clone(self._date[lag:],v,name)
     
-    def _rollapply(self, func, window = 20, **kwargs):
+    def _rollapply(self,
+                   func,
+                   window = 20,
+                   bycolumn = True,
+                   **kwargs):
         # NUMPY implementation of the rollapply function
         func = _functions.get(func,None) or func
-        return rollsingle(self, func, window = window, **kwargs)
+        if bycolumn:
+            return rollsingle(self, func, window = window, **kwargs)
+        else:
+            raise NotImplementedError
         
     

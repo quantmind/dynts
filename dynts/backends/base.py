@@ -214,7 +214,8 @@ Second order derivative. Optimised.
     def apply(self, func,
               window = None,
               bycolumn = True,
-              align = None, **kwargs):
+              align = None,
+              **kwargs):
         '''Apply function ``func`` to the timeseries.
         
     :keyword func: string indicating function to apply
@@ -268,12 +269,15 @@ Same as::
     self.rollapply('mean',**kwargs)'''
         return self.rollapply('mean',**kwargs)
     
-    def rollsd(self, **kwargs):
+    def rollsd(self, scale = 1, **kwargs):
         '''A :ref:`rolling function <rolling-function>` for stadard-deviation values:
 Same as::
 
     self.rollapply('sd',**kwargs)'''
-        return self.rollapply('sd',**kwargs)
+        ts = self.rollapply('sd',**kwargs)
+        if scale != 1:
+            ts *= scale
+        return ts
     
     def window(self, start, end):
         raise NotImplementedError
