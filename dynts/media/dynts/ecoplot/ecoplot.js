@@ -250,6 +250,7 @@ $.extend({
 							},
 		    paginate:		null,
 		    infoPanel:		'ecoplot-info',
+		    min_height:		200,
 		    defaultFade:	300,
 		    default_month_interval: 12,
 		    classname:		 'ts-plot-module',
@@ -1033,8 +1034,13 @@ $.ecoplot.paginate = function($this) {
 	}
 	$.ecoplot.set_default_dates($this);
 	options.layout = function(el) {
-		elems = el[0].options.elems;
-		var h = Math.max(el.height() - elems.menu.height(),30);
+		var options = el[0].options;
+		elems = options.elems;
+		var height = el.height();
+		if(height < 10) {
+			height = options.height || options.min_height;
+		}
+		var h = Math.max(height - elems.menu.height(),30);
 		elems.body.height(h);
 		elems.canvas_cont.height(h-10).css({'margin':'5px 0'});
 		el.height('auto');

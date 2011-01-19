@@ -46,7 +46,8 @@
         			elems:		    elems_,
         			flot_options:   poptions,
         			parse: 		    parsedata,
-        			start:			start
+        			start:			start,
+        			height:			height,
         		}; 
     		if(!dshow.length) {
     			options.showplot = function(i) {return i<=1;}
