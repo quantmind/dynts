@@ -15,6 +15,7 @@ class rules(object):
     t_RSQUARE = r'\]'
     t_EQUAL   = r'\='
     t_QUOTE   = r'\"'
+    t_BACKQUOTE = r'\`'
     t_CONCAT  = r'\%s' % settings.concat_operator
     t_SPLIT   = r'\%s' % settings.separator_operator
 
@@ -41,6 +42,7 @@ class rules(object):
               'CONCAT',
               'SPLIT',
               'QUOTE',
+              'BACKQUOTE',
               'ID',
               'FUNCTION'
               ] + re.values() 
@@ -50,6 +52,8 @@ class rules(object):
     def __get_precedence(self):
         return (('left','SPLIT'),
                 ('left','CONCAT'),
+                ('left','QUOTE'),
+                ('left','BACKQUOTE'),
                 ('left','EQUAL'),
                 ('left','PLUS','MINUS'),
                 ('left','TIMES','DIVIDE'),
@@ -61,9 +65,10 @@ class rules(object):
         r'([0-9]+\.?[0-9]*|\.[0-9]+)([eE](\+|-)?[0-9]+)?'
         #r'\d+'
         try:
-            v = float(t.value)
+            sv = t.value
+            v = float(sv)
             iv = int(v)
-            t.value = iv if iv == v else v
+            t.value = (iv if iv == v else v,sv)
         except ValueError:
             print("Number %s is too large!" % t.value)
             t.value = 0

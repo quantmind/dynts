@@ -1,4 +1,14 @@
-from dynts.dsl.ast import *        
+from dynts.dsl.ast import *
+
+def p_expression_string(p):
+    '''expression : QUOTE expression QUOTE'''
+    p[0] = String(p[2])
+    
+    
+def p_expression_backquote(p):
+    '''expression : BACKQUOTE expression BACKQUOTE'''
+    p[0] = Symbol(p[2])
+    
 
 def p_expression_binop(p):
     '''expression : expression PLUS expression
@@ -38,19 +48,23 @@ def p_expression_group(p):
 
 def p_expression_number(p):
     '''expression : NUMBER'''
-    p[0] = Number(p[1])
+    p[0] = Number(p[1][0])
     
 def p_expression_id(p):
     '''expression : ID'''
     p[0] = Symbol(p[1])
+
+def p_expression_id2(p):
+    '''expression : ID ID'''
+    p[0] = Symbol(p[1]+p[2])
     
 def p_expression_id_number1(p):
     '''expression : NUMBER ID'''
-    p[0] = Symbol('%s%s' % (p[1],p[2]))
+    p[0] = Symbol('%s%s' % (p[1][1],p[2]))
     
-def p_expression_string(p):
-    '''expression : QUOTE expression QUOTE'''
-    p[0] = String(p[2])
+def p_expression_id_number2(p):
+    '''expression : ID NUMBER'''
+    p[0] = Symbol('%s%s' % (p[1],p[2][1]))
     
 def p_expression_function(p):
     '''expression : FUNCTION LPAREN expression RPAREN'''

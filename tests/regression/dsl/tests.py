@@ -6,6 +6,7 @@ except ImportError:
     pass
 
 import dynts
+from dynts.conf import settings
 from dynts import dsl
 
 class TestDsl(unittest.TestCase):
@@ -33,6 +34,39 @@ class TestDsl(unittest.TestCase):
         self.assertEqual(len(names),2)
         self.assertEqual(names[0],str(res.left))
         self.assertEqual(names[1],str(res.right))
+        
+    def testQuote(self):
+        res = dynts.parse('"FX-15"+amzn')
+        self.assertEqual(len(res.children),2)
+        names = res.symbols()
+        self.assertEqual(len(names),1)
+        self.assertEqual(names[0],str(res.right))
+        
+    def testSpecialSymbol(self):
+        '''Symbol can be included by character'''
+        res = dynts.parse('`FX-15`+amzn')
+        self.assertEqual(len(res.children),2)
+        names = res.symbols()
+        self.assertEqual(len(names),2)
+        self.assertEqual(names[0],'FX-15')
+        self.assertEqual(names[1],'AMZN')
+        
+    def testSpecialSymbol2(self):
+        '''Symbol can be included by character'''
+        res = dynts.parse('`EURSW6M2YR_2.2`')
+        names = res.symbols()
+        self.assertEqual(len(names),1)
+        self.assertEqual(names[0],'EURSW6M2YR_2.2')
+        
+    def testSpecialSymbol3(self):
+        '''Symbol can be included by character'''
+        sep = settings.field_separator
+        settings.field_separator = '@'
+        res = dynts.parse('`EURSW6M2YR_2.2:RM@all`')
+        names = res.symbols()
+        self.assertEqual(len(names),1)
+        self.assertEqual(names[0],'EURSW6M2YR_2.2:RM@all')
+        settings.field_separator = sep
         
     def testTwoTimeSeries(self):
         '''Get a timeseries and a function and check for consistency'''
@@ -66,7 +100,7 @@ class TestDsl(unittest.TestCase):
         ts2 = data.serie(1)
         for v1,v2 in zip(ts1,ts2):
             self.assertAlmostEqual(v1,2.*v2)
-        
+                  
     def testTSName(self):
         '''
         The dslresult should include an attribute 'name' 
@@ -87,6 +121,4 @@ class TestDsl(unittest.TestCase):
             expected_name = '__'.join(expr.split(','))
             self.assertEqual(name, expected_name)
             
-        
-
         
