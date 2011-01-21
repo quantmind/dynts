@@ -71,6 +71,8 @@ Typical usage::
     '''
     if isinstance(expression,strtype):
         expression = parse(expression)
+    if expression.malformed():
+        raise CouldNotParse(expression)
     symbols = expression.symbols()
     data = providers.load(symbols, start, end, loader = loader,
                           logger = logger, backend = backend, **kwargs)

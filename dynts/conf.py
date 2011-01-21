@@ -50,6 +50,7 @@ To change settings::
         self.separator_operator = '|'
         self.default_provider   = 'YAHOO'
         self.field_separator    = ':'
+        self.idregex = '[a-zA-Z_][a-zA-Z_0-9:@]*'
         self.default_loader     = None
         self.months_history     = 12
         self.proxies = {}

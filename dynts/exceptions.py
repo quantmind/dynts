@@ -61,8 +61,8 @@ dsl language translation.
     
 class CouldNotParse(ExpressionError):
     
-    def __init__(self, f):
-        msg = 'Failed to parse expression "%s"' % (f)
+    def __init__(self, f, data = None):
+        msg = 'Failed to parse expression {0}: {1}'.format(f,data or '')
         super(CouldNotParse,self).__init__(msg)
 
     

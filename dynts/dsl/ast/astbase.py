@@ -16,6 +16,9 @@ class Expr(object):
         '''Number of nodes'''
         return 1
     
+    def malformed(self):
+        return False
+    
     @property
     def type(self):
         return self.__class__.__name__.lower()
@@ -62,6 +65,13 @@ class BaseExpression(Expr):
     def info(self):
         return str(self.value)
         
+
+class BadExpression(BaseExpression):
+    '''A malformed expression
+    '''
+    def malformed(self):
+        return True
+    
     
 class Expression(BaseExpression):
     '''Base class for single expression
@@ -150,6 +160,12 @@ class MultiExpression(Expr):
         self.children        = []
         self.concat_operator = concat_operator
         
+    def malformed(self):
+        for child in self.children:
+            if child.malformed():
+                return True
+        return False
+    
     def __len__(self):
         return len(self.children)
     

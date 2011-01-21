@@ -60,13 +60,20 @@ class TestDsl(unittest.TestCase):
         
     def testSpecialSymbol3(self):
         '''Symbol can be included by character'''
-        sep = settings.field_separator
-        settings.field_separator = '@'
         res = dynts.parse('`EURSW6M2YR_2.2:RM@all`')
         names = res.symbols()
         self.assertEqual(len(names),1)
-        self.assertEqual(names[0],'EURSW6M2YR_2.2:RM@all')
-        settings.field_separator = sep
+        self.assertEqual(names[0],'EURSW6M2YR_2.2:RM@ALL')
+        
+    def testSyntaxError(self):
+        '''Symbol can be included by character'''
+        res = dynts.parse('delta(goog', debug = True)
+        self.assertTrue(res.malformed())
+        
+    def testSyntaxError2(self):
+        '''Symbol can be included by character'''
+        res = dynts.parse('yahoo,delta(goog', debug = True)
+        self.assertTrue(res.malformed())
         
     def testTwoTimeSeries(self):
         '''Get a timeseries and a function and check for consistency'''

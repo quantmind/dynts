@@ -1,12 +1,17 @@
-from dynts.dsl.grammar import *
+'''A domain specific language for timeseries analysis and manipulation.
+
+Created using ply (http://www.dabeaz.com/ply/) a pure Python implementation
+of the popular compiler construction tools lex and yacc.
+'''
 from dynts.conf import settings
+from dynts.dsl.grammar import *
 from dynts.exceptions import DyntsException
 from dynts.backends import istimeseries, isxy
 from dynts.dsl.registry import FunctionBase, ComposeFunction, function_registry
 from dynts.utils import smart_str
 
 
-def parse(timeseries_expression, method = None, functions = None):
+def parse(timeseries_expression, method = None, functions = None, debug = False):
     '''Function for parsing :ref:`timeseries expressions <dsl-script>`.
 If succesful, it returns an instance of :class:`dynts.dsl.Expr`.'''
     from ply import yacc
@@ -18,7 +23,7 @@ If succesful, it returns an instance of :class:`dynts.dsl.Expr`.'''
     tokens     = ru.tokens
     precedence = ru.precedence
     yacc       = yacc.yacc(method = method or 'SLR')
-    return yacc.parse(lexer = ru.lexer)
+    return yacc.parse(lexer = ru.lexer, debug = debug)
 
 
 def merge(series):

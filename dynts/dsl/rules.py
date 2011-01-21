@@ -50,10 +50,10 @@ class rules(object):
     tokens = property(fget = __get_tokens)
     
     def __get_precedence(self):
-        return (('left','SPLIT'),
-                ('left','CONCAT'),
-                ('left','QUOTE'),
+        return (('left','QUOTE'),
                 ('left','BACKQUOTE'),
+                ('left','SPLIT'),
+                ('left','CONCAT'),
                 ('left','EQUAL'),
                 ('left','PLUS','MINUS'),
                 ('left','TIMES','DIVIDE'),
@@ -63,7 +63,6 @@ class rules(object):
     # A regular expression rule with some action code
     def t_NUMBER(self, t):
         r'([0-9]+\.?[0-9]*|\.[0-9]+)([eE](\+|-)?[0-9]+)?'
-        #r'\d+'
         try:
             sv = t.value
             v = float(sv)
@@ -75,7 +74,7 @@ class rules(object):
         return t
 
     def t_ID(self, t):
-        r'[a-zA-Z_][a-zA-Z_0-9:@]*'
+        r'[a-zA-Z_0-9][a-zA-Z_0-9\.:@]*'
         res    = self.oper.get(t.value, None) # Check for reserved words (operations)
         if res == None:
             res = t.value.upper()
@@ -91,7 +90,12 @@ class rules(object):
             t.value = res
             t.type  = 'FUNCTION'
         return t
-
+    
+    # Define a rule so we can track line numbers
+    def t_newline(self, t):
+        r'\n+'
+        t.lexer.lineno += len(t.value)
+        
     # Error handling rule
     def t_error(self, t):
         print "Illegal character '%s'" % t.value[0]
