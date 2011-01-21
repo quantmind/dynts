@@ -67,12 +67,12 @@ class TestDsl(unittest.TestCase):
         
     def testSyntaxError(self):
         '''Symbol can be included by character'''
-        res = dynts.parse('delta(goog', debug = True)
+        res = dynts.parse('delta(goog')
         self.assertTrue(res.malformed())
         
     def testSyntaxError2(self):
         '''Symbol can be included by character'''
-        res = dynts.parse('yahoo,delta(goog', debug = True)
+        res = dynts.parse('yahoo,delta(goog')
         self.assertTrue(res.malformed())
         
     def testTwoTimeSeries(self):
