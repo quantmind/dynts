@@ -1,8 +1,4 @@
-try:
-    from itertools import izip as zip
-except:
-    pass
-
+from dynts.utils.py2py3 import zip
 from dynts import tsfunctions
 
 
