@@ -2,7 +2,11 @@
 Ver. 0.4.0 - Development
 ================================
 * Dropped python 2.5 compatibility and moved towards python 3 support. The idea is to
-  have the library working on python 2.6, 2.7 and the 3 series by the next version. 
+  have the library working on python 2.6, 2.7 and the 3 series by the next version.
+* Regular expression for ``DSL`` IDs changed to::
+
+    r'`[^`]*`|[a-zA-Z_][a-zA-Z_0-9:@]*'
+     
 * Moved ``tests`` module ouside ``dynts`` package. It now contains three types of tests:
   
   * ``regression`` for unit and regression tests.

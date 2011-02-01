@@ -131,13 +131,24 @@ class Symbol(BaseExpression):
     '''
     def __init__(self, value, field = None):
         value = settings.symboltransform(value)
-        super(Symbol,self).__init__(value)
+        if len(value)>2 and value[0] == '`' and value[-1] == '`':
+            self.quotes = True
+            value = value[1:-1]
+        else:
+            self.quotes = False
+        super(Symbol,self).__init__(str(value))
     
+    def info(self):
+        if self.quotes:
+            return '`{0}`'.format(self.value)
+        else:
+            return self.value
+        
     def symbols(self):
-        return [str(self)]
+        return [self.value]
     
     def _unwind(self, values, backend, **kwargs):
-        sdata = values[str(self)]
+        sdata = values[self.value]
         if istimeseries(sdata):
             return sdata
         else:

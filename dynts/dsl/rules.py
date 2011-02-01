@@ -15,7 +15,6 @@ class rules(object):
     t_RSQUARE = r'\]'
     t_EQUAL   = r'\='
     t_QUOTE   = r'\"'
-    t_BACKQUOTE = r'\`'
     t_CONCAT  = r'\%s' % settings.concat_operator
     t_SPLIT   = r'\%s' % settings.separator_operator
 
@@ -42,7 +41,6 @@ class rules(object):
               'CONCAT',
               'SPLIT',
               'QUOTE',
-              'BACKQUOTE',
               'ID',
               'FUNCTION'
               ] + re.values() 
@@ -51,7 +49,6 @@ class rules(object):
     
     def __get_precedence(self):
         return (('left','QUOTE'),
-                ('left','BACKQUOTE'),
                 ('left','SPLIT'),
                 ('left','CONCAT'),
                 ('left','EQUAL'),
@@ -74,7 +71,7 @@ class rules(object):
         return t
 
     def t_ID(self, t):
-        r'[a-zA-Z_0-9][a-zA-Z_0-9\.:@]*'
+        r'`[^`]*`|[a-zA-Z_][a-zA-Z_0-9:@]*'
         res    = self.oper.get(t.value, None) # Check for reserved words (operations)
         if res == None:
             res = t.value.upper()

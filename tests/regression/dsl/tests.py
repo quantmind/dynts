@@ -26,6 +26,15 @@ class TestDsl(unittest.TestCase):
         self.assertEqual(names[0],str(res.right))
         #ts = dynts.evaluate(res)
         #self.assertEqual(ts.count(),1)
+        
+    def testOperationOrder(self):
+        res = dynts.parse('2*GOOG+4*YHOO')
+        self.assertEqual(len(res.children),2)
+        self.assertTrue(isinstance(res,dsl.PlusOp))
+        res1 = res.children[0]
+        self.assertTrue(isinstance(res1,dsl.MultiplyOp))
+        res2 = res.children[1]
+        self.assertTrue(isinstance(res2,dsl.MultiplyOp))
     
     def testAdditionOperation(self):
         res = dynts.parse('YHOO+GOOG')
@@ -56,6 +65,7 @@ class TestDsl(unittest.TestCase):
         res = dynts.parse('`EURSW6M2YR_2.2`')
         names = res.symbols()
         self.assertEqual(len(names),1)
+        self.assertEqual(str(res),'`EURSW6M2YR_2.2`')
         self.assertEqual(names[0],'EURSW6M2YR_2.2')
         
     def testSpecialSymbol3(self):
@@ -107,6 +117,10 @@ class TestDsl(unittest.TestCase):
         ts2 = data.serie(1)
         for v1,v2 in zip(ts1,ts2):
             self.assertAlmostEqual(v1,2.*v2)
+            
+    def testQuotedLinearSuperimposition(self):
+        res = dynts.parse("4*`eur:rm@bla`-8*`abc:56`+4*`a-b-c:-20`")
+        self.assertEqual(len(res),2)
                   
     def testTSName(self):
         '''

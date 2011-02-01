@@ -4,11 +4,6 @@ def p_expression_string(p):
     '''expression : QUOTE expression QUOTE'''
     p[0] = String(p[2])
     
-    
-def p_expression_backquote(p):
-    '''expression : BACKQUOTE expression BACKQUOTE'''
-    p[0] = Symbol(p[2])
-    
 
 def p_expression_binop(p):
     '''expression : expression PLUS expression
