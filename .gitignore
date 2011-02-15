@@ -1,6 +1,7 @@
 *.pyc
 .project
 .pydevproject
+.coverage
 .settings/*
 dist/*
 build/*
