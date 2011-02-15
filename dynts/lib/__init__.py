@@ -1,3 +1,5 @@
+from dynts.utils.py2py3 import zip
+
 try:
     from cts import *
     hasextensions = True
@@ -8,7 +10,7 @@ else:
     import fallback
     
     
-def makeskiplist(data = None, expected_size = 100, use_fallback = False):
+def makeskiplist(data = None, expected_size = 10000, use_fallback = False):
     '''Create a new skiplist'''
     if hasattr(data,'__len__'):
         expected_size = max(expected_size,len(data))
@@ -20,4 +22,4 @@ def makeskiplist(data = None, expected_size = 100, use_fallback = False):
             insert(value)
     return s
     
-    
+            

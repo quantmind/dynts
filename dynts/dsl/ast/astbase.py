@@ -156,7 +156,11 @@ class Symbol(BaseExpression):
                             date = sdata['date'],
                             data = sdata['value'],
                             backend = backend)
-            values[ts.name] = ts
+            # Uses this hack to make sure timeseries are ordered
+            # Lots of room for performance improvement
+            hash = ts.ashash()
+            hash.modified = True
+            values[ts.name] = hash.getts()
             return ts
     
     def lineardecomp(self):
