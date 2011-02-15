@@ -3,6 +3,8 @@ from random import uniform, randint
 
 from numpy import ndarray
 
+from .py2py3 import range
+
 def_converter = lambda x: x
 def_generator = lambda x : uniform(0,1)
 
@@ -24,13 +26,7 @@ class gdata(object):
 def datepopulate(size = 10, start = None, delta = 1):
     dt = start or date.today() - timedelta(days = delta*(size-1))
     td = timedelta(days=delta)
-    data = []
-    s  = 0
-    while s < size:
-        data.append(dt)
-        dt += td
-        s  += 1
-    return gdata(data)
+    return [dt+s*td for s in range(size)]
         
 def populate(size = 100, cols = 1, generator = None):
     generator = generator or def_generator

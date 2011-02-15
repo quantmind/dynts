@@ -57,7 +57,7 @@ class TimeSeries(dynts.TimeSeries):
             self._data = None
         else:
             self._date = asarray(date)
-            data = asarray(data)
+            data = asarray(data, np.double)
             if len(data.shape) == 1:
                 data = data.reshape(len(data),1)
             self._data = data

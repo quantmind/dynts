@@ -130,7 +130,7 @@ It is needed since during tests some data is fetched from google finance.
 
 To access coverage of tests you need to install the coverage_ package and run the tests using::
 
-	coverage run --source=dynts runtests.py
+	coverage run runtests.py
 	
 and to check out the coverage report::
 

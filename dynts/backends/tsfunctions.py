@@ -35,6 +35,7 @@ the average value and the standard deviation of the data value have to be estima
         result.name = name
     return result
 
+
 @better_ts_function
 def prange(ts, **kwargs):
     '''Rolling Percentage range. Value between 0 and 1 indicating the position in the rolling range.'''

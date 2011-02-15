@@ -1,15 +1,23 @@
 from rpy2 import rinterface
-from numpy import asarray, ndarray
+from numpy import asarray, ndarray, double
 
 import dynts
 from dynts import composename
 from dynts.utils import ascolumn
 from dynts.utils.rutils import rpyobject, py2rdate, r2pydate, isoformat
 
+r_variance ='''\
+var <- function(x,ddof=0) {
+    (sum(x*x) - sum(x)^2/length(x))/(length(x)-ddof)
+}
 
+sd <- function(x,ddof=0) {sqrt(var(x,ddof))}
+'''
 
 class rts(dynts.TimeSeries,rpyobject):
     '''Base class for R-based timeseries objects'''
+    scripts = ['logdelta <- function(df,lag){ diff(log(df),lag)}',
+               r_variance]
     
     @property
     def shape(self):
@@ -38,7 +46,7 @@ class rts(dynts.TimeSeries,rpyobject):
         if date is None:
             ts = None
         else:
-            data = ascolumn(data)
+            data = ascolumn(data, double)
             ts = self.factory(date, data, raw = raw)
         self._ts = ts
         
@@ -86,9 +94,11 @@ class rts(dynts.TimeSeries,rpyobject):
         return self.rcts('square', name = name)
     
     def logdelta(self, lag = 1, name = None, **kwargs):
-        self.r('''logdelta <- function(df,lag){ diff(log(df),lag)}''')
         name = name or 'logdelta(%s,%s)' % (self.name,lag)
         return self.rcts('logdelta',lag, name = name)
+    
+    #def var(self, ddof = 0):
+    #    return [self.rc('var',serie,ddof) for serie in self.series()]
     
     def isregular(self):
         return self.rc('is.regular')[0]
@@ -104,6 +114,7 @@ class rts(dynts.TimeSeries,rpyobject):
         return self.r[command](self._ts,*args,**kwargs)
     
     def rcts(self, command, *args, **kwargs):
+        '''General function for applying a rolling R function to a timeserie'''
         cls = self.__class__
         name = kwargs.pop('name','')
         date = kwargs.pop('date',None)

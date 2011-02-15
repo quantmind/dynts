@@ -1,3 +1,6 @@
+# COLLECTIONS OF UTILITIES FOR USING R WITHIN PYTHON
+#
+#
 from datetime import date, datetime, timedelta
 
 from rpy2 import rinterface
@@ -14,6 +17,7 @@ def loadlib(lib):
 class rpyobject(object):
     _robj = None
     libraries = []
+    scripts = []
     
     def __new__(cls, *args, **kwargs):
         obj = super(rpyobject,cls).__new__(cls)
@@ -26,7 +30,9 @@ class rpyobject(object):
             cls._robj = r
             for lib in cls.libraries:
                 loadlib(lib)
-                    
+            for script in cls.scripts:
+                r(script)
+            
         return cls._robj
     
 

@@ -12,21 +12,22 @@ __all__ = ['cross','asarray','ascolumn','assimple',
            'scalarasiter']
 
 
-def asarray(x):
+def asarray(x, dtype = None):
     '''Convert ``x`` into a ``numpy.ndarray``.'''
-    from numpy import array, ndarray
+    from numpy import array, ndarray, double
     iterable = scalarasiter(x)
     if isinstance(iterable,ndarray):
         return iterable
     else:
         if not hasattr(iterable,'__len__'):
             iterable = list(iterable)
-        return array(iterable)
+        return array(iterable, dtype = dtype)
+        
 
 
-def ascolumn(x):
+def ascolumn(x, dtype = None):
     '''Convert ``x`` into a ``column``-type ``numpy.ndarray``.'''
-    x = asarray(x)
+    x = asarray(x, dtype)
     return x if len(x.shape) >= 2 else x.reshape(len(x),1)
 
         

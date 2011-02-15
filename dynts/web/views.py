@@ -11,10 +11,8 @@ class TimeSeriesView(appview.ModelView):
 Available as Ajax Get response.'''
     _methods      = ('get',)
     
-    def get_response(self, djp):
+    def ajax_get_response(self, djp):
         request = djp.request
-        if not request.is_ajax():
-            raise http.Http404
         sdata = self.econometric_data(djp.request, dict(request.GET.items()))
         return djp.http.HttpResponse(sdata, mimetype='application/javascript')
     

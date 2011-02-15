@@ -1,6 +1,6 @@
 '''Quantitative financial timeseries analysis'''
 
-VERSION = (0, 4, 'dev')
+VERSION = (0, 4, 0)
  
 def get_version():
     return '.'.join(map(str,VERSION))
@@ -46,18 +46,19 @@ Formatters['plot'] = formatters.ToPlot()
 
 def evaluate(expression, start = None, end = None,
              loader = None, logger = None, backend = None, **kwargs):
-    '''Evaluate expression *e*. This and :func:`dynts.parse`
-represent the main entry point of the library.
+    '''Evaluate the timeseries ``expression`` into
+a timeseries object
     
-* *expression* string or an instance of :class:`dynts.dsl.Expr` obtained using
-  the :func:`dynts.parse` function.
-* *start* start date or ``None``.
-* *end* end date or ``None``.
-* *loader* Optional :class:`dynts.data.TimeSerieLoader` class or instance.
-* *logger* Python logging class or ``None``. Used if you required logging.
-* *backend* :class:`dynts.TimeSeries` backend name or ``None``.
+:parameter expression: A timeseries aexpression string or an instance
+                       of :class:`dynts.dsl.Expr` obtained using
+                       the :func:`dynts.parse` function.
+:parameter start: Start date or ``None``.
+:parameter end: End date or ``None``. If not provided today values is used.
+:parameter loader: Optional :class:`dynts.data.TimeSerieLoader` class or instance to use.
+:parameter logger: Python logging instance or ``None``. Used if you required logging.
+:parameter backend: :class:`dynts.TimeSeries` backend name or ``None``.
 
-*expression* is parsed and the :class:`dynts.expr.Symbol` are sent to the
+The ``expression`` is parsed and the :class:`dynts.expr.Symbol` are sent to the
 :class:`dynts.data.TimeSerieLoader` instance for retrieving actual timeseries data.
 It returns an instance of :class:`dynts.dslresult`.
 

@@ -114,11 +114,11 @@ This is a simple rolling aggregation.'''
     return output
 
 
-def roll_sd(input, window, scale = 1.0):
+def roll_sd(input, window, scale = 1.0, ddof = 0):
     '''Apply a rolling standard deviation function
 to an array. This is a simple rolling aggregation of squared
 sums.'''
-    nobs, i, j, sum_x, sum_xx = 0,0,0,0.,0.
+    nobs, i, j, sx, sxx = 0,0,0,0.,0.
     N = len(input)
     sqrt = np.sqrt
 
@@ -130,22 +130,27 @@ sums.'''
     for val in input[:window]:
         if val == val:
             nobs += 1
-            sum_x += val*val
+            sx += val
+            sxx += val*val
         
-    output[j] = NaN if not nobs else sqrt(scale * sum_x / nobs)
+    nn = nobs - ddof
+    output[j] = NaN if nn<=0 else sqrt(scale * (sxx - sx*sx/nobs) / nn)
     
     for val in input[window:]:
         prev = input[j]
         if prev == prev:
-            sum_x -= prev*prev
+            sx -= prev
+            sxx -= prev*prev
             nobs -= 1
 
         if val == val:
             nobs += 1
-            sum_x += val*val
+            sx += val
+            sxx += val*val
 
         j += 1
-        output[j] = NaN if not nobs else sqrt(scale * sum_x / nobs)
+        nn = nobs - ddof
+        output[j] = NaN if nn<=0 else sqrt(scale * (sxx - sx*sx/nobs) / nn)
 
     return output
 

@@ -6,7 +6,6 @@ from .base import TimeSeries, ops, ts_bin_op
 
 BACKENDS = {
     'zoo': 'zoo',
-    'rmetrics': 'rmetrics',
     'numpy': 'tsnumpy',
 }
 

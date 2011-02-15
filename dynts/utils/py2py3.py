@@ -10,7 +10,8 @@ __all__ = ['string_type',
            'iteritems',
            'itervalues',
            'zip',
-           'map']
+           'map',
+           'range']
 
 
 def ispy3k():
@@ -24,12 +25,14 @@ if ispy3k(): # Python 3
     is_string = lambda x : isinstance(x,str)
     zip = zip
     map = map
+    range = range
 else: # Python 2
     string_type = unicode
     itervalues = lambda d : d.itervalues()
     iteritems = lambda d : d.iteritems()
     is_string = lambda x : isinstance(x,basestring)
     from itertools import izip as zip, imap as map
+    range = xrange
 
 try:
     int_type = (types.IntType, types.LongType)

@@ -1,20 +1,27 @@
-# NOT USED DIRECTLY - THIS CLASS IS IMPORTED IN dynts.tests.timeseries
+# NOT USED DIRECTLY
+#==========================
 #
-from dynts.test import TestCase
+# This module is imported in regression.tsnumpy and regression.tszoo
+# to perform tests across different backends
+#
 from datetime import date
-from itertools import izip
 
+from dynts import test
+from dynts.utils.py2py3 import zip
 from dynts.utils import cross, asarray
 from dynts.exceptions import *
 
-class TestFunctionTS(TestCase):
+
+class TestFunctionTS(test.TestCase):
     
     def _rollingTest(self, func):
-        # A rolling frunction calculation
+        # A rolling function calculation
         ts = self.getts(cols = 2)
         rollfun = 'roll%s' % func
+        # Calculate the rolling function for two different windows
         mts30 = getattr(ts,rollfun)(window = 30, fallback = self.fallback)
         mts60 = getattr(ts,rollfun)(window = 60, fallback = self.fallback)
+        # Check that dimensions are OK
         self.assertEqual(len(mts30),len(ts) - 29)
         self.assertEqual(len(mts60),len(ts) - 59)
         self.assertEqual(mts30.count(),2)
@@ -23,12 +30,15 @@ class TestFunctionTS(TestCase):
         v30 = mts30.values()
         date   = asarray(ts.dates())
         c = 0
+        # Loop over the items of the shorter windows rolling function
         for dt,v in mts30.items():
+            # Clone the timeseries for this particular window
             tst = ts.clone(date[c:c+30],values[c:c+30])
             self.assertEqual(dt,tst.end())
+            # Get the rolling function applied to the whole timeseries clone
             tv = getattr(tst,func)()
             c += 1
-            for a,b in izip(v,tv):
+            for a,b in zip(v,tv):
                 self.assertAlmostEqual(a,b)
                 
     def testMax(self):
@@ -77,7 +87,7 @@ class TestTS(TestFunctionTS):
         ts,dates,data = self.getts(True)
         self.assertEqual(ts.type,self.backend)
         self.assertEqual(len(ts),len(dates))
-        for dt,dt1 in izip(dates,ts.dates()):
+        for dt,dt1 in zip(dates,ts.dates()):
             self.assertEqual(dt,dt1)
         
     def test_isregular(self):
