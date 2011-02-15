@@ -1,5 +1,4 @@
-
-Ver. 0.4.0 - Development
+Ver. 0.4.0 - 2011 Feb 15
 ================================
 * Dropped python 2.5 compatibility and moved towards python 3 support. The idea is to
   have the library working on python 2.6, 2.7 and the 3 series by the next version.
@@ -7,7 +6,7 @@ Ver. 0.4.0 - Development
 
     r'`[^`]*`|[a-zA-Z_][a-zA-Z_0-9:@]*'
      
-* Moved ``tests`` module ouside ``dynts`` package. It now contains three types of tests:
+* Moved ``tests`` module outside ``dynts`` package. It now contains three types of tests:
   
   * ``regression`` for unit and regression tests.
   * ``profile`` for analysing performance of different backends and impact of cython_.
@@ -19,7 +18,7 @@ Ver. 0.4.0 - Development
   if cython is available, otherwise a fall-back pure python library will be used.
 * Added simple statistics pivot table.
 * Bug fixes.
-* **117 Tests**, **70% test coverage**
+* **118 Tests**, **70% test coverage**
 
 Ver. 0.3.3 - 2010 Nov 16
 ===================================

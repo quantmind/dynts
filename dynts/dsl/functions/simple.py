@@ -52,7 +52,7 @@ value and return a timeseries with exactly the same dimensions.
     
 class Delta(ScalarFunction):
     """\
-It evaluates the first order difference evaluated as
+First order differencing evaluated as
 
 .. math::
 
@@ -62,6 +62,10 @@ Typical usage::
 
     delta(tiker)
     delta(tiker,lag=5)
+    
+Or for calculating standard deviation on changes::
+
+    sd(delta(tiker))
     
 :parameter lag: backward lag. Default ``1``.
 """
@@ -97,7 +101,7 @@ It is an optimised shortcut function equivalent to::
 class LDelta(ScalarFunction):
     """\
 Calculate the log-delta of a timeseries. This is the first order difference
-in log-space useful for evaluationg percentage moments
+in log-space useful for evaluating percentage moments:
     
 .. math::
 
@@ -148,18 +152,20 @@ Moving min function.
 
 class SD(ScalarWindowFunction):
     '''\
-Rolling standard deviation as given by:
+Rolling standard deviation given by:
 
 .. math::
 
-    {\\tt sd}(y_t) = \\sqrt{{\\t scale}} \\frac{1}{w}\\sum_{i=0}^{w-1} (\\Delta y_{t-i})^2}
+    {\\tt sd}(y_t,w) = \\sqrt{{\\tt scale} \cdot {\\tt var}(y_t,w)} 
     
+where ``var`` is the rolling variance (not in docs yet).
 Typical usage::
 
-    stdev(tiker)
-    stdev(tiker,window=40)
-    stdev(tiker, window=40, scale = 252)
-    
+    sd(tiker)
+    sd(tiker,window=40)
+    sd(tiker, window=40, scale = 252)
+    sd(ldelta(GOOG), window = 60, scale = 252)
+
 :parameter window: the rolling window in units. Default ``20``.
 :parameter scale: Scaling constant. Default ``1``.
 '''
@@ -169,20 +175,18 @@ Typical usage::
 
 class Sharpe(ScalarWindowFunction):
     '''\
-Rolling Sharpe Ratio as given by:
+Rolling Annualised Sharpe Ratio given by:
 
 .. math::
 
-    {\\tt sd}(y_t) = \\sqrt{{\\t scale}} \\frac{1}{w}\\sum_{i=0}^{w-1} (\\Delta y_{t-i})^2}
+    {\\tt sharpe}(y_t,w) = \\frac{y_t-y_{t-w}}{{\\tt sd}({\\tt delta}(y_t),w)}
     
 Typical usage::
 
-    stdev(tiker)
-    stdev(tiker,window=40)
-    stdev(tiker, window=40, scale = 252)
+    sharpe(tiker)
+    sharpe(tiker,window=40)
     
 :parameter window: the rolling window in units. Default ``20``.
-:parameter scale: Scaling constant. Default ``1``.
 '''
     def apply(self, ts, **kwargs):
         return ts.rollapply('sharpe',**kwargs)

@@ -122,7 +122,8 @@ def functions_docs():
         docs += title
         func = function_registry[name]
         fdoc = func.__doc__
-        docs += fdoc
+        if fdoc:
+            docs += fdoc
     return docs
 
 def dump_docs(filename = 'dyntslist.rst'):
