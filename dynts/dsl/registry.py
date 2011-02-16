@@ -61,6 +61,7 @@ The only member function to implement is the ``__call__`` method.
             std(expression,window=20)
     '''
     abstract = True
+    description = ''
     
     def __str__(self):
         return self.name
@@ -96,8 +97,11 @@ The only member function to implement is the ``__call__`` method.
         
 
 
-def ComposeFunction(name, comp):
-    return ASTFunctionMeta(name, (CompositeBase,), {'composite':comp})
+def ComposeFunction(name, comp, description ='', docs = ''):
+    attrs = {'composite':comp,
+             '__doc__':docs,
+             'description':description}
+    return ASTFunctionMeta(name, (CompositeBase,), attrs)
     
 
 function_registry = FunctionRegistry()

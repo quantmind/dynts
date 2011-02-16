@@ -1,4 +1,7 @@
 import random
+
+from dynts.utils.py2py3 import map,itervalues
+from dynts.conf import settings
 from dynts.test import TestCase
 from dynts.backends import ops
 from dynts import exceptions 
@@ -12,7 +15,7 @@ class TestOperators(TestCase):
         for op in ops.values():
            # print op
             ts3 = op(ts1,ts2)
-            exp = map(op, data1, data2)
+            exp = list(map(op, data1, data2))
             self.check_dates(ts3, dates1) #the dates should be the same
             self.check_values(ts3, exp) #the values should be 
 
@@ -23,7 +26,7 @@ class TestOperators(TestCase):
             new_ts = op(ts, delta)
             curry_op = lambda x : op(x, delta)
 
-            exp = map(curry_op, data)
+            exp = list(map(curry_op, data))
             self.check_dates(new_ts, dates)
             self.check_values(new_ts, exp)
     
@@ -34,7 +37,7 @@ class TestOperators(TestCase):
         ts1 = self.getts(cols = 2)
         ts2 = self.getts(cols = 1)
         
-        op = ops.values()[0]
+        op = list(itervalues(ops))[0]
         
         curry_fn = lambda : op(ts1, ts2)
         self.assertRaises(exceptions.ExpressionError, curry_fn)
@@ -45,7 +48,7 @@ class TestOperators(TestCase):
         
         all_dates = list(set(dates1).union(set(dates2)))
         all_dates.sort()
-        op = ops.values()[0]
+        op = list(itervalues(ops))[0]
         ts3 = op(ts1,ts2)
         self.check_dates(ts3, all_dates) ##Check that all the dates are in the return series by default
         
@@ -57,7 +60,6 @@ class TestOperators(TestCase):
         self._check_missing_dts(not_in_dates1, btree)
         
     def _check_missing_dts(self, dts, btree):
-        from dynts.conf import settings
         ismissing = settings.ismissing
         
         for dt in  dts:

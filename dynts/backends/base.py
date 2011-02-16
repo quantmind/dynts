@@ -37,6 +37,7 @@ This class expose all the main functionalities of a timeseries
     __sub__ = operators.sub
     __mul__ = operators.mul
     __div__ = operators.div
+    __truediv__ = operators.div # Python 3
     
     def __len__(self):
         return self.shape[0]

@@ -3,7 +3,7 @@
 #
 #
 from collections import deque
-from itertools import izip
+
 import numpy as np
 
 import dynts
@@ -12,9 +12,6 @@ from dynts.utils import laggeddates, asarray
 
 
 arraytype = np.ndarray
-
-
-arrayfunc = lambda func, *args : [func(*items) for items in izip()]
 
 
 _functions = {'min':'min',
@@ -92,8 +89,8 @@ class TimeSeries(dynts.TimeSeries):
     
     def isregular(self):
         dates = self.dates().__iter__()
-        d0 = dates.next()
-        d1 = dates.next()
+        d0 = next(dates)
+        d1 = next(dates)
         dt = d1 - d0
         for d2 in dates:
             if d2 - d1 == dt:

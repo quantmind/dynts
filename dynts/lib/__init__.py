@@ -1,7 +1,7 @@
 from dynts.utils.py2py3 import zip
 
 try:
-    from cts import *
+    from .cts import *
     hasextensions = True
 except ImportError as e:
     hasextensions = False

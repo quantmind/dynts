@@ -2,14 +2,12 @@
 # NOT USED DIRECTLY
 # TEMPLATE TEST CASE FOR Difference Operators
 #
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
 import numpy as np
 
 from dynts import test, tsname
+from dynts.utils.py2py3 import zip
 from dynts.utils.populate import randomts
+
 
 class TestCase(test.TestCase):
     

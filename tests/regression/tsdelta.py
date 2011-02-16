@@ -2,11 +2,8 @@
 # NOT USED DIRECTLY
 # TEMPLATE TEST CASE FOR Difference Operators
 #
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
 from dynts import test
+from dynts.utils.py2py3 import zip
 from dynts.utils.populate import randomts, polygen
 
 

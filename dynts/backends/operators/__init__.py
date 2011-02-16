@@ -129,7 +129,7 @@ def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None
     from dynts import istimeseries
     op = _get_op(op_name)
     fill = fill if fill is not None else settings.missing_value
-    if callable(fill):
+    if hasattr(fill,'__call__'):
         fill_fn = fill
     else:
         fill_fn = lambda : fill

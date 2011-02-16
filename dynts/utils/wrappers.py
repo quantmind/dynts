@@ -109,8 +109,6 @@ class ashash(TimeSerieWrap):
         ts = self.ts
         hash = {}
         self.hash   = hash
-        self.keys   = hash.iterkeys
-        self.values = hash.itervalues
         for dt,v in ts.items():
             hash[dt] = v
     
@@ -131,14 +129,14 @@ an :class:`dynts.exceptions.DateNotFound`.'''
 
     def items(self):
         h = self.hash
-        for dt in sorted(self.keys()):
+        for dt in sorted(self.hash):
             yield dt,h[dt]
             
     def getts(self):
         if self.modified:
             name   = settings.splittingnames.join(self.names)
             hash   = self.hash
-            dates  = sorted(self.keys())
+            dates  = sorted(self.hash)
             values = (hash[dt] for dt in dates)
             return self.ts.clone(name = name, date = dates, data = values)
         else:

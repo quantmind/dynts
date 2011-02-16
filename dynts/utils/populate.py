@@ -31,8 +31,8 @@ def datepopulate(size = 10, start = None, delta = 1):
 def populate(size = 100, cols = 1, generator = None):
     generator = generator or def_generator
     data = ndarray([size,cols])
-    for c in xrange(0,cols):
-        data[:,c] = [generator(i) for i in xrange(0,size)]
+    for c in range(0,cols):
+        data[:,c] = [generator(i) for i in range(0,size)]
     return data
 
 

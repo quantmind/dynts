@@ -26,6 +26,7 @@ if ispy3k(): # Python 3
     zip = zip
     map = map
     range = range
+    from io import StringIO as StreamIO
 else: # Python 2
     string_type = unicode
     itervalues = lambda d : d.itervalues()
@@ -33,6 +34,7 @@ else: # Python 2
     is_string = lambda x : isinstance(x,basestring)
     from itertools import izip as zip, imap as map
     range = xrange
+    from io import BytesIO as StreamIO
 
 try:
     int_type = (types.IntType, types.LongType)

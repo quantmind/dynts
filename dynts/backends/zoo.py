@@ -1,4 +1,3 @@
-from itertools import izip
 from rpy2.robjects import IntVector
 
 import dynts

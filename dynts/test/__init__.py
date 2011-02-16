@@ -6,6 +6,7 @@ import types
 
 import numpy as np
 
+from dynts.conf import settings
 from dynts import timeseries, evaluate, tsname
 from dynts.utils.importlib import import_modules
 from dynts.utils.populate import populate, datepopulate, randomts
@@ -26,7 +27,18 @@ class TestCase(unittest.TestCase):
         self.tsname = tsname
         self.datepopulate = datepopulate
         self.populate = populate
-        self.randomts = randomts
+        
+    def setUp(self):
+        if self.backend:
+            self._oldbe = settings.backend
+            settings.backend = self.backend 
+    
+    def tearDown(self):
+        if self.backend:
+            settings.backend = self._oldbe
+        
+    def randomts(self,**kwargs):
+        return randomts(backend = self.backend, **kwargs)
         
     def getdata(self, size = 100, cols = 1, delta = 1, start = None):
         dates = self.datepopulate(size = size, delta = delta)

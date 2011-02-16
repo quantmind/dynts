@@ -4,22 +4,23 @@ Created using ply (http://www.dabeaz.com/ply/) a pure Python implementation
 of the popular compiler construction tools lex and yacc.
 '''
 from dynts.conf import settings
-from dynts.dsl.grammar import *
 from dynts.exceptions import DyntsException
 from dynts.backends import istimeseries, isxy
-from dynts.dsl.registry import FunctionBase, ComposeFunction, function_registry
-from dynts.utils import smart_str
+from dynts.utils.py2py3 import to_string
+
+from .grammar import *
+from .registry import FunctionBase, ComposeFunction, function_registry
 
 
 def parse(timeseries_expression, method = None, functions = None, debug = False):
     '''Function for parsing :ref:`timeseries expressions <dsl-script>`.
 If succesful, it returns an instance of :class:`dynts.dsl.Expr`.'''
     from ply import yacc
-    from rules import rules
+    from .rules import rules
     functions = functions if functions is not None else function_registry
     ru = rules(functions)
     ru.build()
-    ru.input(smart_str(timeseries_expression).lower())
+    ru.input(to_string(timeseries_expression).lower())
     tokens     = ru.tokens
     precedence = ru.precedence
     yacc       = yacc.yacc(method = method or 'SLR')
@@ -30,7 +31,7 @@ def merge(series):
     '''Merge timeseries. *series* must be an iterable over
 timeseries.'''
     series = iter(series)
-    ts = series.next()
+    ts = next(series)
     return ts.merge(series)
 
     

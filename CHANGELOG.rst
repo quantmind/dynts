@@ -1,3 +1,8 @@
+Ver. 0.4.1 - Development
+================================
+* All timeseries functions must have a documentation, otherwise ``docs`` tests don't pass.
+* **118 Tests**, **70% test coverage**
+
 Ver. 0.4.0 - 2011 Feb 15
 ================================
 * Dropped python 2.5 compatibility and moved towards python 3 support. The idea is to

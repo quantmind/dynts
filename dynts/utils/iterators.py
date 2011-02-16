@@ -6,7 +6,7 @@ def laggeddates(ts, step = 1):
         dates = ts.dates()
         if not hasattr(dates,'next'):
             dates = dates.__iter__()
-        dt0 = dates.next()
+        dt0 = next(dates)
         for dt1 in dates:
             yield dt1,dt0
             dt0 = dt1
@@ -14,7 +14,7 @@ def laggeddates(ts, step = 1):
         q = deque()
         while done:
             done+=1
-            lag.append(dates.next())
+            lag.append(next(dates))
         for dt1 in dates:
             lag.append(dt1)
             yield dt1,lag.pop(0)
@@ -24,7 +24,7 @@ def laggeditems(ts, step = 1):
     '''Iteration over lagged items.'''
     if setp == 1:
         items = self.items()
-        d0,i0 = items.next()
+        d0,i0 = next(items)
         for d1,i1 in dates:
             yield d1,i1,d0,i0
             d0 = d1
@@ -36,7 +36,7 @@ def laggeditems(ts, step = 1):
         lag    = deque()
         while done:
             done+=1
-            lag.append(items.next())
+            lag.append(next(items))
         for item1 in items:
             lag.append(item1)
             yield item1+lag.pop(0)

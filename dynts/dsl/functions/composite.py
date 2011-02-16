@@ -2,15 +2,36 @@ from dynts.dsl import ComposeFunction
 from .simple import ScalarWindowFunction
 
 
-ComposeFunction('sdd','sd(delta(x1),window=20)')
-ComposeFunction('asdd','15.874*sd(delta(x1),window=20)')
-ComposeFunction('sdld','sd(ldelta(x1),window=20)')
-ComposeFunction('avol','15.874*sd(ldelta(x1),window=20)')
+ComposeFunction('sdd','sd(delta(x1),window=20)',docs='''\
+This is a shortcut function for calculating the standard deviation
+of changes. Therefore:
+
+.. math::
+
+    {\\tt sdd}(y_t,w) = {\tt sd}({\\tt delta}(y_t),w)
+''',description = 'standard deviation of changes')
+
+ComposeFunction('vol','15.874*sd(delta(x1),window=20)',docs='''\
+a''',description='Annualised volatility')
+
+ComposeFunction('psdd','sd(ldelta(x1),window=20)',docs='''\
+This is a shortcut function for calculating the standard deviation
+of log-changes. Therefore:
+
+.. math::
+
+    {\\tt sdd}(y_t,w) = {\tt sd}({\\tt ldelta}(y_t),w)
+''',description='log standard deviation')
+
+ComposeFunction('avol','15.874*sd(ldelta(x1),window=20)',docs='''\
+a''',description='annualised volatility')
 
 # Annualized sharpe on changes
-ComposeFunction('asharpe','15.874*sharpe(delta(x1),window=20)')
+ComposeFunction('asharpe','15.874*sharpe(delta(x1),window=20)',docs='''\
+a''',description='Annualised volatility')
 # Annualized sharpe on log-changes
-ComposeFunction('alsharpe','15.874*sharpe(ldelta(x1),window=20)')
+ComposeFunction('alsharpe','15.874*sharpe(ldelta(x1),window=20)',docs='''\
+a''',description='Annualised volatility')
 
 
 class zscore(ScalarWindowFunction):

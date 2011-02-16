@@ -1,11 +1,13 @@
-import numpy as np
 from collections import deque
 from itertools import islice
+
+import numpy as np
 
 from .common import *
 
 
-from skiplist import skiplist
+from .skiplist import skiplist
+
 
 __all__ = ['roll_max',
            'roll_min',

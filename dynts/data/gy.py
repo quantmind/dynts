@@ -19,6 +19,12 @@ from .base import DataProvider
 short_month = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')
 
 
+def line_decoder(res):
+    '''Simply convert to unicode'''
+    for line in res:
+        yield line.decode('ascii','ignore')
+
+
 class WebCsv(DataProvider):
 
     def __init__(self):
@@ -48,7 +54,7 @@ class WebCsv(DataProvider):
     def rowdata(self, ticker, startdate, enddate):
         url = self.hystory_url(str(ticker), startdate, enddate)
         res = self.request(url)
-        return csv.DictReader(res)
+        return csv.DictReader(line_decoder(res))
         
     def hystory_url(self, ticker, startdate, enddate, field = None):
         raise NotImplementedError
@@ -57,14 +63,14 @@ class WebCsv(DataProvider):
         return ['Close','Open','Low','High','Volume']
         
     def load(self, symbol, startdate, enddate, logger, backend, **kwargs):
+        from ccy import dateFromString
         ticker = symbol.ticker
         field  = symbol.field
         data = self.rowdata(ticker, startdate, enddate)
         if not data:
             return
 
-        fields = {}        
-        std  = self.string_to_date
+        fields = {}
         datestr = None
         dates = []
         for r in data:
@@ -80,15 +86,12 @@ class WebCsv(DataProvider):
                                 continue
                         fields[str(k).upper()] = []
                 
-                dt  = std(r[datestr])
+                dt  = dateFromString(r[datestr])
                 dates.append(dt)
                 for k,v in r.items():
-                    nts = fields.get(str(k).upper(),None)
-                    if nts is not None:
-                        try:
-                            nts.append(float(v))
-                        except:
-                            continue
+                    k = k.upper()
+                    if k in fields:
+                        fields[k].append(float(v))
             except:
                 continue
         

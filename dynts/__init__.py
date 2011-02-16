@@ -1,6 +1,6 @@
 '''Quantitative financial timeseries analysis'''
 
-VERSION = (0, 4, 0)
+VERSION = (0, 4, '1dev')
  
 def get_version():
     return '.'.join(map(str,VERSION))
@@ -18,8 +18,9 @@ CLASSIFIERS  = [
                 'Intended Audience :: Science/Research',
                 'License :: OSI Approved :: BSD License',
                 'Operating System :: OS Independent',
-                'Programming Language :: Python',
                 'Programming Language :: JavaScript',
+                'Programming Language :: Python :: 2.6',
+                'Programming Language :: Python :: 2.7',
                 'Topic :: Scientific/Engineering',
                 'Topic :: Scientific/Engineering :: Mathematics',
                 'Topic :: Office/Business :: Financial'
@@ -30,6 +31,8 @@ try:
 except NameError:
     strtype = str
     
+from functools import reduce
+
 from dynts.exceptions import *
 from .backends import timeseries, xydata, TimeSeries, DynData, tsfunctions
 from .backends import istimeseries, Formatters, BACKENDS, ts_bin_op
@@ -113,18 +116,24 @@ def hasextensions():
     return hasextensions
 
 
+def function_doc(name):
+    link = '.. _functions-{0}:'.format(name)
+    func = function_registry[name]
+    if func.description:
+        title = '{0} - {1}'.format(name,func.description)
+    else:
+        title = name
+    under = (2+len(title))*'='
+    fdoc = func.__doc__
+    if not fdoc:
+        raise FunctionError('Function {0} has no documentation.'.format(name))
+    return '\n'.join((link,'',title,under,'',fdoc,'\n'))
+
+        
 def functions_docs():
     names = sorted(function_registry.keys())
-    docs = ''
-    for name in names:
-        t = (1+len(name))*'='
-        title = '\n{0}\n{1}\n'.format(name,t)
-        docs += title
-        func = function_registry[name]
-        fdoc = func.__doc__
-        if fdoc:
-            docs += fdoc
-    return docs
+    return '\n'.join((function_doc(name) for name in names))
+
 
 def dump_docs(filename = 'dyntslist.rst'):
     docs = functions_docs()

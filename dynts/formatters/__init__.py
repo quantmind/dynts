@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 import csv
 
-from io import BytesIO as StreamIO
-
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
-
+from dynts.utils.py2py3 import zip, StreamIO
 from dynts.exceptions import FormattingException
 from dynts.backends import istimeseries
 from dynts.utils import asarray

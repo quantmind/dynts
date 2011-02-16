@@ -56,7 +56,7 @@ First order differencing evaluated as
 
 .. math::
 
-    \\Delta y_t = y_t - y_{t-lag}
+    {\\tt delta}(y_t,{\\tt lag}) = y_t - y_{t-{\\tt lag}}
 
 Typical usage::
 
@@ -100,12 +100,13 @@ It is an optimised shortcut function equivalent to::
     
 class LDelta(ScalarFunction):
     """\
-Calculate the log-delta of a timeseries. This is the first order difference
+Calculate the logarithmic difference of a timeseries.
+This is the first order difference
 in log-space useful for evaluating percentage moments:
     
 .. math::
 
-    {\\tt ldelta} (y, lag=1) = \\log{\\frac{y_t}{y_{t-{\\tt lag}}}}   
+    {\\tt ldelta} (y_t, {\\tt lag}) = \\log{\\frac{y_t}{y_{t-{\\tt lag}}}}   
 
 Typical usage::
 
@@ -114,14 +115,22 @@ Typical usage::
     
 :parameter lag: backward lag. Default ``1``.
 """
+    description = "log delta"
     def apply(self, ts, **kwargs):
         return ts.logdelta(**kwargs)
 
 
 class Ma(ScalarWindowFunction):
     """\
-Arithmetic moving average function.
+Arithmetic moving average function simply defined by
+
+.. math::
+
+    {\\tt ma}(y_t,w) = \\frac{1}{w}\\sum_{i=0}^{w-1} y_{t-i}
+
+:parameter window ``w``: the rolling window in units. Default ``20``
 """
+    description = 'arithmetic moving avarage'
     def apply(self, ts, **kwargs):
         return ts.rollmean(**kwargs)
     
@@ -129,6 +138,12 @@ Arithmetic moving average function.
 class Max(ScalarWindowFunction):
     """\
 Moving max function.
+
+.. math::
+
+    {\\tt max}(y_t,w) = \\max\\left(w_t,\\dots,w_{t-w+1}\\right)
+
+:parameter window ``w``: the rolling window in units. Default ``20``
 """
     def apply(self, ts, **kwargs):
         return ts.rollmax(**kwargs)
@@ -145,11 +160,39 @@ Moving median function.
 class Min(ScalarWindowFunction):
     """\
 Moving min function.
+
+.. math::
+
+    {\\tt min}(y_t,w) = \\min\\left(w_t,\\dots,w_{t-w+1}\\right)
+
+:parameter window ``w``: the rolling window in units. Default ``20``
 """
     def apply(self, ts, **kwargs):
         return ts.rollmin(**kwargs)    
 
 
+class Var(ScalarWindowFunction):
+    '''\
+Rolling arithmetic average variance given by:
+
+.. math::
+
+    {\\tt var}(y_t,w,d) = \\frac{1}{w-d} \\sum_{i=0}^{w-1} \\left[y_{t-i} - {\\tt ma}(y_t,w)\\right]^2 
+    
+where :math:`\\tt ma` is the :ref:`rolling moving average <functions-ma>`.
+Typical usage::
+
+    var(tiker)
+    var(tiker,window=40)
+
+:parameter window ``w``: The rolling window in units. Default ``20``
+:parameter ddof ``d``: Delta degree of freedom. Default ``0``
+'''
+    description = 'rolling variance'
+    def apply(self, ts, **kwargs):
+        return ts.rollsd(**kwargs)
+    
+    
 class SD(ScalarWindowFunction):
     '''\
 Rolling standard deviation given by:
@@ -166,8 +209,8 @@ Typical usage::
     sd(tiker, window=40, scale = 252)
     sd(ldelta(GOOG), window = 60, scale = 252)
 
-:parameter window: the rolling window in units. Default ``20``.
-:parameter scale: Scaling constant. Default ``1``.
+:parameter window: the rolling window in units. Default ``20``
+:parameter scale: Scaling constant. Default ``1``
 '''
     def apply(self, ts, **kwargs):
         return ts.rollsd(**kwargs)
@@ -210,6 +253,7 @@ There are two optional parameters:
 * *alpha* default is ``1``. If set to zero alpha won't be included in the regression.
 """        
     name = 'regr'
+    description = 'rolling linear regression'
     
     def __call__(self, input, **kwargs):
         pass

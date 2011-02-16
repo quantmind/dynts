@@ -20,6 +20,7 @@ class CustomLoader(TimeSerieLoader):
 
 
 class TestDataProvider(TestCase):
+    backend = 'numpy'
     
     def testyahoo(self):
         ts = dynts.evaluate('GOOG:yahoo')

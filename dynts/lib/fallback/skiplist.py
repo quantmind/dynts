@@ -1,11 +1,21 @@
 # Original from
 # http://code.activestate.com/recipes/576930-efficient-running-median-using-an-indexable-skipli/
 #
+import sys
 import math
 from random import random
 from math import log, ceil
 from collections import deque
 from itertools import islice
+#from decimal import Decimal
+
+#NaN = float(Decimal('NaN'))
+
+try:
+    range = xrange
+except NameError:
+    pass
+
 
 __all__ = ['skiplist']
 
@@ -19,11 +29,22 @@ class End(object):
     'Sentinel object that always compares greater than another object'
     def __cmp__(self, other):
         return 1
+    def __ge__(self, other):
+        return 1
+    def __gt__(self, other):
+        return 1
+    def __lt__(self, other):
+        return 0
+    def __eq__(self, other):
+        return 0
+    def __le__(self, other):
+        return 0
+    
 
 NIL = Node(End(), [], [])               # Singleton terminator node
 
 
-class skiplist:
+class skiplist(object):
     'Sorted collection supporting O(lg n) insertion, removal, and lookup by rank.'
 
     def __init__(self, expected_size=100):
@@ -46,7 +67,7 @@ class skiplist:
         node = self.head
         i += 1
         #for level in reversed(range(self.maxlevels)):
-        for level in xrange(self.maxlevels-1,-1,-1):
+        for level in range(self.maxlevels-1,-1,-1):
             while node.width[level] <= i:
                 i -= node.width[level]
                 node = node.next[level]
@@ -58,7 +79,7 @@ class skiplist:
         steps_at_level = [0] * self.maxlevels
         node = self.head
         #for level in reversed(range(self.maxlevels)):
-        for level in xrange(self.maxlevels-1,-1,-1):
+        for level in range(self.maxlevels-1,-1,-1):
             while node.next[level].value <= value:
                 steps_at_level[level] += node.width[level]
                 node = node.next[level]
@@ -75,7 +96,7 @@ class skiplist:
             newnode.width[level] = prevnode.width[level] - steps
             prevnode.width[level] = steps + 1
             steps += steps_at_level[level]
-        for level in xrange(d, self.maxlevels):
+        for level in range(d, self.maxlevels):
             chain[level].width[level] += 1
         self.size += 1
 
@@ -83,7 +104,7 @@ class skiplist:
         # find first node on each level where node.next[levels].value >= value
         chain = [None] * self.maxlevels
         node = self.head
-        for level in xrange(self.maxlevels-1,-1,-1):
+        for level in range(self.maxlevels-1,-1,-1):
             while node.next[level].value < value:
                 node = node.next[level]
             chain[level] = node
@@ -92,11 +113,11 @@ class skiplist:
 
         # remove one link at each level
         d = len(chain[0].next[0].next)
-        for level in xrange(d):
+        for level in range(d):
             prevnode = chain[level]
             prevnode.width[level] += prevnode.next[level].width[level] - 1
             prevnode.next[level] = prevnode.next[level].next[level]
-        for level in xrange(d, self.maxlevels):
+        for level in range(d, self.maxlevels):
             chain[level].width[level] -= 1
         self.size -= 1
 

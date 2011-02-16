@@ -1,7 +1,6 @@
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
+from functools import reduce
+
+from dynts.utils.py2py3 import zip
 
 crossoperator = lambda func,*args : [func(*vals) for vals in zip(*args)]
 

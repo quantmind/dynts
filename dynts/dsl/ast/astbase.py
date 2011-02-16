@@ -1,13 +1,9 @@
+from functools import reduce
+
 from dynts.conf import settings
 from dynts import timeseries, istimeseries, ts_bin_op
 from dynts.exceptions import *
 
-def isnumber(value):
-    try:
-        float(value)
-        return True
-    except:
-        return False
 
 class Expr(object):
     '''Base class for abstract syntax nodes
