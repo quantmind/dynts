@@ -1,6 +1,6 @@
 Ver. 0.4.1 - Development
 ================================
-* All timeseries functions must have a documentation, otherwise ``docs`` tests don't pass.
+* All timeseries functions must have a documentation, otherwise ``docs`` tests wont pass.
 * **118 Tests**, **70% test coverage**
 
 Ver. 0.4.0 - 2011 Feb 15

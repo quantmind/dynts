@@ -44,7 +44,7 @@ To change settings::
     settings.default_provider = 'GOOGLE'
     '''
     def __init__(self):
-        self.backend = 'zoo'
+        self.backend = 'numpy'
         self.splittingnames     = '__'
         self.concat_operator    = ','
         self.separator_operator = '|'

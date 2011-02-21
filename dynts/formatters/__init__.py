@@ -63,12 +63,22 @@ class ToFlot(BaseFormatter):
                 res.add(serie)
         else:
             res = flot.Flot(ts.name)
-            for name,serie in zip(ts.names(),ts.series()):
-                serie = flot.Serie(label = serie.name,
-                                   data = serie.data,
-                                   lines = {'show':serie.lines},
-                                   points = {'show':serie.points})
-                res.add(serie)
+            if ts.extratype:
+                for name,serie in zip(ts.names(),ts.series()):
+                    serie = flot.Serie(label = serie.name,
+                                       data = serie.data,
+                                       lines = {'show':serie.lines},
+                                       points = {'show':True},
+                                       scatter = {'show':serie.points,
+                                                  'extratype':ts.extratype})
+                    res.add(serie)
+            else:
+                for name,serie in zip(ts.names(),ts.series()):
+                    serie = flot.Serie(label = serie.name,
+                                       data = serie.data,
+                                       lines = {'show':serie.lines},
+                                       points = {'show':serie.points})
+                    res.add(serie)
         result.add(res)
         return result
 

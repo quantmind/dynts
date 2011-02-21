@@ -16,3 +16,13 @@ class TestFlot(unittest.TestCase):
         self.assertEqual(len(plot['series']),2)
         data = json.dumps(dts)
         
+    def testScatter(self):
+        ts = dynts.evaluate('scatter(YHOO,GOOG)').dump('flot')
+        dts = ts.todict()
+        self.assertEqual(dts['type'],'multiplot')
+        self.assertEqual(len(dts['plots']),1)
+        plot = dts['plots'][0]
+        self.assertEqual(plot['type'],'xy')
+        self.assertEqual(len(plot['series']),1)
+        serie = plot['series'][0]
+        self.assertEqual(serie['extratype'],'date')

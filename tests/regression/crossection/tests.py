@@ -1,8 +1,8 @@
-import unittest
+from dynts import test
 from dynts.utils import cross
 
 
-class CrossectionTest(unittest.TestCase):
+class CrossectionTest(test.TestCase):
     
     def testAllGE(self):
         self.assertTrue(cross([1,2]) >= [-1,0.5])

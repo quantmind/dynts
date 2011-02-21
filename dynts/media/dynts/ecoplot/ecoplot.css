@@ -14,6 +14,9 @@
 	float: right;
 	height: 100%;
 }
+.econometric-plot .legend {
+    width: 150px;
+}
 .econometric-plot .canvas-container {
 	float: none;
 	margin: auto;

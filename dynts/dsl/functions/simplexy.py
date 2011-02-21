@@ -12,11 +12,11 @@ class SimpleFunctionXY(FunctionBase):
 
 class scatter(SimpleFunctionXY):
     """\
-A two-dimensional scatter plot::
+A two-dimensional scatter for timeseries::
 
     scatter(GOOG,YHOO)
     
-will plot Google price on the x-axis versus Yahoo price on the y-axis.
+will create Google versus Yahoo prices withe date reference.
 """
     def apply(self, args, **kwargs):
         if not len(args) == 2:
@@ -31,7 +31,9 @@ will plot Google price on the x-axis versus Yahoo price on the y-axis.
                 v1 = ts1[dt]
             except DateNotFound:
                 continue
-            data.append([v0[0],v1[0]])
-        return xydata(name = name, data = data, lines = False)
+            data.append((v0[0],v1[0],dt))
+        return xydata(name = name, data = data,
+                      lines = False,
+                      extratype = 'date')
     
     

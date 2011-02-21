@@ -1,10 +1,23 @@
 from datetime import datetime, date
 
+from dynts.utils.py2py3 import is_string
 from dynts.utils.anyjson import JSONdatainfo, JSONobject
 
 EPOCH = 1970
 _EPOCH_ORD = date(EPOCH, 1, 1).toordinal()
 
+
+def pydate2flot(dte):
+    year, month, day, hour, minute, second = dte.timetuple()[:6]
+    days = date(year, month, 1).toordinal() - _EPOCH_ORD + day - 1
+    hours = days*24 + hour
+    minutes = hours*60 + minute
+    seconds = minutes*60 + second
+    if isinstance(dte,datetime):
+        return 1000*seconds + 0.001*dte.microsecond
+    else:
+        return 1000*seconds
+    
 
 class MultiPlot(JSONdatainfo):
     '''Class holding several :class:`dynts.web.flot.Flot` instances.
@@ -34,10 +47,10 @@ class MultiPlot(JSONdatainfo):
 
 class Flot(JSONobject):
     '''A single plot which can be a timeseries or a XY plot.'''
-    allowed_types = ['xy','timeseries']
+    allowed_types = ['xy','timeseries','scatter']
     def __init__(self, name = '', type = None, shadowSize = None, **kwargs):
         if type not in self.allowed_types:
-            type = 'xy'
+            type = 'scatter'
         self.name   = name
         self.type   = type
         self.series = []
@@ -59,38 +72,27 @@ class Flot(JSONobject):
 class Serie(JSONobject):
     
     def __init__(self, label = '', data = None,
-                 color = None, line = None, point = None,
-                 shadowSize = None, yaxis = 1, xaxis = 1,
-                 **kwargs):
+                 color = None, shadowSize = None, yaxis = 1, xaxis = 1,
+                 extratype = None, **kwargs):
         self.label = label
         if data is None:
-            data = []
+            data = ()
+        if 'scatter' in kwargs and kwargs['scatter']['extratype'] == 'date':
+            ndata = []
+            for a,b,dt in data:
+                ndata.append((a,b,pydate2flot(dt)))
+            data = ndata
         self.data = data
         for k,v in kwargs.items():
             setattr(self,k,v)
-        if isinstance(color,basestring):
+        if is_string(color):
             if not color.startswith('#'):
                 color = '#%s' % color
         self.xaxis = xaxis
         self.yaxis = yaxis
         if color:
             self.color = color
-        if isinstance(line,dict):
-            self.lines = line
-        if isinstance(line,dict):
-            self.points = point
         if shadowSize:
             self.shadowSize = shadowSize
 
-
-def pydate2flot(dte):
-    year, month, day, hour, minute, second = dte.timetuple()[:6]
-    days = date(year, month, 1).toordinal() - _EPOCH_ORD + day - 1
-    hours = days*24 + hour
-    minutes = hours*60 + minute
-    seconds = minutes*60 + second
-    if isinstance(dte,datetime):
-        return 1000*seconds + 0.001*dte.microsecond
-    else:
-        return 1000*seconds
 

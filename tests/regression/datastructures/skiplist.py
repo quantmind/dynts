@@ -1,11 +1,8 @@
 import unittest
-
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
+from functools import reduce
 
 import dynts
+from dynts.utils.py2py3 import zip
 from dynts import lib
 from dynts.stats import rollingOperation
 from dynts.utils.populate import populate
@@ -20,7 +17,11 @@ class RollingFunctionSkipList(unittest.TestCase):
     def testSkipList(self):
         data  = populate(size = 500)[:,0]
         ol = lib.makeskiplist(data = data, use_fallback = self.fallback)
-        reduce(lambda x,y: self.assertTrue(y>x),ol)
+        p = None
+        for v in ol:
+            if p is not None:
+                self.assertTrue(v>=p)
+            p = v
         
     def testRollingOp(self):
         data  = populate(size = 500)[:,0]

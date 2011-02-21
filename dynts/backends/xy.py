@@ -103,10 +103,15 @@ class xyserie(object):
 
 
 class xydata(DynData):
-    '''A :class:`dynts.DynData` class for 2-dimensional series of data.'''
-    def __init__(self, name = '', data = None, info = None, **kwargs):
+    '''A :class:`dynts.DynData` class for 2-dimensional series of data
+    with an extra dimension which contain further information for
+    of each x-y pair. For example a date in a timeseries scatter plot.'''
+    def __init__(self, name = '', data = None,
+                 info = None, extratype = None,
+                 **kwargs):
         super(xydata,self).__init__(name,info)
         self._series = []
+        self.extratype = extratype
         if data:
             self.add(xyserie(name=name,data=data,**kwargs))
         
