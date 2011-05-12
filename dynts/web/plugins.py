@@ -4,13 +4,13 @@ https://github.com/lsbardel/djpcms
 from djpcms import sites, forms
 from djpcms.template import loader
 from djpcms.plugins import DJPplugin
-from djpcms.views import appsite
+
 
 skin = getattr(sites.settings,'DYNTS_SKIN','dynts/ecoplot/skins/smooth.css')
 
 
 class EcoForm(forms.Form):
-    url    = forms.CharField()
+    path = forms.CharField()
     default_show = forms.BooleanField(initial = True, required = False)
     height = forms.IntegerField()
     
@@ -22,6 +22,7 @@ __ http://packages.python.org/djpcms/'''
     name = "econometric-plot"
     description = "Econometric plot"
     form = EcoForm
+    template = 'dynts/econometric-plot.html'
     
     class Media:
         css = {
@@ -41,14 +42,14 @@ __ http://packages.python.org/djpcms/'''
               'dynts/decorator.js']
     
     def render(self, djp, wrapper, prefix, height = 400,
-               default_show = True, url = '', start = None, **kwargs):
+               default_show = True, path = '', start = None, **kwargs):
         height = abs(int(height))
-        ctx = {'url':    url,
+        ctx = {'url':    path,
                'height': height,
                'default_show': default_show,
                'item':   djp.instancecode(),
                'start': start}
-        return loader.render_to_string('dynts/econometric-plot.html', ctx)
+        return loader.render(self.template, ctx)
     
 
 class EconometricFunctions(DJPplugin):
