@@ -1,0 +1,84 @@
+/*{{ tag }}-canvas {width: 100%; overflow: hidden;}*/
+{{ tag }} .lowermenu {float: left; width:100%;}
+{{ tag }} .dateholder {line-height: 34px; font-weight: bold}
+{{ tag }} .nav-menu {float: left; width: auto; margin-left: 10px;}
+{{ tag }} .nav-menu ul {float: left; width: auto; list-style-type: none;}
+{{ tag }} .nav-menu li {float: left; list-style-type: none;
+                                display: inline; background: transparent;}
+{{ tag }} .nav-menu ul li:hover {background: rgb(224,224,224);}
+{{ tag }} .nav-menu ul li.clicked {background: rgb(154,154,154);}
+{{ tag }} .nav-menu ul li a {display: block;
+                                     line-height: 34px;
+                                     height: 28px;
+                                     padding: 0 3px;
+                                     background-repeat: no-repeat;
+                                     background-position: center;
+                                     width: 25px;
+                                     cursor: pointer;
+                                     border: 1px outset rgb(114,114,114);}
+
+{{ tag }} .menu-item {float: left;}
+{{ tag }} .ts-input-date {max-width: 100px;}
+
+{{ tag }} .loader  {
+    display: none;
+    background-image: url(img/ajax-loader.gif);
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 34px; width: 34px;
+    float:right; margin-right: 2%;
+    opacity: 0.5;
+}
+
+{{ tag }} .secondary .panel {
+    display: none;
+    width: 92%;
+    height: 94%;
+    margin: 0;
+    float: right;
+    padding: 3% 10px;
+}
+              
+.dataErrorMessage {color: rgb(179,0,0); font-weight: bold;}
+
+/* Margins & Paddings */
+{{ tag }} .lowermenu {padding: 2px 0;}
+{{ tag }} .menu-item {
+    margin-left: 10px;
+}
+{{ tag }} .menu-item.command {
+    margin: 0 10px;
+}
+
+/* UI-Tabs */
+{{ tag }} .canvas-container .ui-corner-all {
+    -moz-border-radius:0;
+}
+{{ tag }} .canvas-container .ui-tabs .ui-widget-header,
+{{ tag }} .canvas-container .ui-tabs {
+    padding: 0;
+    border: none;
+}
+{{ tag }} a:link,
+{{ tag }} a:visited {
+    font-weight: normal;
+}
+{{ tag }} .canvas-container .ui-tabs .ui-tabs-panel {
+    padding: 0;
+}
+{{ tag }} table.plot-options {
+    margin: 0 auto;
+}
+{{ tag }} table.plot-options th, 
+{{ tag }} table.plot-options td {
+    padding: 2px 7px 0 0;
+}
+{{ tag }} table.plot-options td.center {
+    text-align: center;
+}
+{{ tag }} table.plot-options tr.serie-option td {
+    padding-bottom: 7px;
+}
+{{ tag }} table.plot-options td.label {
+    opacity: 0.7;
+}

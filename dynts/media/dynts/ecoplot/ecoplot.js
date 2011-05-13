@@ -494,7 +494,7 @@
     have sensible default values apart from one which
     needs to supplied.
 
-      load_url: String for the remote data provider URL.
+      url: String for the remote data provider URL.
 
     The most common options are:
 
@@ -573,7 +573,10 @@
                    show: true,
                    label: 'Period',
                    format: "d M yy",
-                   cn: "ts-input-date"
+                   cn: "ts-input-date",
+                   default_month_interval: 12,
+                   start: null,
+                   end: null,
                },
                command: {show: true, entry: null},
                toolbar: default_toolbar,
@@ -582,7 +585,7 @@
                requestParams: {},
                show_tooltip: true,
                autoload: true,
-               load_url: null,
+               url: null,
                loaderimage: 'ajax-loader.gif',
                flot_options: {
                    xaxis: {}
@@ -591,7 +594,6 @@
                infoPanel: 'ecoplot-info',
                min_height: 200,
                defaultFade: 300,
-               default_month_interval: 12,
                classname: 'ts-plot-module',
                errorClass: 'dataErrorMessage',
                canvasClass: 'ts-plot-module-canvas',
@@ -650,7 +652,6 @@
 
         function _parseOptions(options_) {
             var options = {
-                    load_url: null,
                     elems: {}
                 },
                 cl;
@@ -663,32 +664,31 @@
             if(cl.symbol) {
                 cl.show = false;
             }
+            _set_default_dates(options.dates);
             return options;
         }
 
         /**
          * Set default dates in the date panel.
          */
-        function _set_default_dates($this)  {
-            var options = $this[0].options,
-                dates = options.dates,
-                td, v1, v2;
-            if(options.end) {
-                td = new Date(options.end);
+        function _set_default_dates(dates)  {
+            var td, v1, v2;
+            if(dates.end) {
+                td = new Date(dates.end);
             }
             else {
                 td = new Date();
             }
             v2 = $.datepicker.formatDate(dates.format, td);
-            if(!options.start) {
-                td.setMonth(td.getMonth() - options.default_month_interval);
+            if(!dates.start) {
+                td.setMonth(td.getMonth() - dates.default_month_interval);
             }
             else {
-                td = new Date(options.start);
+                td = new Date(dates.start);
             }
             v1 = $.datepicker.formatDate(dates.format, td);
-            dates.start.val(v1);
-            dates.end.val(v2);
+            dates.start = v1;
+            dates.end = v2;
         }
 
         /**
@@ -978,10 +978,10 @@
 
         function _request($this)  {
             var options  = $this[0].options;
-            if(!options.load_url)  {return;}
+            if(!options.url)  {return;}
             var dataplot = _get_data($this);
             if(!dataplot) {return;}
-            log("Sending ajax request to " + options.load_url);
+            log("Sending ajax request to " + options.url);
             log(dataplot.command + ' from ' + dataplot.start + ' end '+ dataplot.end);
             var params   = {
                     timestamp: +new Date()
@@ -991,7 +991,7 @@
             });
             params = $.extend(true, params, dataplot);
             options.startLoading($this);
-            $.ajax({url: options.load_url,
+            $.ajax({url: options.url,
                 type: options.requestMethod,
                 data: $.param(params),
                 dataType: options.responsetype,
@@ -1026,6 +1026,7 @@
         function _construct(options_) {
             var options = _parseOptions(options_);
             return this.each(function(i) {
+                
                 var $this = $(this).attr({'id':plugin_class+"_"+i}).addClass(plugin_class);
                 this.options = options;
                 $this.hide().html("");
@@ -1065,6 +1066,7 @@
             setdebug: function(v){debug = v;},
             log: log,
             version: _version,
+            'plugin_class': plugin_class,
             addMenu: function(menu) {menubar[menu.name] = menu;},
             getmenu: function(name,$this) {
                 var menu = menubar[name];
@@ -1338,7 +1340,7 @@
         var elems   = options.elems;
 
         elems.menu = $('<div class="menu"></div>').appendTo($this);
-        elems.body = $('<div class="body"></div>').appendTo($this);
+        elems.body = $('<div class="body ui-widget-content"></div>').appendTo($this);
         var page  = $('<div class="main"></div>').appendTo(elems.body);
         var page2 = $('<div class="secondary"></div>').appendTo(elems.body);
 
@@ -1348,8 +1350,8 @@
         elems.loader  = $('<div class="loader"></div>');
 
         /* The menu bar */
-        var upperm = $('<div class="uppermenu"></div>');
-        var lowerm = $('<div class="lowermenu"></div>');
+        var upperm = $('<div class="menubar upper ui-widget-header"></div>');
+        var lowerm = $('<div class="menubar lower ui-widget-header"></div>');
         elems.menu.append(upperm).append(lowerm);
 
         elems.commandline = $.ecoplot.getmenu('command',$this).appendTo(upperm);

@@ -48,7 +48,8 @@ Formatters['plot'] = formatters.ToPlot()
 
 
 def evaluate(expression, start = None, end = None,
-             loader = None, logger = None, backend = None, **kwargs):
+             loader = None, logger = None, backend = None,
+             **kwargs):
     '''Evaluate the timeseries ``expression`` into
 a timeseries object
     

@@ -1,29 +1,41 @@
 '''Web views for djpcms 
 https://github.com/lsbardel/djpcms
 '''
-from djpcms.views import appview
+from djpcms import views, forms
+from djpcms.html import HtmlWidget
+from djpcms.utils import gen_unique_id
 
 from ccy import dateFromString
 
 
-class TimeSeriesView(appview.ModelView):
-    '''```djpcms``` application view for retriving timeseries data as  JSON string.
+class EcoForm(forms.Form):
+    height = forms.IntegerField()
+    
+
+class TimeSeriesView(views.ModelView):
+    '''``djpcms`` application view for retriving timeseries data as  JSON string.
 Available as Ajax Get response.'''
+    plugin_form = EcoForm
     _methods      = ('get',)
+    
+    def render(self, djp, height = 400, start = None, **kwargs):
+        height = abs(int(height))
+        code = self.get_code_object(djp)
+        id = gen_unique_id()
+        widget = HtmlWidget('div', id = id, cn = 'econometric-plot')
+        widget.addData('height',height)\
+              .addData('item',code)\
+              .addData('start',start)\
+              .addData('url',self.path)
+        return widget.render()
     
     def ajax_get_response(self, djp):
         request = djp.request
-        sdata = self.econometric_data(djp.request, dict(request.GET.items()))
-        return djp.http.HttpResponse(sdata, mimetype='application/javascript')
+        return self.econometric_data(djp.request, dict(request.GET.items()))
     
-    def get_object(self, code):
+    def get_code_object(self, djp):
         '''Check if the code is an instance of a model.'''
-        codes = code.split(':')
-        if len(codes) == 2 and codes[0] == str(self.model._meta):
-            try:
-                return self.model.objects.get(id = int(codes[1]))
-            except:
-                return None
+        return None
                 
     def econometric_data(self, request, data):
         #Obtain the data
@@ -38,13 +50,7 @@ Available as Ajax Get response.'''
             start = dateFromString(str(start))
         if end:
             end = dateFromString(str(end))
-        try:
-            return self.getdata(request,cts,start,end)
-        except IOError, e:
-            return ''
-    
-    def codeobject(self, object):
-        return str(object)
+        return self.getdata(request,cts,start,end)
     
     def getdata(self,request,expression,start,end):
         '''Pure virtual function which retrives the actual data.

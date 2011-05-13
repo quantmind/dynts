@@ -1,0 +1,36 @@
+{% extends "medplate/elem.css_t" %}
+
+{% block body %}
+{{ tag }} .menu,
+{{ tag }} .body {
+	width: 100%;
+	float: left;
+}
+{{ tag }} .main {
+	width: 100%;
+	height: 100%;
+	float: left;
+}
+{{ tag }} .secondary {
+	float: right;
+	height: 100%;
+}
+{{ tag }} .legend {
+    width: 150px;
+}
+{{ tag }} .canvas-container {
+	float: none;
+	margin: auto;
+	width: auto;
+	display: block;
+}
+{{ tag }} label {margin-right: 10px;}
+{{ tag }} label.middle {margin: 0 5px;}
+
+{{ tag }} .body.with-panel .main {
+    width: 50%;
+}
+{{ tag }} .body.with-panel .secondary {
+    width: 50%;
+}
+{% endblock %}

@@ -23,18 +23,18 @@
 	width: auto;
 	display: block;
 }
-/*div.econometric-plot-canvas {width: 100%; overflow: hidden;}*/
-div.econometric-plot .uppermenu {height: 34px; line-height:34px; float: left; width:100%;}
-div.econometric-plot .lowermenu {float: left; width:100%;}
-div.econometric-plot .uppermenu input {height: 20px; margin: 4px 10px; width: 97%;}
-div.econometric-plot .dateholder {line-height: 34px; font-weight: bold}
-div.econometric-plot .nav-menu {float: left; width: auto; margin-left: 10px;}
-div.econometric-plot .nav-menu ul {float: left; width: auto; list-style-type: none;}
-div.econometric-plot .nav-menu li {float: left; list-style-type: none;
+/*.econometric-plot-canvas {width: 100%; overflow: hidden;}*/
+.econometric-plot .uppermenu {height: 34px; line-height:34px; float: left; width:100%;}
+.econometric-plot .lowermenu {float: left; width:100%;}
+.econometric-plot .uppermenu input {height: 20px; margin: 4px 10px; width: 97%;}
+.econometric-plot .dateholder {line-height: 34px; font-weight: bold}
+.econometric-plot .nav-menu {float: left; width: auto; margin-left: 10px;}
+.econometric-plot .nav-menu ul {float: left; width: auto; list-style-type: none;}
+.econometric-plot .nav-menu li {float: left; list-style-type: none;
 							    display: inline; background: transparent;}
-div.econometric-plot .nav-menu ul li:hover {background: rgb(224,224,224);}
-div.econometric-plot .nav-menu ul li.clicked {background: rgb(154,154,154);}
-div.econometric-plot .nav-menu ul li a {display: block;
+.econometric-plot .nav-menu ul li:hover {background: rgb(224,224,224);}
+.econometric-plot .nav-menu ul li.clicked {background: rgb(154,154,154);}
+.econometric-plot .nav-menu ul li a {display: block;
 									 line-height: 34px;
 									 height: 28px;
 									 padding: 0 3px;

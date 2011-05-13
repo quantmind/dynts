@@ -1,5 +1,6 @@
 Ver. 0.4.1 - Development
 ================================
+* Refactored Javascript plugin to conform with `djpcms` 0.9.
 * All timeseries functions must have a documentation, otherwise ``docs`` tests wont pass.
 * **118 Tests**, **70% test coverage**
 
