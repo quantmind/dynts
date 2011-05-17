@@ -1,6 +1,5 @@
-from itertools import izip
-
 from dynts.test import TestCase
+from dynts.utils.py2py3 import zip
 from dynts import BasicStatistics, pivottable
 
 
@@ -32,7 +31,7 @@ class StatisticsTest(TestCase):
         for field in p.fields:
             for name in p.names:
                 val = p.get(field,name)
-                dt  = dict(izip(p.data['names'],p.data[field]))
+                dt  = dict(zip(p.data['names'],p.data[field]))
                 self.assertEqual(val,dt[name])
             
     def testPrangeFunction(self):
