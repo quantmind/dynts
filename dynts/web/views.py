@@ -36,16 +36,16 @@ Available as Ajax Get response.'''
     def get_code_object(self, djp):
         '''Check if the code is an instance of a model.'''
         return None
-                
+           
     def econometric_data(self, request, data):
         #Obtain the data
         cts    = data.get('command',None)
         start  = data.get('start',None)
         end    = data.get('end',None)
         period = data.get('period',None)
-        object = self.get_object(cts)
-        if object:
-            cts = self.codeobject(object)
+        #object = self.get_object(cts)
+        #if object:
+        #    cts = self.codeobject(object)
         if start:
             start = dateFromString(str(start))
         if end:
