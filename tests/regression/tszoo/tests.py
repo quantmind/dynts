@@ -1,4 +1,5 @@
 '''Timeseries Zoo R package implementation'''
+import rpy2
 from regression import tsinterface, tsop, tsdelta, tsscalar, stat
 
 

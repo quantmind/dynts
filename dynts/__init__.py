@@ -1,6 +1,6 @@
 '''Quantitative financial timeseries analysis'''
 
-VERSION = (0, 4, '1dev')
+VERSION = (0, 5, 0)
  
 def get_version():
     return '.'.join(map(str,VERSION))
@@ -21,6 +21,7 @@ CLASSIFIERS  = [
                 'Programming Language :: JavaScript',
                 'Programming Language :: Python :: 2.6',
                 'Programming Language :: Python :: 2.7',
+                'Programming Language :: Python :: 3.2',
                 'Topic :: Scientific/Engineering',
                 'Topic :: Scientific/Engineering :: Mathematics',
                 'Topic :: Office/Business :: Financial'

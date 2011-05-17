@@ -1,5 +1,7 @@
-Ver. 0.4.1 - Development
+Ver. 0.5.0 - Development
 ================================
+* Python 3 compatible version.
+* Removed dependency on ``rpy2``. Numpy based timeseries object by default.
 * Refactored Javascript plugin to conform with `djpcms` 0.9.
 * All timeseries functions must have a documentation, otherwise ``docs`` tests wont pass.
 * **118 Tests**, **70% test coverage**
