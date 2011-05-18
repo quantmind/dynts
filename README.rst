@@ -1,9 +1,9 @@
 
-.. rubric:: A statistic package for python with enphasis on timeseries analysis.
-            Built around numpy_, it provides several back-end timeseries classes
-            including R-based objects via rpy2_.
-            It is shipped with a domain specific language for timeseries analysis
-            and manipulation.
+A statistic package for python with enphasis on timeseries analysis.
+Built around numpy_, it provides several back-end timeseries classes including R-based objects via rpy2_.
+It is shipped with a domain specific language for timeseries analysis
+and manipulation built on to of ply_.
+It requires Python 2.6 and up, including Python 3 versions.
 
 --
 
@@ -59,17 +59,19 @@ This is a simple multiplication::
 
 Requirements
 =====================
-There are several requirements that must be met:
+There are few requirements that must be met:
 
-* python_ 2.6 or later. Support for Python 3 series is under development and should be completed soon.
+* python_ 2.6 up to python 3.2.
 * numpy_ version 1.5.1 or higher for arrays and matrices.
 * ply_ version 3.3 or higher, the building block of the DSL_.
-* rpy2_ if an R_ TimeSeries back-end is used (default).
 * ccy_ for date and currency manipulation.
 
+R backend
+===============================
 Depending on the back-end used, additional dependencies need to be met.
 For example, there are back-ends depending on the following R packages:
 
+* rpy2_ if an R_ TimeSeries back-end is used (default).
 * zoo_ and PerformanceAnlytics_ for the ``zoo`` back-end (currently the default one)
 * timeSeries_ for the ``rmetrics`` back-end 
 

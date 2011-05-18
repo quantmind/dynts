@@ -4,6 +4,9 @@ def MakeUpperMenu(ecoplot,
                   height = 36,
                   vertical_margin_input = 4,
                   vertical_padding_input = 4):
+    '''Style the Ecoplot plugin header with a input command line,
+dates inputs and the toolbar.
+    '''
     h = '{0}px'.format(height)
     ih = height-2*(vertical_margin_input+vertical_padding_input)
     um = CssContext('ecoplot_menubar',

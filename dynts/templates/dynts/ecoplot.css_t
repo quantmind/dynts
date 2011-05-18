@@ -24,8 +24,8 @@
 	width: auto;
 	display: block;
 }
-{{ tag }} label {margin-right: 10px;}
-{{ tag }} label.middle {margin: 0 5px;}
+{{ tag }} .dateholder label {margin-right: 10px;}
+{{ tag }} .dateholder label.middle {margin: 0 5px;}
 
 {{ tag }} .body.with-panel .main {
     width: 50%;
@@ -33,4 +33,6 @@
 {{ tag }} .body.with-panel .secondary {
     width: 50%;
 }
+{{ tag }} .invisible {display: none;}
 {% endblock %}
+

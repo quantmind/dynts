@@ -1,3 +1,171 @@
+Flot 0.7
+--------
+
+API changes:
+
+Multiple axes support. Code using dual axes should be changed from
+using x2axis/y2axis in the options to using an array (although
+backwards-compatibility hooks are in place). For instance,
+
+  {
+    xaxis: { ... }, x2axis: { ... },
+    yaxis: { ... }, y2axis: { ... }
+  }
+
+becomes
+
+  {
+    xaxes: [ { ... }, { ... } ],
+    yaxes: [ { ... }, { ... } ]
+  }
+
+Note that if you're just using one axis, continue to use the
+xaxis/yaxis directly (it now sets the default settings for the
+arrays). Plugins touching the axes must be ported to take the extra
+axes into account, check the source to see some examples.
+
+A related change is that the visibility of axes is now auto-detected.
+So if you were relying on an axis to show up even without any data in
+the chart, you now need to set the axis "show" option explicitly.
+
+"tickColor" on the grid options is now deprecated in favour of a
+corresponding option on the axes, so { grid: { tickColor: "#000" }}
+becomes { xaxis: { tickColor: "#000"}, yaxis: { tickColor: "#000"} },
+but if you just configure a base color Flot will now autogenerate a
+tick color by adding transparency. Backwards-compatibility hooks are
+in place.
+
+Final note: now that IE 9 is coming out with canvas support, you may
+want to adapt the excanvas include to skip loading it in IE 9 (the
+examples have been adapted thanks to Ryley Breiddal). An alternative
+to excanvas using Flash has also surfaced, if your graphs are slow in
+IE, you may want to give it a spin:
+
+  http://code.google.com/p/flashcanvas/
+
+
+Changes:
+
+- Support for specifying a bottom for each point for line charts when
+  filling them, this means that an arbitrary bottom can be used
+  instead of just the x axis (based on patches patiently provided by
+  Roman V. Prikhodchenko).
+- New fillbetween plugin that can compute a bottom for a series from
+  another series, useful for filling areas between lines (see new
+  example percentiles.html for a use case).
+- More predictable handling of gaps for the stacking plugin, now all
+  undefined ranges are skipped.
+- Stacking plugin can stack horizontal bar charts.
+- Navigate plugin now redraws the plot while panning instead of only
+  after the fact (can be disabled by setting the pan.frameRate option
+  to null), raised by lastthemy (issue 235).
+- Date formatter now accepts %0m and %0d to get a zero-padded month or
+  day (issue raised by Maximillian Dornseif).
+- Revamped internals to support an unlimited number of axes, not just
+  dual (sponsored by Flight Data Services,
+  www.flightdataservices.com).
+- New setting on axes, "tickLength", to control the size of ticks or
+  turn them off without turning off the labels.
+- Axis labels are now put in container divs with classes, for instance
+  labels in the x axes can be reached via ".xAxis .tickLabel".
+- Support for setting the color of an axis (sponsored by Flight Data
+  Services, www.flightdataservices.com).
+- Tick color is now auto-generated as the base color with some
+  transparency (unless you override it).
+- Support for aligning ticks in the axes with "alignTicksWithAxis" to
+  ensure that they appear next to each other rather than in between,
+  at the expense of possibly awkward tick steps (sponsored by Flight
+  Data Services, www.flightdataservices.com).
+- Support for customizing the point type through a callback when
+  plotting points and new symbol plugin with some predefined point
+  types (sponsored by Utility Data Corporation).
+- Resize plugin for automatically redrawing when the placeholder
+  changes size, e.g. on window resizes (sponsored by Novus Partners).
+  A resize() method has been added to plot object facilitate this.
+- Support Infinity/-Infinity for plotting asymptotes by hacking it
+  into +/-Number.MAX_VALUE (reported by rabaea.mircea).
+- Support for restricting navigate plugin to not pan/zoom an axis (based
+  on patch by kkaefer).
+- Support for providing the drag cursor for the navigate plugin as an
+  option (based on patch by Kelly T. Moore).
+- Options for controlling whether an axis is shown or not (suggestion
+  by Timo Tuominen) and whether to reserve space for it even if it
+  isn't shown.
+- New attribute $.plot.version with the Flot version as a string.
+- The version comment is now included in the minified jquery.flot.min.js.
+- New options.grid.minBorderMargin for adjusting the minimum margin
+  provided around the border (based on patch by corani, issue 188).
+- Refactor replot behaviour so Flot tries to reuse the existing
+  canvas, adding shutdown() methods to the plot (based on patch by
+  Ryley Breiddal, issue 269). This prevents a memory leak in Chrome
+  and hopefully makes replotting faster for those who are using $.plot
+  instead of .setData()/.draw(). Also update jQuery to 1.5.1 to
+  prevent IE leaks fixed in jQuery.
+- New real-time line chart example.
+
+- New hooks: drawSeries, shutdown
+
+Bug fixes:
+
+- Fixed problem with findNearbyItem and bars on top of each other
+  (reported by ragingchikn, issue 242).
+- Fixed problem with ticks and the border (based on patch from
+  ultimatehustler69, issue 236).
+- Fixed problem with plugins adding options to the series objects.
+- Fixed a problem introduced in 0.6 with specifying a gradient with {
+  brightness: x, opacity: y }.
+- Don't use $.browser.msie, check for getContext on the created canvas
+  element instead and try to use excanvas if it's not found (fixes IE
+  9 compatibility).
+- highlight(s, index) was looking up the point in the original s.data
+  instead of in the computed datapoints array, which breaks with
+  plugins that modify the datapoints (such as the stacking plugin).
+  Issue 316 reported by curlypaul924.
+- More robust handling of axis from data passed in from getData()
+  (problem reported by Morgan).
+- Fixed problem with turning off bar outline (issue 253, fix by Jordi
+  Castells).
+- Check the selection passed into setSelection in the selection
+  plugin, to guard against errors when synchronizing plots (fix by Lau
+  Bech Lauritzen).
+- Fix bug in crosshair code with mouseout resetting the crosshair even
+  if it is locked (fix by Lau Bech Lauritzen and Banko Adam).
+- Fix bug with points plotting using line width from lines rather than
+  points.
+- Fix bug with passing non-array 0 data (for plugins that don't expect
+  arrays, patch by vpapp1).
+- Fix errors in JSON in examples so they work with jQuery 1.4.2
+  (fix reported by honestbleeps, issue 357).
+- Fix bug with tooltip in interacting.html, this makes the tooltip
+  much smoother (fix by bdkahn). Fix related bug inside highlighting
+  handler in Flot.
+- Use closure trick to make inline colorhelpers plugin respect
+  jQuery.noConflict(true), renaming the global jQuery object (reported
+  by Nick Stielau).
+- Listen for mouseleave events and fire a plothover event with empty
+  item when it occurs to drop highlights when the mouse leaves the
+  plot (reported by by outspirit).
+- Fix bug with using aboveData with a background (reported by
+  amitayd).
+- Fix possible excanvas leak (report and suggested fix by tom9729).
+- Fix bug with backwards compatibility for shadowSize = 0 (report and
+  suggested fix by aspinak).
+- Adapt examples to skip loading excanvas (fix by Ryley Breiddal).
+- Fix bug that prevent a simple f(x) = -x transform from working
+  correctly (fix by Mike, issue 263).
+- Fix bug in restoring cursor in navigate plugin (reported by Matteo
+  Gattanini, issue 395).
+- Fix bug in picking items when transform/inverseTransform is in use
+  (reported by Ofri Raviv, and patches and analysis by Jan and Tom
+  Paton, issue 334 and 467).
+- Fix problem with unaligned ticks and hover/click events caused by
+  padding on the placeholder by hardcoding the placeholder padding to
+  0 (reported by adityadineshsaxena, Matt Sommer, Daniel Atos and some
+  other people, issue 301).
+- Update colorhelpers plugin to avoid dying when trying to parse an
+  invalid string (reported by cadavor, issue 483).
+
+
 Flot 0.6
 --------
 
@@ -7,7 +175,7 @@ API changes:
 passing selection: { mode: something }, you MUST include the file
 jquery.flot.selection.js after jquery.flot.js. This reduces the size
 of base Flot and makes it easier to customize the selection as well as
-improving code clarity. The change is based on patch from andershol.
+improving code clarity. The change is based on a patch from andershol.
 
 2. In the global options specified in the $.plot command,
 "lines", "points", "bars" and "shadowSize" have been moved to a

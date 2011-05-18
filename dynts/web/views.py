@@ -18,8 +18,10 @@ Available as Ajax Get response.'''
     plugin_form = EcoForm
     _methods      = ('get',)
     
-    def render(self, djp, height = 400, start = None, **kwargs):
-        height = abs(int(height))
+    def render(self, djp):
+        kwargs = djp.kwargs
+        height = max(int(kwargs.get('height',400)),30)
+        start = kwargs.get('start',None)
         code = self.get_code_object(djp)
         id = gen_unique_id()
         widget = HtmlWidget('div', id = id, cn = 'econometric-plot')
@@ -57,4 +59,11 @@ Available as Ajax Get response.'''
 It must return a JSON string.'''
         raise NotImplementedError
     
+        class Media:
+            js = ['dynts/flot/excanvas.min.js',
+                  'dynts/flot/jquery.flot.js',
+                  'dynts/flot/jquery.flot.selection.js',
+                  'dynts/jquery.flot.text.js',
+                  'dynts/ecoplot/ecoplot.js',
+                  'dynts/decorator.js']
     

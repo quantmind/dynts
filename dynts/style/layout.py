@@ -13,10 +13,27 @@ MakeUpperMenu(ecoplot,
               vertical_margin_input = 4)
 
 
-#CssContext('ecoplot_options',
-#           parent = ecoplot,
-#         )
+CssContext('ecoplot_tooltip',
+           tag = '.econometric-plot-tooltip',
+           data = {'padding':'2px'}
+           )
 
+CssContext('ecoplot_legend',
+           tag = '.econometric-plot .legend',
+           data = {'padding':'10px'}
+           )
 
+CssContext('ecoplot_secondary',
+           tag = '.secondary .panel',
+           parent = ecoplot,
+           data = {'padding': '10px'}
+           )
+
+CssContext('ecoplot_plot_options',
+           tag = 'table.plot-options th, table.plot-options td',
+           parent = ecoplot,
+           data = {'padding': '0 5px',
+                   'text_align': 'center'}
+           )
 
 

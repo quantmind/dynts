@@ -2,6 +2,7 @@ Ver. 0.5.0 - Development
 ================================
 * Python 3 compatible version.
 * Removed dependency on ``rpy2``. Numpy based timeseries object by default.
+* Upgraded javascript plugin to work with flot_ 0.7.
 * Refactored Javascript plugin to conform with `djpcms` 0.9.
 * All timeseries functions must have a documentation, otherwise ``docs`` tests wont pass.
 * **118 Tests**, **70% test coverage**
@@ -84,3 +85,4 @@ Ver. 0.1.0  - 2010 Sep 12
 .. _cython: http://www.cython.org/
 .. _ccy: http://code.google.com/p/ccy/
 .. _sphinx: http://sphinx.pocoo.org/
+.. _flot: http://code.google.com/p/flot/
