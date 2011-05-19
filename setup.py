@@ -83,10 +83,11 @@ else:
 for dirpath, dirnames, filenames in os.walk(package_dir):
     # Ignore dirnames that start with '.'
     for i, dirname in enumerate(dirnames):
-        if dirname.startswith('.'): del dirnames[i]
+        if dirname.startswith('.') or dirname == '__pycache__':
+            del dirnames[i]
     if '__init__.py' in filenames:
         packages.append('.'.join(fullsplit(dirpath)[len_root_dir:]))
-    elif filenames:
+    elif filenames and not dirpath.endswith('__pycache__'):
         rel_dir = get_rel_dir(dirpath,root_dir)
         data_files.append([rel_dir, [os.path.join(dirpath, f) for f in filenames]])
 
