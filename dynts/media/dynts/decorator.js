@@ -35,9 +35,9 @@
                     };
                 
                 $(selector,elem).each(function() {
-                    var start;
-                    var el = $(this);
-                    var options = el.data();
+                    var start,
+                        el = $(this),
+                        options = el.data();
                     options.parse = parsedata;
                     options.flot_options = poptions;
                     options.showplot = function(i) {

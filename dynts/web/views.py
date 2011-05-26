@@ -26,9 +26,10 @@ Available as Ajax Get response.'''
         id = gen_unique_id()
         widget = HtmlWidget('div', id = id, cn = 'econometric-plot')
         widget.addData('height',height)\
-              .addData('item',code)\
               .addData('start',start)\
               .addData('url',self.path)
+        if code:
+            widget.addData('commandline',{'show':False,'symbol':code})
         return widget.render()
     
     def ajax_get_response(self, djp):
