@@ -2,7 +2,7 @@
 https://github.com/lsbardel/djpcms
 '''
 from djpcms import views, forms
-from djpcms.html import HtmlWidget
+from djpcms.html import HtmlWidget, Media
 from djpcms.utils import gen_unique_id
 
 from ccy import dateFromString
@@ -10,35 +10,36 @@ from ccy import dateFromString
 
 class EcoForm(forms.Form):
     height = forms.IntegerField()
+    service_url = forms.CharField(required = False)
     
 
 class TimeSeriesView(views.ModelView):
-    '''``djpcms`` application view for retriving timeseries data as  JSON string.
-Available as Ajax Get response.'''
+    '''``djpcms`` application view for retrieving time-series data as object.
+It renders as an econometric plot jQuery plugin and it has an AJAX get response
+for fetching data.'''
+    isplugin = True
     plugin_form = EcoForm
-    _methods      = ('get',)
+    description = 'Timeseries and Scatter Plots'
+    _methods = ('get',)
     
     def render(self, djp):
         kwargs = djp.kwargs
         height = max(int(kwargs.get('height',400)),30)
+        service_url = kwargs.get('service_url',self.path)
         start = kwargs.get('start',None)
-        code = self.get_code_object(djp)
+        code = self.appmodel.get_code_object(djp)
         id = gen_unique_id()
         widget = HtmlWidget('div', id = id, cn = 'econometric-plot')
         widget.addData('height',height)\
               .addData('start',start)\
-              .addData('url',self.path)
+              .addData('url',service_url)
         if code:
             widget.addData('commandline',{'show':False,'symbol':code})
         return widget.render()
     
     def ajax_get_response(self, djp):
         request = djp.request
-        return self.econometric_data(djp.request, dict(request.GET.items()))
-    
-    def get_code_object(self, djp):
-        '''Check if the code is an instance of a model.'''
-        return None
+        return self.econometric_data(request, dict(request.GET.items()))
            
     def econometric_data(self, request, data):
         #Obtain the data
@@ -53,18 +54,13 @@ Available as Ajax Get response.'''
             start = dateFromString(str(start))
         if end:
             end = dateFromString(str(end))
-        return self.getdata(request,cts,start,end)
+        return self.appmodel.getdata(request,cts,start,end)
     
-    def getdata(self,request,expression,start,end):
-        '''Pure virtual function which retrives the actual data.
-It must return a JSON string.'''
-        raise NotImplementedError
-    
-        class Media:
-            js = ['dynts/flot/excanvas.min.js',
-                  'dynts/flot/jquery.flot.js',
-                  'dynts/flot/jquery.flot.selection.js',
-                  'dynts/jquery.flot.text.js',
-                  'dynts/ecoplot/ecoplot.js',
-                  'dynts/decorator.js']
+    def media(self):
+        return Media(js = ['dynts/flot/excanvas.min.js',
+                           'dynts/flot/jquery.flot.js',
+                           'dynts/flot/jquery.flot.selection.js',
+                           'dynts/jquery.flot.text.js',
+                           'dynts/ecoplot/ecoplot.js',
+                           'dynts/decorator.js'])
     
