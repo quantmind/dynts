@@ -1,6 +1,3 @@
-'''Web views for djpcms 
-https://github.com/lsbardel/djpcms
-'''
 from djpcms import views, forms
 from djpcms.html import HtmlWidget, Media
 from djpcms.utils import gen_unique_id

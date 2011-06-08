@@ -25,7 +25,11 @@ def showtestlist(ld):
     print('')
     for name in sorted(ld.keys()):
         mod = ld[name]
-        print(('{0} :    {1}'.format(name,mod.__doc__)))
+        doc = mod.__doc__
+        if doc:
+            print(('{0} : {1}'.format(name,doc)))
+        else:
+            print(name)
 
 
 def get_tests(paths, dirs = False, filename = None):

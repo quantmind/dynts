@@ -25,9 +25,10 @@ Contents
 .. toctree::
    :maxdepth: 1
    
-   interface/index
+   overview
+   datastructures/index
    dsl/index
-   backends/index
+   backends
    provider/index
    functions
    formatters

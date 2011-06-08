@@ -1,9 +1,8 @@
 .. _interface:
 
 ===========================
-Timeserie Interface
+API
 ===========================
-
 
 Dynts data class
 =============================
@@ -13,7 +12,7 @@ Dynts data class
    :member-order: bysource  
    
    
-Interface class
+Time Series class
 ======================
 
 .. autoclass:: dynts.TimeSeries
@@ -26,4 +25,16 @@ XY data class
 
 .. autoclass:: dynts.xydata
    :members:
-   :member-order: bysource     
+   :member-order: bysource
+   
+   
+timeseries
+==================
+
+.. autofunction:: dynts.timeseries
+
+
+Merging TimeSeries
+===========================
+
+.. autofunction:: dynts.merge

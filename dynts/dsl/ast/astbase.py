@@ -156,7 +156,8 @@ class Symbol(BaseExpression):
             # Lots of room for performance improvement
             hash = ts.ashash()
             hash.modified = True
-            values[ts.name] = hash.getts()
+            ts = hash.getts()
+            values[ts.name] = ts
             return ts
     
     def lineardecomp(self):

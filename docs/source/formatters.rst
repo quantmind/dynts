@@ -59,6 +59,11 @@ The flot format is used to send JSON to VBA for displaying in an excel Worksheet
 CSV
 ~~~~~~~~~~~~~
 
+Dump data into a ``csv`` stream::
+
+    >>> f = open('test.csv','w')
+    >>> f.write(ts.dump('csv'))
+    >>> f.close()
 
 
 XLS
@@ -70,3 +75,17 @@ It requires the xlwt_ python package.
 
 .. _xlwt: http://pypi.python.org/pypi/xlwt
 .. _flot: http://code.google.com/p/flot/
+
+
+Matplotlib
+~~~~~~~~~~~~~~~~
+
+A python formatter for plotting data on a matplotlib_ pyplot::
+
+    >>> plt = ts.dump('plot')
+    >>> plt.show()
+
+
+.. _xlwt: http://pypi.python.org/pypi/xlwt
+.. _flot: http://code.google.com/p/flot/
+.. _matplotlib: http://matplotlib.sourceforge.net/

@@ -12,15 +12,17 @@ class DataProvider(object):
         return self.code + ' financial data provider'
     
     def load(self, symbol, startdate, enddate, logger, backend):
-        '''This is the function to implement. It loads the actual data from the data rovider.
+        '''This is the function to implement.
+It loads the actual data from the data rovider.
 This function is not called directly, instead it is called by the 
 :meth:`dynts.data.TimeSerieLoader.load`.
 
-* *ticker* string id for the symbol to load (the ticker).
-* *startdate* and *enddate* interval to load.
-* *field* ``None``, a string or alist of string. Fiels to load.
-    If ``None`` the default field for the provider should load.
-    
+:parameter symbol: string id for the symbol to load (the ticker), including optional fields and providers.
+:parameter startdate: start date of interval to load.
+:parameter enddate: end date of interval to load.
+:parameter logger: instance of :class:logging.Logger.
+:parameter backend: :class:`dynts.TimeSeries` backend name.
+
 It should return either an instance of :class:`dynts.TimeSeries` or
 a dictionary of the form::
 
@@ -28,10 +30,7 @@ a dictionary of the form::
      'field1': [list of values for field1],
      ...
      'fieldN': [list of values for field1N]}
-
-* *logger* instance of :class:logging.Logger.
-* **backend* :class:`dynts.TimeSeries` backend name.
-        '''
+'''
         raise NotImplementedError
     
     def isconnected(self):

@@ -1,7 +1,14 @@
+Ver. 0.4.2 - Development
+================================
+* Improved documentation.
+* Introduced :attr:`dynts.conf.Settings.desc` for specifying the order of dates in timeseries.
+* **118 Tests**, **70% test coverage**
+
 Ver. 0.4.1 - 2011 May 19
 ================================
 * First Python 3 compatible version!
-* Removed dependency on ``rpy2``. Numpy based timeseries object by default.
+* numpy_ set as default timeseries backend.
+* Removed dependency on rpy2_.
 * Upgraded javascript plugin to work with flot_ 0.7 and `djpcms` 0.9.
 * All timeseries functions must have a documentation, otherwise ``docs`` tests wont pass.
 * **118 Tests**, **70% test coverage**
@@ -19,6 +26,7 @@ Ver. 0.4.0 - 2011 Feb 15
   * ``regression`` for unit and regression tests.
   * ``profile`` for analysing performance of different backends and impact of cython_.
   * ``bench`` same as ``profile`` but geared towards speed rather than profiling.
+
   Check :ref:`Running tests <running-tests>` for more information.  	
 * Added fallback tests and split ``zoo`` and ``numpy`` timeseries backend tests.
 * Added sphinx_ extension in :mod:`dynts.web.dyntsx` for displaying the list of timeseries functions available.
@@ -79,9 +87,11 @@ Ver. 0.2.0 - 2010 Sep 24
 Ver. 0.1.0  - 2010 Sep 12
 ====================================
 * First release to PyPi in pre-alpha.
- 
 
+
+.. _numpy: http://numpy.scipy.org/
 .. _cython: http://www.cython.org/
 .. _ccy: http://code.google.com/p/ccy/
 .. _sphinx: http://sphinx.pocoo.org/
 .. _flot: http://code.google.com/p/flot/
+.. _rpy2: http://rpy.sourceforge.net/rpy2.html

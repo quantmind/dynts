@@ -137,6 +137,8 @@ an :class:`dynts.exceptions.DateNotFound`.'''
             name   = settings.splittingnames.join(self.names)
             hash   = self.hash
             dates  = sorted(self.hash)
+            if settings.desc:
+                dates = list(reversed(dates))
             values = (hash[dt] for dt in dates)
             return self.ts.clone(name = name, date = dates, data = values)
         else:

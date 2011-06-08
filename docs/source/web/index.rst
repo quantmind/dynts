@@ -20,6 +20,5 @@ Contents
    
    ecoplot
    flot
-   plugin
 
 __ http://www.djangoproject.com/
