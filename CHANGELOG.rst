@@ -2,6 +2,13 @@ Ver. 0.4.2 - Development
 ================================
 * Improved documentation.
 * Introduced :attr:`dynts.conf.Settings.desc` for specifying the order of dates in timeseries.
+* Added `about` menu to :ref:`Ecoplot plugin <ecoplot-web>`.
+* :ref:`Ecoplot plugin <ecoplot-web>` updated to work with jQuery_ 1.6.1. Changes are mainly in the
+  way checked elements are handled::
+  
+    elem.prop({'checked':true});
+    elem.is(':checked')
+    
 * **118 Tests**, **70% test coverage**
 
 Ver. 0.4.1 - 2011 May 19
@@ -9,7 +16,7 @@ Ver. 0.4.1 - 2011 May 19
 * First Python 3 compatible version!
 * numpy_ set as default timeseries backend.
 * Removed dependency on rpy2_.
-* Upgraded javascript plugin to work with flot_ 0.7 and `djpcms` 0.9.
+* Upgraded javascript plugin to work with flot_ 0.7 and djpcms_ 0.9.
 * All timeseries functions must have a documentation, otherwise ``docs`` tests wont pass.
 * **118 Tests**, **70% test coverage**
 
@@ -92,6 +99,8 @@ Ver. 0.1.0  - 2010 Sep 12
 .. _numpy: http://numpy.scipy.org/
 .. _cython: http://www.cython.org/
 .. _ccy: http://code.google.com/p/ccy/
+.. _djpcms: http://djpcms.com/
 .. _sphinx: http://sphinx.pocoo.org/
 .. _flot: http://code.google.com/p/flot/
 .. _rpy2: http://rpy.sourceforge.net/rpy2.html
+.. _jQuery: http://jquery.com/

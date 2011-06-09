@@ -337,7 +337,9 @@
             }
         }
         
-        var _version = "@VERSION",
+        var _version = "0.4.1",
+            _authors = 'Luca Sbardella',
+            _home_page = 'https://github.com/quantmind/dynts',
             plugin_class = "econometric-plot",
             extraTools     = {},
             events         = {},
@@ -418,6 +420,28 @@
                                    }
                                }
                        );
+                   }
+               },
+               {
+                   classname: 'about',
+                   title: 'About Economeric Plotting Plugin',
+                   icon: "ui-icon-contact",
+                   decorate: function(b,el) {
+                       b.click(function(e) {
+                           var html = "<div class='econometric-about-panel definition-list'>" +
+                           		      "<dl><dt>Version</dt><dd>" + _version + "</dd></dl>"+
+                                      "<dl><dt>Author</dt><dd>" + _authors + "</dd></dl>" +
+                                      "<dl><dt>Web page</dt><dd><a href='" + _home_page +
+                                      "' target='_blank'>" + _home_page + "</a></dd></dl>" +
+                                      "<dl><dt>jQuery</dt><dd>" + $.fn.jquery + "</dd></dl>" +
+                                      "<dl><dt>Flot</dt><dd>" + $.plot.version + "</dd></dl>" +
+                                      "</div>";
+                           $('<div title="Econometric plugin"></div>').html(html)
+                                .dialog({modal: true,
+                                        draggable: false,
+                                        resizable: false,
+                                        width: 500});
+                       });
                    }
                }
                ],
@@ -597,14 +621,16 @@
                 oseries = oldcanvas.series;
             }
             //Add a column element to a series row
-            var tdinp = function(type,name,value,checked) {
+            function tdinp(type,name,value,checked) {
                 var check = $('<input type="'+type+'" name="'+name+'" value="'+value+'">');
                 if(checked) {
-                    check.attr('checked',true);
+                    check.prop({'checked':true}); // jQuery 1.6.1
+                    //check.attr('checked',true);
                 }
                 return $('<td class="center"></td>').append(check);
-            };
-            var checkmedia = function(med,show) {
+            }
+            
+            function checkmedia(med,show) {
                 if(med) {
                     if(med.show === undefined) {
                         med.show = show;
@@ -614,7 +640,8 @@
                     med = {show: show};
                 }
                 return med;
-            };
+            }
+            
             var circle = 0;
             $.each(data.series, function(i,serie) {
                 var oserie = null;
@@ -1054,7 +1081,8 @@
                 $("#y").text(pos.y.toFixed(2));
 
                 if(options.show_tooltip) {
-                    var canvas = options.canvases.current;
+                    var canvas = options.canvases.current,
+                        previousPoint = options.previousPoint;
                     if (item) {
                         if(previousPoint || previousPoint !== item.datapoint) {
                             previousPoint = item.datapoint;
@@ -1075,6 +1103,7 @@
                         $("."+cl).remove();
                         previousPoint = null;            
                     }
+                    options.previousPoint = previousPoint;
                 }
             });
 

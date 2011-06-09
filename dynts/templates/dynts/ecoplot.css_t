@@ -34,5 +34,28 @@
     width: 50%;
 }
 {{ tag }} .invisible {display: none;}
+{{ tag }} .definition-list dl dt {
+    float: left;
+    opacity: 0.6;
+    width: 40%;
+}
+.econometric-about-panel {
+    font-size: 90%;
+}
+.definition-list dl {
+    margin: 4px 0 0;
+    overflow: hidden;
+}
+.definition-list dl:first-child {
+    margin-top: 0;
+}
+.definition-list dl dt {
+    float: left;
+    opacity: 0.6;
+    width: 30%;
+}
+.definition-list dl dd {
+    margin: 0;
+}
 {% endblock %}
 
