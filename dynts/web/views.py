@@ -1,5 +1,4 @@
-from djpcms import views, forms
-from djpcms.html import HtmlWidget, Media
+from djpcms import views, forms, html
 from djpcms.utils import gen_unique_id
 
 from ccy import dateFromString
@@ -17,6 +16,12 @@ for fetching data.'''
     isplugin = True
     plugin_form = EcoForm
     description = 'Timeseries and Scatter Plots'
+    flot_media = html.Media(js = ['dynts/flot/excanvas.min.js',
+                                  'dynts/flot/jquery.flot.js',
+                                  'dynts/flot/jquery.flot.selection.js',
+                                  'dynts/jquery.flot.text.js',
+                                  'dynts/ecoplot/ecoplot.js',
+                                  'dynts/decorator.js'])
     _methods = ('get',)
     
     def render(self, djp):
@@ -26,10 +31,10 @@ for fetching data.'''
         start = kwargs.get('start',None)
         code = self.appmodel.get_code_object(djp)
         id = gen_unique_id()
-        widget = HtmlWidget('div', id = id, cn = 'econometric-plot')
-        widget.addData('height',height)\
-              .addData('start',start)\
-              .addData('url',service_url)
+        widget = html.Widget('div', id = id, cn = 'econometric-plot')\
+                .addData('height',height)\
+                .addData('start',start)\
+                .addData('url',service_url)
         if code:
             widget.addData('commandline',{'show':False,'symbol':code})
         return widget.render()
@@ -54,10 +59,5 @@ for fetching data.'''
         return self.appmodel.getdata(request,cts,start,end)
     
     def media(self):
-        return Media(js = ['dynts/flot/excanvas.min.js',
-                           'dynts/flot/jquery.flot.js',
-                           'dynts/flot/jquery.flot.selection.js',
-                           'dynts/jquery.flot.text.js',
-                           'dynts/ecoplot/ecoplot.js',
-                           'dynts/decorator.js'])
+        return flot_media
     
