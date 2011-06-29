@@ -59,5 +59,5 @@ for fetching data.'''
         return self.appmodel.getdata(request,cts,start,end)
     
     def media(self):
-        return flot_media
+        return self.flot_media
     
