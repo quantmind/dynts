@@ -35,6 +35,17 @@ class ToCsv(BaseFormatter):
     
         return stream.getvalue()
 
+class ToExcel(BaseFormatter):
+    type = 'excel'
+    
+    def __call__(self, ts, filename = None, **kwargs):
+        '''Returns Excel representation of a :class:`dynts.TimeSeries`.'''
+        rtn = []
+    
+        for row in tsiterator(ts):
+            rtn.append(row)
+    
+        return rtn
 
 class ToFlot(BaseFormatter):
     type = 'json'

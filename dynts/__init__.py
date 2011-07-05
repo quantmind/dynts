@@ -45,6 +45,7 @@ from dynts import formatters
 Formatters['flot'] = formatters.ToFlot()
 Formatters['jsonvba'] = formatters.ToJsonVba()
 Formatters['csv']  = formatters.ToCsv()
+Formatters['excel']  = formatters.ToExcel()
 Formatters['xls']  = formatters.ToXls()
 Formatters['plot'] = formatters.ToPlot()
 
