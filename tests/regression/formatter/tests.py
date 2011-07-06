@@ -26,3 +26,12 @@ class TestFlot(unittest.TestCase):
         self.assertEqual(len(plot['series']),1)
         serie = plot['series'][0]
         #self.assertEqual(serie['extratype'],'date')
+        
+    def testVbaJson(self):
+        ts = dynts.evaluate('AMZN,AAPL').dump('jsonvba')
+        self.assertTrue(isinstance(ts,list))
+        head = ts[0]
+        self.assertEqual(['Date','AMZN','AAPL'],head)
+        for row in ts[1:]:
+            self.assertTrue(isinstance(row[0],int))
+            self.assertEqual(len(row),3)

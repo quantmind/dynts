@@ -105,8 +105,13 @@ The unserializer is also included in the directory extras'''
         from ccy import date2juldate
         from dynts.utils.anyjson import JSONdatainfo
         if istimeseries(ts):
-            return JSONdatainfo(list(tsiterator(ts, dateconverter=date2juldate, desc = desc)),
-                                info = ts.info)
+            return list(tsiterator(ts,
+                                   dateconverter=date2juldate,
+                                   desc = desc))
+            #return JSONdatainfo(list(tsiterator(ts,
+            #                                    dateconverter=date2juldate,
+            #                                    desc = desc)),
+            #                    info = ts.info)
         else:
             raise NotImplementedError
 
