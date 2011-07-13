@@ -24,12 +24,12 @@ for fetching data.'''
                                   'dynts/decorator.js'])
     _methods = ('get',)
     
-    def render(self, djp):
+    def get_widget(self, djp):
         kwargs = djp.kwargs
         height = max(int(kwargs.get('height',400)),30)
         service_url = kwargs.get('service_url',self.path)
         start = kwargs.get('start',None)
-        code = self.appmodel.get_code_object(djp)
+        code = self.get_code_object(djp)
         id = gen_unique_id()
         widget = html.Widget('div', id = id, cn = 'econometric-plot')\
                 .addData('height',height)\
@@ -37,7 +37,13 @@ for fetching data.'''
                 .addData('url',service_url)
         if code:
             widget.addData('commandline',{'show':False,'symbol':code})
-        return widget.render()
+        return widget
+            
+    def render(self, djp):
+        return self.get_widget(djp).render(djp)
+    
+    def get_code_object(self, djp):
+        return self.appmodel.get_code_object(djp)
     
     def ajax_get_response(self, djp):
         request = djp.request

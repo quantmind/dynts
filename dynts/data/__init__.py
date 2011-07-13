@@ -59,8 +59,10 @@ It doesn't do anything special.
         
 
 class TimeSerieLoader(object):
-    '''Cordinates the loading of timeseries data into :class:`dynts.dsl.Symbol`.
-This class can be overritten by a custom one if required. There are four different
+    '''Cordinates the loading of timeseries data
+into :class:`dynts.dsl.Symbol`.
+This class can be overritten by a custom one if required.
+There are four different
 **hooks** which can be used to customised its behaviour:
 
 * :func:`dynts.data.TimeSerieLoader.parse_symbol`
@@ -69,15 +71,17 @@ This class can be overritten by a custom one if required. There are four differe
 * :func:`dynts.data.TimeSerieLoader.onfinishload`'''
 
     preprocessdata = PreProcessData
-    '''Class holding data returned by the :meth:`dynts.data.TimeSerieLoader.preprocess` method.
+    '''Class holding data returned by the
+    :meth:`dynts.data.TimeSerieLoader.preprocess` method.
     It contains two attributes:
     
     * ``intervals`` ``None`` or a tuple of two-elements tuples.
     * ``result`` ``None`` or any intermediate result.
     
     If ``intervals`` is ``None`` or an empty container, the
-    :func:`dynts.data.DataProvider.load` method won't be called, and the ``result``
-    attribute will be passed to the :meth:`dynts.data.TimeSerieLoader.onresult` method.
+    :func:`dynts.data.DataProvider.load` method won't be called,
+    and the ``result`` attribute will be passed to the
+    :meth:`dynts.data.TimeSerieLoader.onresult` method.
     '''
     symboldata = SymbolData
     
@@ -104,13 +108,16 @@ available.
             symbol = self.parse_symbol(sym, providers)
             provider = symbol.provider
             if not provider:
-                raise MissingDataProvider('data provider for %s not available' % sym)
+                raise MissingDataProvider('data provider for %s not\
+ available' % sym)
             pre = self.preprocess(symbol, start, end, logger, backend, **kwargs)
             if pre.intervals:
                 result = None
                 for st,en in pre.intervals:
-                    logger.info('Loading %s from %s. From %s to %s' % (symbol.ticker,provider,st,en))
-                    res = provider.load(symbol, st, en, logger, backend, **kwargs)
+                    logger.info('Loading %s from %s. From %s to %s' %\
+                                 (symbol.ticker,provider,st,en))
+                    res = provider.load(symbol, st, en, logger, backend,
+                                        **kwargs)
                     if result is None:
                         result = res
                     else:
