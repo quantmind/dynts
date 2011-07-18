@@ -50,7 +50,7 @@ class Flot(JSONobject):
     allowed_types = ['xy','timeseries','scatter']
     def __init__(self, name = '', type = None, shadowSize = None, **kwargs):
         if type not in self.allowed_types:
-            type = 'scatter'
+            type = 'xy'
         self.name   = name
         self.type   = type
         self.series = []

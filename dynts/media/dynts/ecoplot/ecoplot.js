@@ -341,9 +341,10 @@
             _authors = 'Luca Sbardella',
             _home_page = 'https://github.com/quantmind/dynts',
             plugin_class = "econometric-plot",
-            extraTools     = {},
-            events         = {},
-            menubar		   = {},
+            instances = [],
+            extraTools = {},
+            events = {},
+            menubar = {},
             debug		   = false,
             css_loaded	   = false,
             siteoptions	   = {
@@ -464,7 +465,7 @@
                toolbar: default_toolbar,
                commandline: default_command_line,
                showplot: function(i) {return true;},
-               requestParams: {},
+               requestparams: {},
                show_tooltip: true,
                loaderimage: 'ajax-loader.gif',
                flot_options: {
@@ -692,6 +693,10 @@
             else {
                 typ = null;
             }
+            
+            function show_elem(typ,el) {
+                return $("input[name='"+typ+"']",el).attr('checked') ? true : false;
+            } 
 
             var renderflot = function(height,opts) {
                 var zoptions;
@@ -706,9 +711,9 @@
                 this.edit.find('tr.serie-option').each(function(i) {
                     var el = $(this);
                     var serie = series[i];
-                    serie.lines.show  = $("input[name='line']",el).attr('checked');
-                    serie.points.show = $("input[name='points']",el).attr('checked');
-                    serie.bars.show = $("input[name='bars']",el).attr('checked');
+                    serie.lines.show  = show_elem('line',el);
+                    serie.points.show = show_elem('points',el);
+                    serie.bars.show = show_elem('bars',el);
                     if($("input[value='y-ax1']",el).attr("checked")) {
                         serie.yaxis = 1;
                     }
@@ -863,14 +868,15 @@
             log.info("Sending ajax request to " + options.url);
             log.debug(dataplot.command + ' from ' + dataplot.start + ' end '+ dataplot.end);
             var params   = {
-                    timestamp: +new Date()
+                timestamp: +new Date()
             };
-            $.each(options.requestParams, function(key, param) {
+            $.each(options.requestparams, function(key, param) {
                 params[key] = typeof param === "function" ? param() : param;
             });
             params = $.extend(true, params, dataplot);
             options.startLoading($this);
-            $.ajax({url: options.url,
+            $.ajax({
+                url: options.url,
                 type: options.requestMethod,
                 data: $.param(params),
                 dataType: options.responsetype,
@@ -905,8 +911,16 @@
         function _construct(options_) {
             var options = _parseOptions(options_);
             return this.each(function(i) {
-                
-                var $this = $(this).attr({'id':plugin_class+"_"+i}).addClass(plugin_class);
+                var $this = $(this),
+                    instance_id = $this.data("ecoplot-instance-id"),
+                    instance;
+                if(typeof instance_id !== "undefined" && instances[instance_id]) {
+                    instances[instance_id].destroy();
+                }
+                instance_id = parseInt(instances.push({}),10) - 1;
+                $this.data('ecoplot-instance-id',instance_id)
+                     .attr({'id':plugin_class+"_"+instance_id})
+                     .addClass(plugin_class);
                 this.options = options;
                 $this.hide().html("");
                 options.paginate($this);
@@ -934,6 +948,16 @@
             removeEvent: function(id){delete events[id];},
             debug: function(){return debug;},
             setdebug: function(v){debug = v;},
+            count: function() {return instances.length;},
+            instance: function(elem) {
+                // get by instance id
+                if(instances[elem]) { return instances[elem]; }
+                return null;
+                var o = $(elem); 
+                if(!o.length && typeof elem === "string") { o = $("#" + elem); }
+                if(!o.length) { return null; }
+                return instances[o.closest("."+plugin_class).data("instance-id")] || null;
+            },
             log: default_logger,
             version: _version,
             'plugin_class': plugin_class,
@@ -1001,14 +1025,13 @@
     $.ecoplot.addEvent({
         id: 'zoom',
         className: 'zoom-out',
-        register: function($this) {
-            var comm;
-            var options = $this[0].options;
-            $this.bind("plotselected", function (event, ranges) {
-                var canvases = options.canvases;
-                if(!canvases) {
-                    return;
-                }
+        register: function(elem) {
+            elem.bind("plotselected", function (event, ranges) {
+                var comm,
+                    options = this.options,
+                    canvases = options.canvases,
+                    pl, ax, opts = {};
+                if(!canvases) { return; }
                 pl = canvases.current;
                 function checkax(ax)  {
                     if(ax.to - ax.from < 0.00001)  {
@@ -1016,8 +1039,7 @@
                     }
                     return {min: ax.from, max: ax.to};
                 }
-                var ax = pl.flot.getAxes();
-                var opts = {};
+                ax = pl.flot.getAxes();
                 if(ax.xaxis)  {
                     opts.xaxis = checkax(ranges.xaxis);
                 }
@@ -1061,49 +1083,76 @@
 
     $.ecoplot.addEvent({
         id: 'tooltip',
-        register: function($this) {
-            var options = $this[0].options;
-            var cl = 'econometric-plot-tooltip';
-            function showTooltip(x, y, contents) {
-                $('<div class="'+cl+'">' + contents + '</div>').css( {
+        register: function(elem) {
+            var cl = 'econometric-plot-tooltip',
+                time_out = 500;
+            
+            function tooltip_out(tltp, options) {
+                var timeout = setTimeout(function(){
+                    tltp.remove();
+                    options.previousPoint = null;
+                }, time_out );
+                tltp.data('timeout',timeout);
+            }
+            
+            function showTooltip(x, y, contents, options) {
+                return $('<div class="'+cl+'">' + contents + '</div>').css( {
                     position: 'absolute',
                     display: 'none',
                     top: y + 5,
                     left: x + 5
-                }).appendTo("body").fadeIn(200);
+                }).fadeIn(200).mouseenter(function() {
+                    var timeout = $(this).data('timeout');
+                    if(timeout) {
+                        clearTimeout(timeout);
+                    }
+                }).mouseleave(function(){
+                    var that = $(this);
+                    tooltip_out(that, options);
+                });
             }
 
-            $this.bind("plothover", function (event, pos, item) {
-                if(!pos.x) {
+            elem.bind("plothover", function(event, pos, item) {
+                var options = this.options,
+                    canvas = options.canvases.current,
+                    previousPoint = options.previousPoint,
+                    $this, tltp;
+                
+                if(!options.show_tooltip) {
                     return;
                 }
-                $("#x").text(pos.x.toFixed(2));
-                $("#y").text(pos.y.toFixed(2));
-
-                if(options.show_tooltip) {
-                    var canvas = options.canvases.current,
-                        previousPoint = options.previousPoint;
-                    if (item) {
-                        if(previousPoint || previousPoint !== item.datapoint) {
-                            previousPoint = item.datapoint;
-
-                            $("."+cl).remove();
-                            var x = item.datapoint[0].toFixed(2),
-                            y = item.datapoint[1].toFixed(2);
-                            if(canvas.type === 'timeseries') {
-                                x = new Date(parseFloat(x));
-                                x = $.datepicker.formatDate(options.dates.format, x);
-                            }
-
-                            showTooltip(item.pageX, item.pageY,
-                                    item.series.label + " of " + x + " = " + y);
+                //if(!pos.x || !pos.y) {
+                //    return;
+                //}
+                //$("#x").text(pos.x.toFixed(2));
+                //$("#y").text(pos.y.toFixed(2));
+                
+                that = $(this);
+                tltp = $("."+cl,that);
+                
+                if (item) {
+                    if(!previousPoint || 
+                       (previousPoint.dataIndex !== item.dataIndex ||
+                        previousPoint.seriesIndex !== item.seriesIndex)) {
+                        var x = item.datapoint[0].toFixed(2),
+                            y = item.datapoint[1].toFixed(2),
+                            d = item.series.data[item.dataIndex],
+                            text = d.length == 3 ? d[2] : item.series.label;
+                        tltp.remove();
+                        if(canvas.type === 'timeseries') {
+                            x = new Date(parseFloat(x));
+                            x = $.datepicker.formatDate(options.dates.format, x);
+                            text += " of " + x + " = " + y;
                         }
+                        else {
+                            text += " (" + x + "," + y + ")"
+                        }
+                        showTooltip(item.pageX, item.pageY, text, options).appendTo(that);
+                        options.previousPoint = item;
                     }
-                    else {
-                        $("."+cl).remove();
-                        previousPoint = null;            
-                    }
-                    options.previousPoint = previousPoint;
+                }
+                else if(tltp.length) {
+                    tooltip_out(tltp,options);
                 }
             });
 

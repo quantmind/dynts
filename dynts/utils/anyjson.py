@@ -12,13 +12,14 @@ class JSONRPCEncoder(json.JSONEncoder):
         if isinstance(obj, date) or isinstance(obj, datetime):
             return date2timestamp(obj)
         else:
-            raise exceptions.JSONEncodeException("%r is not JSON serializable" % (obj,))
+            raise exceptions.JSONEncodeException(\
+                            "%r is not JSON serializable" % (obj,))
         
 
 class jsonPickler(object):
     
     def dumps(self, obj, **kwargs):
-        return json.dumps(res, cls=JSONRPCEncoder, **kwargs)
+        return json.dumps(obj, cls=JSONRPCEncoder, **kwargs)
     
     def loads(self,sobj):
         return json.loads(sobj)
@@ -34,6 +35,12 @@ class JSONobject(object):
     
     def tojson(self):
         return self.pickler.dumps(self.todict())
+    
+    def dumps(self):
+        return self.pickler.dumps(self.todict())
+    
+    def mimetype(self):
+        return 'application/javascript'
     
     
 class JSONdatainfo(JSONobject):

@@ -11,13 +11,11 @@
     /**
      * DJPCMS Decorator for Econometric ploting
      */
-    if($.djpcms) {
+    if($.djpcms && $.plot) {
+            
         $.djpcms.decorator({
             id:"econometric_plot",
             decorate: function(elem,config) {
-        		if(!$.ecoplot) {
-        		    return;
-        		}
         		$.ecoplot.log = $.djpcms.logger;
                 var poptions = {
                         // colors: ["#205497","#2D8633","#B84000","#d18b2c"],
@@ -29,6 +27,9 @@
                     selector = '.'+$.ecoplot.plugin_class,
                     parsedata = function(data,el) {
                         var res = data.result;
+                        if(!res) {
+                            res = data;
+                        }
                         if(res.type === 'multiplot') {
                             return res.plots;
                         }

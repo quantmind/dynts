@@ -36,7 +36,8 @@ except NameError:
 from functools import reduce
 
 from dynts.exceptions import *
-from .backends import timeseries, xydata, TimeSeries, DynData, tsfunctions
+from .backends import timeseries, xyserie, xydata, TimeSeries, DynData,\
+                      tsfunctions
 from .backends import istimeseries, Formatters, BACKENDS, ts_bin_op
 from .dsl import parse, merge, dslresult, function_registry, functions
 from .maths import BasicStatistics, pivottable

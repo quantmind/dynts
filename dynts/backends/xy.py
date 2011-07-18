@@ -94,12 +94,12 @@ length given by :class:`dynts.DynData.count`.'''
 
 class xyserie(object):
     
-    def __init__(self, name = '', data = None, lines = True, points = False):
+    def __init__(self, name = '', data = None, lines = True,
+                 points = False):
         self.points = points if lines else True
         self.lines = lines
         self.name = name
         self.data = data
-
 
 
 class xydata(DynData):
