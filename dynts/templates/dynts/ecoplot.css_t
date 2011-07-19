@@ -57,5 +57,16 @@
 .definition-list dl dd {
     margin: 0;
 }
+{{ tag }} .loader {
+    background-image: url("{{ MEDIA_URL }}/dynts/ecoplot/img/ajax-loader.gif");
+    background-position: center center;
+    background-repeat: no-repeat;
+    display: none;
+    float: right;
+    height: 34px;
+    margin-right: 2%;
+    opacity: 0.5;
+    width: 34px;
+}
 {% endblock %}
 

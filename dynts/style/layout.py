@@ -36,4 +36,3 @@ CssContext('ecoplot_plot_options',
                    'text_align': 'center'}
            )
 
-

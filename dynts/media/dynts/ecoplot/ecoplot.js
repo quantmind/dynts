@@ -342,15 +342,11 @@
             _home_page = 'https://github.com/quantmind/dynts',
             plugin_class = "econometric-plot",
             instances = [],
+            plugins = {},
             extraTools = {},
             events = {},
             menubar = {},
             debug		   = false,
-            css_loaded	   = false,
-            siteoptions	   = {
-                url: null,
-                theme: 'smooth'
-            },
             default_logger = {
                 log: function(msg,level) {console_logger(msg);},
                 info : function(msg) {console_logger(msg);},
@@ -467,7 +463,6 @@
                showplot: function(i) {return true;},
                requestparams: {},
                show_tooltip: true,
-               loaderimage: 'ajax-loader.gif',
                flot_options: {
                    xaxis: {}
                },
@@ -480,9 +475,10 @@
                canvasClass: 'ts-plot-module-canvas',
                convasContClass: 'ts-plot-module-canvas-container',
                startLoading: function($this) {
+                   var el = $('.loader',$this).show();
                    var co = this.elems;
-                   co.loader.css({'display':'block'});
-                   co.canvas_cont.css({'opacity':'0.4'});
+                   //co.loader.css({'display':'block'});
+                   co.canvas_cont.css({'opacity':'0.7'});
                },
                stopLoading: function($this) {
                    var co = this.elems;
@@ -873,6 +869,7 @@
             $.each(options.requestparams, function(key, param) {
                 params[key] = typeof param === "function" ? param() : param;
             });
+            $this.trigger('eco_before_load', params);
             params = $.extend(true, params, dataplot);
             options.startLoading($this);
             $.ajax({
@@ -904,7 +901,16 @@
                 }
             });
         }
-
+        
+        function make_instance(index_, container_, settings_) {
+            return {
+                data: {},
+                logger: function() { return settings_.logger; },
+                settings: function() { return settings_; },
+                index: function() { return index_; },
+                container: function() { return container_; }
+            };
+        }
         /**
          * The jQuery plugin constructor
          */
@@ -921,18 +927,26 @@
                 $this.data('ecoplot-instance-id',instance_id)
                      .attr({'id':plugin_class+"_"+instance_id})
                      .addClass(plugin_class);
+                
+                instance = instances[instance_id] = make_instance(
+                        instance_id,$this, options);
+                $.each(plugins, function(name,extension) {
+                    instance[name] = extension;
+                    extension.init.apply(instance);
+                });
+                
                 this.options = options;
                 $this.hide().html("");
                 options.paginate($this);
                 
                 _registerEvents($this);
-
-                if(options.autoload) {
-                    $this.trigger("load");
-                }
-                $this.fadeIn(options.defaultFade);
+                //$this.fadeIn(options.defaultFade);
+                $this.show();
                 if(options.layout) {
                     options.layout($this);
+                }
+                if(options.autoload) {
+                    $this.trigger("load");
                 }
             });
         }
@@ -952,11 +966,11 @@
             instance: function(elem) {
                 // get by instance id
                 if(instances[elem]) { return instances[elem]; }
-                return null;
                 var o = $(elem); 
                 if(!o.length && typeof elem === "string") { o = $("#" + elem); }
                 if(!o.length) { return null; }
-                return instances[o.closest("."+plugin_class).data("instance-id")] || null;
+                return instances[o.closest("."+plugin_class)
+                                 .data("ecoplot-instance-id")] || null;
             },
             log: default_logger,
             version: _version,
@@ -967,6 +981,9 @@
                 if(menu) {
                     return menu.create($this[0]);
                 }
+            },
+            plugin: function(pname, pdata) {
+                plugins[pname] = pdata;
             }
         };
     }());
@@ -1002,6 +1019,19 @@
             });
         });
     };
+    
+    $.ecoplot.plugin('plotselect',{
+        init: function() {
+            this.plotselecting = false;
+            this.container().bind('plotselecting', function() {
+                var instance = $.ecoplot.instance(this);
+                instance.plotselecting = true;
+            }).bind('plotselected', function() {
+                var instance = $.ecoplot.instance(this);
+                instance.plotselecting = false;
+            });
+        }
+    });
 
 
 
@@ -1015,7 +1045,6 @@
                 if(!elem) {
                     elem = $(this);
                 }
-                elem.trigger('pre-reload',[elem, this]);
                 $.ecoplot.loadData(elem);
                 elem.trigger('after-reload',[elem, this]);
             });
@@ -1026,6 +1055,14 @@
         id: 'zoom',
         className: 'zoom-out',
         register: function(elem) {
+            
+            function checkax(axis)  {
+                if(axis.to - axis.from < 0.00001)  {
+                    axis.to = axis.from + 0.00001;
+                }
+                return {min: axis.from, max: axis.to};
+            }
+            
             elem.bind("plotselected", function (event, ranges) {
                 var comm,
                     options = this.options,
@@ -1033,23 +1070,17 @@
                     pl, ax, opts = {};
                 if(!canvases) { return; }
                 pl = canvases.current;
-                function checkax(ax)  {
-                    if(ax.to - ax.from < 0.00001)  {
-                        ax.to = ax.from + 0.00001;
-                    }
-                    return {min: ax.from, max: ax.to};
-                }
                 ax = pl.flot.getAxes();
-                if(ax.xaxis)  {
+                if(ax.xaxis && ranges.xaxis)  {
                     opts.xaxis = checkax(ranges.xaxis);
                 }
-                if(ax.yaxis)  {
+                if(ax.yaxis && ranges.yaxis)  {
                     opts.yaxis = checkax(ranges.yaxis);
                 }
-                if(ax.x2axis)  {
+                if(ax.x2axis && ranges.x2axis)  {
                     opts.x2axis = checkax(ranges.x2axis);
                 }
-                if(ax.y2axis)  {
+                if(ax.y2axis && ranges.y2axis)  {
                     opts.y2axis = checkax(ranges.y2axis);
                 }
                 // do the zooming
@@ -1113,19 +1144,19 @@
             }
 
             elem.bind("plothover", function(event, pos, item) {
-                var options = this.options,
+                var instance = $.ecoplot.instance(this),
+                    options = instance.settings(),
                     canvas = options.canvases.current,
                     previousPoint = options.previousPoint,
                     $this, tltp;
                 
-                if(!options.show_tooltip) {
+                if(!options.show_tooltip || instance.plotselecting) {
                     return;
                 }
-                //if(!pos.x || !pos.y) {
-                //    return;
+                //if(pos.x || pos.y) {
+                //    $("#x").text(pos.x.toFixed(2));
+                //    $("#y").text(pos.y.toFixed(2));
                 //}
-                //$("#x").text(pos.x.toFixed(2));
-                //$("#y").text(pos.y.toFixed(2));
                 
                 that = $(this);
                 tltp = $("."+cl,that);
@@ -1142,11 +1173,8 @@
                         if(canvas.type === 'timeseries') {
                             x = new Date(parseFloat(x));
                             x = $.datepicker.formatDate(options.dates.format, x);
-                            text += " of " + x + " = " + y;
                         }
-                        else {
-                            text += " (" + x + "," + y + ")"
-                        }
+                        text += " (" + x + "," + y + ")";
                         showTooltip(item.pageX, item.pageY, text, options).appendTo(that);
                         options.previousPoint = item;
                     }

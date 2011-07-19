@@ -19,7 +19,8 @@
         		$.ecoplot.log = $.djpcms.logger;
                 var poptions = {
                         // colors: ["#205497","#2D8633","#B84000","#d18b2c"],
-                        grid: {hoverable: true, clickable: true, color: '#00264D', tickColor: '#A3A3A3'},
+                        grid: {hoverable: true, clickable: true,
+                                color: '#00264D', tickColor: '#A3A3A3'},
                         selection: {mode: 'xy', color: '#3399FF'},
                         lines: {show: true, lineWidth: 3},
                         shadowSize: 0
