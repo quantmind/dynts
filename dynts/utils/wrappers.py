@@ -70,6 +70,10 @@ an :class:`dynts.exceptions.DateNotFound`.'''
         else:
             raise DateNotFound
         
+    def at(self, dt):
+        val = self[dt]
+        return dict(zip(self.names,val))
+        
     def find_ge(self, dt):
         '''Building block of all searches. Find the index
 corresponding to the leftmost value greater or equal to *dt*.

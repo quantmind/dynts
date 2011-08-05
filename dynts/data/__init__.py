@@ -49,6 +49,8 @@ class SymbolData(object):
 This class provides a place-holder of information.
 It doesn't do anything special.
 '''
+    __slots__ = ('ticker','field','provider')
+    
     def __init__(self, ticker, field, provider):
         self.ticker = ticker
         self.field = field
@@ -56,7 +58,7 @@ It doesn't do anything special.
     
     def __str__(self):
         return self.ticker
-        
+    
 
 class TimeSerieLoader(object):
     '''Cordinates the loading of timeseries data
@@ -203,17 +205,16 @@ This function is called before retrieving data.
         elif len(bits) > 3:
             raise BadSymbol('Could not parse %s.' % symbol)
         
-        if provider is None:
-            provider = self.default_provider_for_ticker(ticker, field)
-        
+        return self.symbol_for_ticker(ticker, field, provider, providers)
+ 
+    def symbol_for_ticker(self, ticker, field, provider, providers):
+        '''Return an instance of *symboldata* containing
+information about the data provider, the data provider ticker name
+and the data provider field.'''
+        provider = provider or settings.default_provider
         if provider:
             provider  = providers.get(provider,None)
         return self.symboldata(ticker,field,provider)
- 
-    def default_provider_for_ticker(self, ticker, field):
-        '''Calculate the provider when not available in the symbol. By default it returns
-:attr:`dynts.conf.Settings.default_provider`.'''
-        return settings.default_provider
     
     def getsymbol(self, ticker, field, provider):
         '''Convert *ticker*, *field* and *provider* to symbol code.
