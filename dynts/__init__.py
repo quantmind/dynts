@@ -121,22 +121,35 @@ def hasextensions():
     return hasextensions
 
 
-def function_doc(name):
+def function_title_and_body(name,with_body=True):
+    '''Given a function *name* return a tuple containing
+the function title and the restructured text used to
+create the function ducumentation.'''
     link = '.. _functions-{0}:'.format(name)
     func = function_registry[name]
     if func.description:
         title = '{0} - {1}'.format(name,func.description)
     else:
         title = name
-    under = (2+len(title))*'='
-    fdoc = func.__doc__
-    if not fdoc:
-        raise FunctionError('Function {0} has no documentation.'.format(name))
-    return '\n'.join((link,'',title,under,'',fdoc,'\n'))
+    if with_body:
+        under = (2+len(title))*'='
+        fdoc = func.__doc__
+        if not fdoc:
+            raise FunctionError('Function {0} has no documentation.'.format(name))
+        body = '\n'.join((link,'',title,under,'',fdoc,'\n'))
+        return (title,body)
+    else:
+        return title
+
+
+def function_doc(name):
+    '''Given a function *name* return the restructured text used to
+create the function ducumentation.'''
+    return function_title_and_body(name)[1]
 
         
 def functions_docs():
-    names = sorted(function_registry.keys())
+    names = sorted(function_registry)
     return '\n'.join((function_doc(name) for name in names))
 
 

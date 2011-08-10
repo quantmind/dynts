@@ -2,7 +2,8 @@
 
 
 def better_ts_function(f):
-    '''Decorator which check if timeseries has a better implementation of the function'''
+    '''Decorator which check if timeseries has a better
+ implementation of the function.'''
     fname = f.__name__
     
     def _(ts, *args, **kwargs):
@@ -19,9 +20,11 @@ def better_ts_function(f):
 
 @better_ts_function
 def zscore(ts, **kwargs):
-    '''Rolling Z-Score statistics. The Z-score is more formally known as
-``standardised residuals``. To calculate the standardised residuals of a data set,
-the average value and the standard deviation of the data value have to be estimated.
+    '''Rolling Z-Score statistics.
+The Z-score is more formally known as ``standardised residuals``.
+To calculate the standardised residuals of a data set,
+the average value and the standard deviation of the data value
+have to be estimated.
 
 .. math::
 
@@ -42,3 +45,4 @@ def prange(ts, **kwargs):
     mi = ts.rollmin(**kwargs)
     ma = ts.rollmax(**kwargs)
     return (ts - mi)/(ma - mi)
+

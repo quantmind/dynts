@@ -12,7 +12,8 @@ from .grammar import *
 from .registry import FunctionBase, ComposeFunction, function_registry
 
 
-def parse(timeseries_expression, method = None, functions = None, debug = False):
+def parse(timeseries_expression, method = None,
+          functions = None, debug = False):
     '''Function for parsing :ref:`timeseries expressions <dsl-script>`.
 If succesful, it returns an instance of :class:`dynts.dsl.Expr`.'''
     from ply import yacc

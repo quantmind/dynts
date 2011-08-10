@@ -23,8 +23,15 @@ of log-changes. Therefore:
     {\\tt sdd}(y_t,w) = {\tt sd}({\\tt ldelta}(y_t),w)
 ''',description='log standard deviation')
 
-ComposeFunction('avol','15.874*sd(ldelta(x1),window=20)',docs='''\
-a''',description='annualised volatility')
+ComposeFunction('avol','15.874*sd(ldelta(x1),window=20)',\
+description='annualised volatility',
+docs='''Function for evaluating the annualized percentage \
+volatility of an asset. The asset price must be positive.
+
+This function is equivalent to::
+
+    15.874*sd(ldelta(x1),...)
+''')
 
 # Annualized sharpe on changes
 ComposeFunction('asharpe','15.874*sharpe(delta(x1),window=20)',docs='''\

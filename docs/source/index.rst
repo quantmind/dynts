@@ -26,6 +26,7 @@ Contents
    :maxdepth: 1
    
    overview
+   api
    datastructures/index
    dsl/index
    backends
