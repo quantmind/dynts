@@ -1,11 +1,16 @@
 import matplotlib.pyplot as plt
 
-def toplot(ts, filename = None, **kwargs):
+def toplot(ts,
+           filename = None,
+           grid = True,
+           legend = True,
+           pargs = (),
+           **kwargs):
     '''To plot formatter'''
     fig = plt.figure()
     ax = fig.add_subplot(111)
     dates = list(ts.dates())
-    ax.plot(dates, ts.values())
+    ax.plot(dates, ts.values(), *pargs)
     #ax.xaxis.set_major_locator(years)
     #ax.xaxis.set_major_formatter(yearsFmt)
     #ax.xaxis.set_minor_locator(months)
@@ -17,7 +22,7 @@ def toplot(ts, filename = None, **kwargs):
     #def price(x): return '$%1.2f'%x
     #ax.format_xdata = mdates.DateFormatter('%Y-%m-%d')
     #ax.format_ydata = price
-    ax.grid(True)
+    ax.grid(grid)
     
     # rotates and right aligns the x labels, and moves the bottom of the
     # axes up to make room for them
@@ -31,7 +36,7 @@ def toplot(ts, filename = None, **kwargs):
         #fontsize = kwargs.get('title_fontsize', 7)
         fontweight = kwargs.get('title_fontweight', 'bold')
         ax.set_title(title, fontweight=fontweight)#,fontsize=fontsize,         
-    else:
+    elif legend:
         ##add legend
         loc = kwargs.get('legend_location','best')
         ncol = kwargs.get('legend_ncol', 2)

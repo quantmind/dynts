@@ -28,18 +28,14 @@ CLASSIFIERS  = [
                 'Topic :: Office/Business :: Financial'
                 ]
 
-try:
-    strtype = basestring
-except NameError:
-    strtype = str
-    
+
 from functools import reduce
 
 from dynts.exceptions import *
 from .backends import timeseries, xyserie, xydata, TimeSeries, DynData,\
                       tsfunctions
 from .backends import istimeseries, Formatters, BACKENDS, ts_bin_op
-from .dsl import parse, merge, dslresult, function_registry, functions
+from .dsl import parse, evaluate, merge, dslresult, function_registry, functions
 from .maths import BasicStatistics, pivottable
 from .data import providers
 from dynts import formatters
@@ -49,43 +45,6 @@ Formatters['csv']  = formatters.ToCsv()
 Formatters['excel']  = formatters.ToExcel()
 Formatters['xls']  = formatters.ToXls()
 Formatters['plot'] = formatters.ToPlot()
-
-
-def evaluate(expression, start = None, end = None,
-             loader = None, logger = None, backend = None,
-             **kwargs):
-    '''Evaluate the timeseries ``expression`` into
-a timeseries object
-    
-:parameter expression: A timeseries aexpression string or an instance
-                       of :class:`dynts.dsl.Expr` obtained using
-                       the :func:`dynts.parse` function.
-:parameter start: Start date or ``None``.
-:parameter end: End date or ``None``. If not provided today values is used.
-:parameter loader: Optional :class:`dynts.data.TimeSerieLoader` class or instance to use.
-:parameter logger: Python logging instance or ``None``. Used if you required logging.
-:parameter backend: :class:`dynts.TimeSeries` backend name or ``None``.
-
-The ``expression`` is parsed and the :class:`dynts.expr.Symbol` are sent to the
-:class:`dynts.data.TimeSerieLoader` instance for retrieving actual timeseries data.
-It returns an instance of :class:`dynts.dslresult`.
-
-Typical usage::
-
-    >>> import dynts
-    >>> r = dynts.evaluate('min(GS,window=30)')
-    >>> r
-    min(GS,window=30)
-    >>> ts = r.unwind()
-    '''
-    if isinstance(expression,strtype):
-        expression = parse(expression)
-    if expression.malformed():
-        raise CouldNotParse(expression)
-    symbols = expression.symbols()
-    data = providers.load(symbols, start, end, loader = loader,
-                          logger = logger, backend = backend, **kwargs)
-    return dslresult(expression, data, backend = backend)
 
 
 def statistics(expression,

@@ -1,4 +1,4 @@
-.. _index-dsl:
+.. _dsl:
 
 .. module:: dynts.dsl
 
@@ -21,37 +21,34 @@ Here few script examples:
 * ``GOOG-AMZN`` a subtraction between two symbols.
 
 
-.. _dsl-parse:
-
-Parsing timeserie scripts
-==============================
-Parsing timeseries expressions is accomplished using the :func:`dynts.parse` function:
-
-
-.. autofunction:: dynts.parse
-
-
 For example::
 
-	>>> import dynts
-	>>> r = dynts.parse('GOOG/2,YHOO')
-	>>> r.type
-	'concatenationop'
-	>>> len(r)
-	2
+    >>> import dynts
+    >>> r = dynts.parse('GOOG/2,YHOO')
+    >>> r.type
+    'concatenationop'
+    >>> len(r)
+    2
 
 Now lets load some data using the built-in :ref:`data providers <data-providers>`::
 
-	>>> result = dynts.evaluate(r)
-	>>> result.expression
-	goog / 2.0 , yhoo
-	>>> ts = result.unwind()
-	>>> len(ts)
-	2
-	
+    >>> result = dynts.evaluate(r)
+    >>> result.expression
+    goog / 2.0 , yhoo
+    >>> ts = result.unwind()
+    >>> len(ts)
+    2
+    
 
-Abstract Syntax Nodes
-================================
+API
+===============
+
+Interpreted Expression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: dynts.dsl.dslresult
+   :members:
+   
 
 Expr
 ~~~~~~~~~~~~~~~
@@ -68,12 +65,12 @@ Symbol
    
 A symbol is any string expression which is not a function. For example::
 
-	>>> e = dynts.parse('0.5*GOOG')
-	>>> e[1].type
-	'symbol'
-	>>> e.symbols()
-	[GOOG]
-	
+    >>> e = dynts.parse('0.5*GOOG')
+    >>> e[1].type
+    'symbol'
+    >>> e.symbols()
+    [GOOG]
+    
 Symbols are special types of the abstract syntax tree which defines the timeserie DSL.
 values of symbol are given by external data providers such as blooberg, yahoo finance, google finance
 and so forth.
@@ -84,7 +81,7 @@ Brackets
 .. autoclass:: dynts.dsl.Bracket
    :members:
    
-	
+    
 Function
 ~~~~~~~~~~~~~~~~~~~~
 

@@ -27,8 +27,9 @@ Contents
    
    overview
    api
-   datastructures/index
-   dsl/index
+   usage
+   structures
+   dsl
    backends
    provider/index
    functions

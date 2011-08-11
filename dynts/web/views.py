@@ -20,6 +20,8 @@ for fetching data.'''
                                   'dynts/flot/jquery.flot.js',
                                   'dynts/flot/jquery.flot.selection.js',
                                   'dynts/jquery.flot.text.js',
+                                  'dynts/base64.js',
+                                  'dynts/canvas2image.js',
                                   'dynts/ecoplot/ecoplot.js',
                                   'dynts/decorator.js'])
     _methods = ('get',)

@@ -13,8 +13,17 @@ istimeseries = lambda value : isinstance(value,TimeSeries)
 isxy = lambda value : isinstance(value,xydata)
 
 
-def timeseries(name = '', backend = None, **kwargs):
-    '''Create a new :class:`dynts.TimeSeries` object.'''
+def timeseries(name = '', backend = None, date = None, data = None, **kwargs):
+    '''Create a new :class:`dynts.TimeSeries` instance using a given *backend*
+and populating it with provided the data.
+
+:parameter name: optional timeseries name. For multivarate timeseries
+                 the :func:`dynts.tsname` utility function can be used
+                 to build it.
+:parameter backend: optional backend name. If not provided, numpy will be used.
+:parameter date: optional iterable over dates.
+:parameter data: optional iterable over data.
+'''
     from dynts import InvalidBackEnd
     backend = backend or settings.backend
     bname = BACKENDS.get(backend,None)
@@ -27,5 +36,6 @@ def timeseries(name = '', backend = None, **kwargs):
     try:
         factory = getattr(module, 'TimeSeries')
     except AttributeError:
-        raise InvalidBackEnd('Could not find a TimeSeries class in module %s' % bmodule)
-    return factory(name = name, **kwargs)
+        raise InvalidBackEnd(
+                'Could not find a TimeSeries class in module %s' % bmodule)
+    return factory(name = name, date = date, data = data, **kwargs)

@@ -337,7 +337,7 @@
             }
         }
         
-        var _version = "0.4.1",
+        var _version = "0.4.2",
             _authors = 'Luca Sbardella',
             _home_page = 'https://github.com/quantmind/dynts',
             plugin_class = "econometric-plot",
@@ -402,7 +402,7 @@
                {
                    classname: 'options',
                    title: "Edit plotting options",
-                   icon: "ui-icon-image",
+                   icon: "ui-icon-copy",
                    type: "checkbox",
                    decorate: function(b,el) {
                        b.toggle(
@@ -417,6 +417,17 @@
                                    }
                                }
                        );
+                   }
+               },
+               {
+                   classname: 'save-image',
+                   title: "Save as image",
+                   icon: "ui-icon-image",
+                   decorate: function(b,el) {
+                       b.click(function() {
+                           var plot = $.ecoplot.instance(this);
+                           plot.saveAsPng();
+                       });
                    }
                },
                {
@@ -472,8 +483,6 @@
                defaultFade: 300,
                classname: 'ts-plot-module',
                errorClass: 'dataErrorMessage',
-               canvasClass: 'ts-plot-module-canvas',
-               convasContClass: 'ts-plot-module-canvas-container',
                startLoading: function($this) {
                    var el = $('.loader',$this).show();
                    var co = this.elems;
@@ -847,12 +856,14 @@
          * }
          */
         function _finaliseLoad($this,data) {
-            var options = $this[0].options;
+            var instance = $.ecoplot.instance($this),
+                options = instance.settings();
             var elems = options.elems;
             if(elems.info) {
                 elems.info.html("");
             }
-            _set_new_canavases($this, data);
+            instance.replace_all_canvases(data);
+            //_set_new_canavases($this, data);
         }
 
         function _request($this)  {
@@ -916,6 +927,24 @@
          */
         function _construct(options_) {
             var options = _parseOptions(options_);
+            
+            function make_function(fname,func) {
+                if(fname.charAt(0) == '_') {
+                    return func;
+                }
+                else {
+                    return function() {
+                        var container = this.container(),
+                            args = Array.prototype.slice.call(arguments),
+                            res;
+                        container.trigger('ecoplot-before-'+fname,args);
+                        res = func.apply(this,args);
+                        container.trigger('ecoplot-after-'+fname,res);
+                        return res;
+                    };
+                }
+            }
+            
             return this.each(function(i) {
                 var $this = $(this),
                     instance_id = $this.data("ecoplot-instance-id"),
@@ -930,9 +959,21 @@
                 
                 instance = instances[instance_id] = make_instance(
                         instance_id,$this, options);
+                
+                // Add plugins
                 $.each(plugins, function(name,extension) {
-                    instance[name] = extension;
-                    extension.init.apply(instance);
+                    instance.data[name] = $.extend({},extension.data || {});                    
+                    $.each(extension,function(fname,elem) {
+                        if(fname == 'init') {
+                            elem.apply(instance);
+                        }
+                        else if(fname !== 'data') {
+                            if($.isFunction(elem)) {
+                                elem = make_function(fname,elem);
+                            }
+                            instance[fname] = elem;
+                        }
+                    });
                 });
                 
                 this.options = options;
@@ -983,6 +1024,7 @@
                 }
             },
             plugin: function(pname, pdata) {
+                defaults[pname] = pdata.defaults || {},
                 plugins[pname] = pdata;
             }
         };
@@ -1020,6 +1062,141 @@
         });
     };
     
+///////////////////////////////////////////////////
+//  Default plugins
+///////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////
+    //  Canvases plugin
+    ///////////////////////////////////////////////////
+    $.ecoplot.plugin('canvases',{
+        defaults : {
+            container_class: 'canvas-container',
+            canvas_class: 'ts-plot-module-canvas',
+        },
+        data: {
+            all: [],
+            current: null,
+        },
+        init: function() {
+            var that = this;
+            $(window).resize(function() {
+                that.canvas_render();
+            });
+        },
+        get_canvas: function(idx) {
+            var canvases = this.data.canvases;
+            if(idx === undefined) {
+                idx = canvases.current;
+            }
+            if(idx !== null) {
+                return {
+                        index:idx,
+                        canvas:canvases.all[idx]
+                        }; 
+            }
+        },
+        canvas_container: function() {
+            return $('.'+this.settings().canvases.container_class,this.container());
+        },
+        _get_serie_data: function(idx,canvas) {
+            return canvas.series;
+        },
+        canvas_render: function(idx,opts) {
+            var c = this.get_canvas(idx),
+                container = this.canvas_container(),
+                canvas = c ? c.canvas : null,
+                height,zoptions,adata;
+            if(!canvas) {return;}
+            height = container.height() - $('ul',container).height();
+            canvas.elem.height(height);
+            if(opts) {zoptions = $.extend(true, {}, canvas.options, opts);}
+            else {zoptions = canvas.options;}
+            adata = this._get_serie_data(idx,canvas);
+            canvas.flot = $.plot(canvas.elem, adata, zoptions);
+            this.data.canvases.current = idx;
+            return canvas;
+        },
+        // Add a new canvas to the list
+        add_canvas: function(data, oldcanvas) {
+            var options = this.settings(),
+                $this = this.container(),
+                container = this.canvas_container(),
+                canvases = this.data.canvases,
+                typ = data.type,
+                name = data.name,
+                idx = canvases.all.length,
+                cid = $this.attr('id') + '-canvas' + idx,
+                cv = $('<div></div>').attr('id',cid)
+                                     .addClass(options.canvases.canvas_class);
+            
+            if(!idx) {
+                $('<ul></ul>').appendTo(container).hide();
+            }
+            $('ul',container).append($('<li><a href="#' + cid + '">' + name + '</a></li>'));
+            cv.appendTo(container);
+            $.ecoplot.log.debug('Adding '+ typ + ' ' + name + ' to canvases.');
+            if(typ === "timeseries") {
+                typ = "time";
+            }
+            else {
+                typ = null;
+            }
+
+            if(oldcanvas && oldcanvas.options.xaxis.mode === typ) {
+                oldcanvas.name = name;
+                oldcanvas.series = data.series;
+                data = oldcanvas;
+            }
+            else {
+                data.options = $.extend(true, {}, options.flot_options, data.options);
+                data.options.xaxis.mode = typ;
+            }
+            data.elem   = cv;
+            canvases.all.push(data);
+            return data;
+        },
+        // Replace all canvases with new ones
+        replace_all_canvases: function(data) {
+            var options = this.settings(),
+                canvases = this.data.canvases,
+                container = this.canvas_container(),
+                oldcanvases = canvases.all,
+                that = this,
+                datac,typ;
+            container.children().fadeOut(options.defaultFade).remove();
+            canvases.current = null;
+            canvases.all = [];
+            
+            function oldcanvas(c) {
+                if(oldcanvases.length > c) {
+                    return oldcanvases.all[c];
+                }
+            };
+
+            if(data) {
+                $.each(data, function(i,v) {
+                    that.add_canvas(v,oldcanvas(i));
+                });
+                if(canvases.all.length == 1) {
+                    $('ul',container).remove();
+                }
+                else {
+                    $('ul',container).show();
+                    container.tabs({
+                        show: function(event,ui) {
+                            if(options.canvases.height) {
+                                that.canvases.render(ui.index);
+                            }
+                        }
+                    }); 
+                }
+            }
+            this.canvas_render(0);       
+        }
+    });
+    
+    
     $.ecoplot.plugin('plotselect',{
         init: function() {
             this.plotselecting = false;
@@ -1032,8 +1209,161 @@
             });
         }
     });
-
-
+    
+    
+    $.ecoplot.plugin('png',{
+        saveAsPng: function() {
+            var c = this.get_canvas();
+                elem = c ? c.canvas.elem : null;
+            if(elem) {
+                Canvas2Image.saveAsPNG(elem);
+            }
+        }
+    });
+    
+    
+    ///////////////////////////////////////////////////
+    //  Edit plugin
+    ///////////////////////////////////////////////////
+    $.ecoplot.plugin('edit',{
+        defaults: {
+            container_class: 'secondary',
+        },
+        init: function() {
+            this.container().bind('ecoplot-after-add_canvas', function(event, data, oldcanvas) {
+                var instance = $.ecoplot.instance(this);
+                instance.create_edit_panel(data,oldcanvas);
+            });
+        },
+        edit_container: function(idx,create) {
+            var holder = $('.'+this.settings().edit.container_class,this.container());
+            if(idx!==null && holder.length) {
+                var cn = 'option'+idx;
+                    p = $('.panel.'+cn,holder);
+                if(!p.length && create) {
+                    p = $('<div class = "panel '+cn+'"></div>').appendTo(holder);
+                }
+                return p;
+            }
+            else {
+                return holder;
+            }
+        },
+        _get_serie_data: function(idx,canvas) {
+            var adata = [];
+            function show_elem(typ,el) {
+                return $("input[name='"+typ+"']",el).attr('checked') ? true : false;
+            }
+            this.edit_container(idx).find('tr.serie-option').each(function(i) {
+                var el = $(this);
+                var serie = canvas.series[i];
+                serie.lines.show  = show_elem('line',el);
+                serie.points.show = show_elem('points',el);
+                serie.bars.show = show_elem('bars',el);
+                if($("input[value='y-ax1']",el).attr("checked")) {
+                    serie.yaxis = 1;
+                }
+                else {
+                    serie.yaxis = 2;
+                }
+                if(serie.lines.show || serie.points.show || serie.bars.show) {
+                    adata.push(serie);
+                }
+            });
+            return adata;
+        },
+        create_edit_panel: function(data, oldcanvas) {
+            // check if oldcanvas is the same. If so keep it!
+            var idx = this.data.canvases.all.length-1,
+                options = this.settings(),
+                cn = 'option'+idx,
+                table = null,
+                body  = null,
+                oldbody = null,
+                oseries = [],
+                showplot = options.showplot,
+                edit_panel = this.edit_container(idx,true);
+            
+            if(!edit_panel.length) {
+                return;
+            }
+            
+            if(!oldcanvas) {
+                $.ecoplot.log.debug('Creating editing panel.');
+                edit_panel.append($('<h2>Series options</h2>'));
+                table = $('<table class="plot-options"></table>').appendTo(edit_panel);
+                var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
+                head.html('<th>line</th><th>points</th><th>bars</th><th>y-axis1</th><th>y-axis2</th>');
+                body = $('<tbody></tbody>').appendTo(table);
+                table.click(function() {
+                    data.render();
+                });
+            }
+            else {
+                table = oldcanvas.edit;
+                body = $('tbody',table).html('');
+                oseries = oldcanvas.series;
+            }
+            //Add a column element to a series row
+            function tdinp(type,name,value,checked) {
+                var check = $('<input type="'+type+'" name="'+name+'" value="'+value+'">');
+                if(checked) {
+                    check.prop({'checked':true}); // jQuery 1.6.1
+                    //check.attr('checked',true);
+                }
+                return $('<td class="center"></td>').append(check);
+            }
+            
+            function checkmedia(med,show) {
+                if(med) {
+                    if(med.show === undefined) {
+                        med.show = show;
+                    }
+                }
+                else {
+                    med = {show: show};
+                }
+                return med;
+            }
+            
+            var circle = 0;
+            $.each(data.series, function(i,serie) {
+                var oserie = null;
+                if(oseries.length > i) {
+                    var os = oseries[i];
+                    if(serie.label === os.label) {
+                        oserie = os;
+                    }
+                }
+                if(circle>1) {
+                    circle = 0;
+                }
+                if(!oserie) {
+                    serie.lines  = checkmedia(serie.lines,showplot(i));
+                    serie.points = checkmedia(serie.points,false);
+                    serie.bars   = checkmedia(serie.bars,false);
+                }
+                else {
+                    serie.lines  = oserie.lines;
+                    serie.points = oserie.points;
+                    serie.bars   = oserie.bars;
+                    serie.yaxis  = oserie.yaxis;
+                    serie.xaxis  = oserie.xaxis;
+                }
+                var trt = $('<tr class="line'+circle+' serie'+i+' serie-title"></tr>').appendTo(body);
+                var tr  = $('<tr class="line'+circle+' serie'+i+' serie-option"></tr>').appendTo(body);
+                trt.append($('<td class="label" colspan="6">'+serie.label+'</td>'));
+                tr.append(tdinp('checkbox','line','line', serie.lines.show));
+                tr.append(tdinp('checkbox','points','points', serie.points.show));
+                tr.append(tdinp('checkbox','bars','bars', serie.bars.show));
+                tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis===1 : i===0));
+                tr.append(tdinp('radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis===2 : i>0));
+                circle += 1;
+            });
+            data.edit = table;
+            return data;
+        }
+    });
 
 ///////////////////////////////////////////////////
 //  DEFAULT EVENTS
