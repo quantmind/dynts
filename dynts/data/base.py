@@ -17,7 +17,8 @@ It loads the actual data from the data rovider.
 This function is not called directly, instead it is called by the 
 :meth:`dynts.data.TimeSerieLoader.load`.
 
-:parameter symbol: string id for the symbol to load (the ticker), including optional fields and providers.
+:parameter symbol: string id for the symbol to load (the ticker),
+                    including optional fields and providers.
 :parameter startdate: start date of interval to load.
 :parameter enddate: end date of interval to load.
 :parameter logger: instance of :class:logging.Logger.

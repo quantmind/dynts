@@ -148,15 +148,17 @@ There should be no reason to override this function.'''
         end   = end if end <= td else td
         start = safetodate(start)
         if not start or start > end:
-            start = end - timedelta(days=int(round(30.4*settings.months_history)))
+            start = end - timedelta(days=int(round(30.4*
+                                                   settings.months_history)))
         return start,end
     
     def parse_symbol(self, symbol, providers):
-        '''Parse a symbol to obtain information regarding ticker, field and provider.
-Must return an instance of :attr:`symboldata`.
+        '''Parse a symbol to obtain information regarding ticker,
+field and provider. Must return an instance of :attr:`symboldata`.
 
 :keyword symbol: string associated with market data to load.
-:keyword providers: dictionary of :class:`dynts.data.DataProvider` instances available.
+:keyword providers: dictionary of :class:`dynts.data.DataProvider`
+                    instances available.
     
 For example::
 
@@ -173,7 +175,8 @@ the following triplet of information::
     intc,volume,google
     intc,None,google
     
-assuming ``yahoo`` is the provider in :attr:`dynts.conf.Settings.default_provider`.
+assuming ``yahoo`` is the provider in
+:attr:`dynts.conf.Settings.default_provider`.
 
 This function is called before retrieving data.
 '''
@@ -201,7 +204,8 @@ This function is called before retrieving data.
                 provider = bits[2]
                 field = bits[1]
             else:
-                raise BadSymbol('Could not parse %s. Unrecognized provider.' % symbol)
+                raise BadSymbol(
+                        'Could not parse %s. Unrecognized provider.' % symbol)
         elif len(bits) > 3:
             raise BadSymbol('Could not parse %s.' % symbol)
         
@@ -233,10 +237,11 @@ By default it returns::
 
     self.preprocessdata(intervals = ((start,end),))
     
-It could be overritten to modify the intervals. If the intervals is ``None`` or 
-an empty container, the :func:`dynts.data.DataProvider.load` method won't be called,
-otherwise it will be called as many times as the number of intervals in the return tuple
-(by default once).
+It could be overritten to modify the intervals.
+If the intervals is ``None`` or an empty container,
+the :func:`dynts.data.DataProvider.load` method won't be called,
+otherwise it will be called as many times as the number of intervals
+in the return tuple (by default once).
 '''
         return self.preprocessdata(intervals = ((start, end),))
     
@@ -252,8 +257,8 @@ It could be used to store data into a cache or database.'''
         return result
     
     def onfinishload(self, data, logger, backend, **kwargs):
-        '''Another post-processing **hook** invoked when the loading is finished.
-By default retun *data*.'''
+        '''Another post-processing **hook** invoked when the
+loading is finished. By default retun *data*.'''
         return data
 
 
@@ -276,8 +281,9 @@ class DataProviders(dict):
         self[provider.code] = provider
         
     def unregister(self, provider):
-        '''Unregister an existing data provider. *provider* must be an instance of
-    DataProvider. If provider name is already available, it will be replaced.'''
+        '''Unregister an existing data provider. *provider* must be
+an instance of DataProvider.
+If provider name is already available, it will be replaced.'''
         if isinstance(provider,type):
             provider = provider()
         if isinstance(provider,DataProvider):

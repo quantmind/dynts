@@ -16,7 +16,8 @@ from dynts.conf import settings
 from .base import DataProvider
 
 
-short_month = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')
+short_month = ('Jan','Feb','Mar','Apr','May','Jun',
+               'Jul','Aug','Sep','Oct','Nov','Dec')
 
 
 def line_decoder(res):
@@ -121,7 +122,8 @@ class yahoo(WebCsv):
     baseurl = 'http://ichart.yahoo.com'
         
     def getdate(self, st, dte):
-        return '%s=%s&%s=%s&%s=%s' % (st[0],dte.month-1,st[1],dte.day,st[2],dte.year)
+        return '%s=%s&%s=%s&%s=%s' % (st[0],dte.month-1,st[1],
+                                      dte.day,st[2],dte.year)
         
     def hystory_url(self, ticker, startdate, enddate):
         b = self.baseurl
