@@ -113,203 +113,6 @@
 
 
 (function($) {
-    
-    $.color_gradient = (function() {
-        
-        var hexDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
-        
-        // checks, if there is any unvalid digit for a hex number
-        function checkHexDigits(s) {
-            var j, found;
-            for(var i = 0; i < s.length; i++) {
-                found   = false;
-                for(j = 0; j < hexDigits.length; j++)
-                    if(s.substr(i, 1) == hexDigits[j])
-                        found   = true;
-                if(!found)
-                    return false;
-            }
-            return true;
-        }
-        
-        // checks, if a given number is a hexadezimal number
-        function checkHex(hex) {
-            if (!hex || hex==""  || hex=="#") throw "No valid hexadecimal given.";
-            hex = hex.toUpperCase();            
-            switch(hex.length) {
-                case 6:
-                    hex = "#" + hex;
-                    break;
-                case 7:
-                    break;
-                case 3:
-                    hex = "#" + hex;
-                    break;
-                case 4:
-                    hex = "#" + hex.substr(1, 1) + hex.substr(1, 1) + hex.substr(2, 1) + hex.substr(2, 1) + hex.substr(3, 1) + hex.substr(3, 1);
-                    break;
-            }
-            if(hex.substr(0, 1) != "#" || !checkHexDigits(hex.substr(1))) {
-                throw "No valid hexadecimal given.";
-            }
-            return hex; 
-        }
-        
-        // generates a rgb value, using a hex value
-        function hex2rgb(hex) {        
-            var rgb = [];
-            try {
-                hex = checkHex(hex);
-                rgb[0]=parseInt(hex.substr(1, 2), 16);
-                rgb[1]=parseInt(hex.substr(3, 2), 16);
-                rgb[2]=parseInt(hex.substr(5, 2), 16);
-                return rgb;
-            } catch (e) {
-                throw e;
-            }
-        }
-
-        //generates the hex-digits for a color. 
-        function hex(x) {
-            return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
-        }
-        
-        // checks, if an array of three values is a valid rgb-array
-        function checkRGB(rgb) {
-             if (rgb.length!=3) throw "this is not a valid rgb-array";
-             if (isNaN(rgb[0]) || isNaN(rgb[1]) || isNaN(rgb[2])) throw "this is not a valid rgb-array";
-             if (rgb[0]<0 || rgb[0]>255 || rgb[1]<0 || rgb[1]>255 || rgb[2]<0 || rgb[3]>255) throw "this is not a valid rgb-array";
-             return rgb;
-        }
-        
-        // generates a hex value, using a rgb value
-        function rgb2hex(rgb) {
-            try {
-                checkRGB(rgb);
-                return "#" + hex(rgb[0]) + hex(rgb[1]) + hex(rgb[2]);
-            } catch (e) {
-                throw e;
-            }
-        }
-        
-        //compares two values to sort
-        function cmp(a, b) {
-            return a - b;
-        }
-        
-        /**
-         * calculateGradient for a color
-         * @param startVal
-         * @param endVal
-         * @param count
-         * @param type: array for each color. Speciefies, how the missing color should be calculated:
-                                             1: linear
-                                             2: trigonometrical 
-                                             3: accidentally
-                                             4: ordered accident
-         */
-         function calculateGradient(startVal, endVal, count, type) {
-             var a = new Array();
-             if(!type || !count) {
-                 return null;
-             } else if (1<count && count < 3) {
-                 a[0] = startVal;
-                 a[1] = endVal;
-                 return a;
-             } else if (count==1) {
-                 a[0] = endVal;
-                 return a;
-             }
-             
-             switch(type) {
-                 case 1: //"linear"
-                     var i;
-                     for(i = 0; i < count; i++)
-                         a[i] = Math.round(startVal + (endVal - startVal) * i / (count - 1));
-                     break;
-         
-                 case 2: //trigonometrical 
-                     var i;
-                     for(i = 0; i < count; i++)
-                         a[i] = Math.round(startVal + (endVal - startVal) * ((Math.sin((-Math.PI / 2) + Math.PI * i / (count - 1)) + 1) / 2));
-                     break;
-         
-                 case 3: //accident
-                     var i;
-                     for(i = 1; i < count - 1; i++)
-                         a[i] = Math.round(startVal + (endVal - startVal) * Math.random());
-                     a[0]    = startVal;
-                     a[count - 1]    = endVal;
-                     break;
-         
-                 case 4: //ordered accident
-                     var i;
-                     for(i = 1; i < count - 1; i++)
-                         a[i] = Math.round(startVal + (endVal - startVal) * Math.random());
-                     a[0]    = startVal;
-                     a[count - 1]    = endVal;
-                     if((typeof(a.sort) == "function") && (typeof(a.reverse) == "function"))
-                     {
-                         a.sort(cmp);
-                         if(startVal > endVal)
-                             a.reverse();
-                     }
-                     break;
-             }
-             return a;
-         }
-    
-        /**
-        * calculates an array with hex values. 
-        * @param startColor: starting color (hex-format or rgb)
-        * @param endColor: ending color (hex-format or rgb)
-        * @param count: specifies, how many colors should be generated
-        * @params types: array for each color.
-        *         Speciefies, how the missing color should be calculated:
-        *               1: linear
-        *               2: trigonometrical 
-        *               3: accidentally
-        *               4: ordered accident
-        */
-        function calculateColor(startColor, endColor, count, types) {
-            if(!types || types.length != 3) {
-                types = [1,1,1];
-            }
-            var start,end,
-                rgb = [],
-                color = [];
-            try {
-                try {
-                    start   = hex2rgb(startColor);
-                    end     = hex2rgb(endColor);
-                } catch (e) {
-                    //no hex-value => check if rgb
-                    checkRGB(startColor);
-                    start = startColor;
-                    checkRGB(endColor);
-                    end = endColor;
-                }
-                
-                rgb[0]  = calculateGradient(start[0], end[0], count, types[0]);
-                rgb[1]  = calculateGradient(start[1], end[1], count, types[1]);
-                rgb[2]  = calculateGradient(start[2], end[2], count, types[2]);
-            
-                for(var i = 0; i < count; i++) {
-                    color[i] = "#" + hex(rgb[0][i]) + hex(rgb[1][i]) + hex(rgb[2][i]);
-                }
-            } catch (e) {
-                throw e;
-            }
-            return color;
-        }
-        
-        return calculateColor;
-    }());
-    
-}(jQuery));
-
-
-(function($) {
 
     /*
     Usage Note:  
@@ -329,6 +132,10 @@
      * dates: Object for specifying how dates are displayed
      */
 
+    $.isnothing = function(o) {
+        return o === null || o === undefined;
+    };
+    
     $.ecoplot = (function() {
         
         function console_logger(msg) {
@@ -346,7 +153,7 @@
             extraTools = {},
             events = {},
             menubar = {},
-            debug		   = false,
+            debug = false,
             default_logger = {
                 log: function(msg,level) {console_logger(msg);},
                 info : function(msg) {console_logger(msg);},
@@ -358,106 +165,46 @@
                 show:true,
                 symbol:null
             },
-            default_toolbar = [
-               {
-                   classname: 'zoomout',
-                   title: "Zoom Out",
-                   icon: "ui-icon-zoomout",
-                   decorate: function(b,el) {
-                       b.click(function(e) {
-                           var pl = el.options.canvases;
-                           if(pl) {
-                               pl.render();
-                           }
-                       });
-                   }
-               },
-               {
-                   classname: 'reload',
-                   title: "Refresh data",
-                   icon: "ui-icon-refresh",
-                   decorate: function(b,el) {
-                       var $this = $(el);
-                       b.click(function(e) {
-                           $this.trigger('load',[$this, this]);
-                       });
-                   }
-               },
-               {
-                   classname: 'toggle-legend',
-                   title: "Toggle legend",
-                   icon: "ui-icon-comment",
-                   type: "checkbox",
-                   decorate: function(b,el) {
-                       var $this = $(el);
-                       b.toggle(function() {
-                            $('.legend',el).hide();
-                        },
-                        function() {
-                            $('.legend',el).show();
-                        }
-                      );
-                   }
-               },
-               {
-                   classname: 'options',
-                   title: "Edit plotting options",
-                   icon: "ui-icon-copy",
-                   type: "checkbox",
-                   decorate: function(b,el) {
-                       b.toggle(
-                               function() {
-                                   if(el.options.canvases) {
-                                       showPanel(el.options.canvases.current.panel,el);
-                                   }
-                               },
-                               function() {
-                                   if(el.options.canvases) {
-                                       hidePanel(el.options.canvases.current.panel,el);
-                                   }
+            tools = {
+                  'legend': {
+                               classname: 'toggle-legend',
+                               title: "Toggle legend",
+                               icon: "ui-icon-comment",
+                               type: "checkbox",
+                               decorate: function(b,instance) {
+                                   b.toggle(function() {
+                                        $('.legend',instance.container()).hide();
+                                    },
+                                    function() {
+                                        $('.legend',instance.container()).show();
+                                    }
+                                  );
                                }
-                       );
-                   }
-               },
-               {
-                   classname: 'save-image',
-                   title: "Save as image",
-                   icon: "ui-icon-image",
-                   decorate: function(b,el) {
-                       b.click(function() {
-                           var plot = $.ecoplot.instance(this);
-                           plot.saveAsPng();
-                       });
-                   }
-               },
-               {
-                   classname: 'about',
-                   title: 'About Economeric Plotting Plugin',
-                   icon: "ui-icon-contact",
-                   decorate: function(b,el) {
-                       b.click(function(e) {
-                           var html = "<div class='econometric-about-panel definition-list'>" +
-                           		      "<dl><dt>Version</dt><dd>" + _version + "</dd></dl>"+
-                                      "<dl><dt>Author</dt><dd>" + _authors + "</dd></dl>" +
-                                      "<dl><dt>Web page</dt><dd><a href='" + _home_page +
-                                      "' target='_blank'>" + _home_page + "</a></dd></dl>" +
-                                      "<dl><dt>jQuery</dt><dd>" + $.fn.jquery + "</dd></dl>" +
-                                      "<dl><dt>Flot</dt><dd>" + $.plot.version + "</dd></dl>" +
-                                      "</div>";
-                           $('<div title="Econometric plugin"></div>').html(html)
-                                .dialog({modal: true,
-                                        draggable: false,
-                                        resizable: false,
-                                        width: 500});
-                       });
-                   }
-               }
-               ],
-           defaults = {
-               responsetype:   'json',
-               requestMethod:  'get',
-               url: null,
-               autoload: true,
+                            },
+                   'about': {
+                               classname: 'about',
+                               title: 'About Economeric Plotting Plugin',
+                               icon: "ui-icon-contact",
+                               decorate: function(b,el) {
+                                   b.click(function(e) {
+                                       var html = "<div class='econometric-about-panel definition-list'>" +
+                                       		      "<dl><dt>Version</dt><dd>" + _version + "</dd></dl>"+
+                                                  "<dl><dt>Author</dt><dd>" + _authors + "</dd></dl>" +
+                                                  "<dl><dt>Web page</dt><dd><a href='" + _home_page +
+                                                  "' target='_blank'>" + _home_page + "</a></dd></dl>" +
+                                                  "<dl><dt>jQuery</dt><dd>" + $.fn.jquery + "</dd></dl>" +
+                                                  "<dl><dt>Flot</dt><dd>" + $.plot.version + "</dd></dl>" +
+                                                  "</div>";
+                                       $('<div title="Econometric plugin"></div>').html(html)
+                                            .dialog({modal: true,
+                                                    draggable: false,
+                                                    resizable: false,
+                                                    width: 500});
+                                   });
+                               }
+                            }
+            },
+            defaults = {
                elems: {},
                dates: {
                    show: true,
@@ -469,10 +216,9 @@
                    end: null,
                },
                command: {show: true, entry: null},
-               toolbar: default_toolbar,
+               toolbar: ['zoomout','reload','legend','edit','saveimage','about'],
                commandline: default_command_line,
                showplot: function(i) {return true;},
-               requestparams: {},
                show_tooltip: true,
                flot_options: {
                    xaxis: {}
@@ -482,41 +228,9 @@
                min_height: 200,
                defaultFade: 300,
                classname: 'ts-plot-module',
-               errorClass: 'dataErrorMessage',
-               startLoading: function($this) {
-                   var el = $('.loader',$this).show();
-                   var co = this.elems;
-                   //co.loader.css({'display':'block'});
-                   co.canvas_cont.css({'opacity':'0.7'});
-               },
-               stopLoading: function($this) {
-                   var co = this.elems;
-                   co.loader.css({'display':'none'});
-                   co.canvas_cont.css({'opacity':'1'});
-               },
-               parse: null
+               errorClass: 'dataErrorMessage'
            };
            
-
-        function showPanel(p,el) {
-            $('.secondary .panel').hide();
-            if(p) {
-                el.options.elems.body.addClass('with-panel');
-                p.show();
-            }
-            if(el.options.canvases) {
-                el.options.canvases.render();
-            }
-        }
-        
-        function hidePanel(name,el) {
-            $('.secondary .panel').hide();
-            el.options.elems.body.removeClass('with-panel');
-            if(el.options.canvases) {
-                el.options.canvases.render();
-            }
-        }
-
         function _addelement(el,holder) {
             var id  = el.id.toLowerCase();
             var p   = holder[id];
@@ -573,343 +287,11 @@
         /**
          * Register ecoplot events
          */
-        function _registerEvents($this) {
-            var opt = $this[0].options;
-            var elems = opt.elems;
-
-            $(window).resize(function() {
-                if(opt.canvases) {
-                    opt.canvases.render();
-                }
-            });
-
+        function _registerEvents(instance) {
+            var $this = instance.container();
             $.each(events, function(id,eve) {
                 $.ecoplot.log.debug('Registering event '+id);
                 eve.register($this);
-            });
-        }
-
-        function _get_data($this)  {
-            var elems = $this[0].options.elems,
-                ticker = elems.commandline.val();
-            if(!ticker) {return null;}
-            return {
-                start: elems.dates.start.val(),
-                end: elems.dates.end.val(),
-                period:'',
-                command:ticker
-            };
-        }
-
-        /**
-         * Create the editing panel for a given Flot canvas
-         */
-        function _editpanel(data, showplot, oldcanvas) {
-            // check if oldcanvas is the same. If so keep it!
-            var newcanvas = data,
-                table = null,
-                body  = null,
-                oldbody = null,
-                oseries = [];
-            if(!oldcanvas) {
-                $.ecoplot.log.debug('Creating editing panel.');
-                table = $('<table class="plot-options"></table>');
-                var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
-                head.html('<th>line</th><th>points</th><th>bars</th><th>y-axis1</th><th>y-axis2</th>');
-                body = $('<tbody></tbody>').appendTo(table);
-                table.click(function() {
-                    data.render();
-                });
-            }
-            else {
-                table = oldcanvas.edit;
-                body = $('tbody',table).html('');
-                oseries = oldcanvas.series;
-            }
-            //Add a column element to a series row
-            function tdinp(type,name,value,checked) {
-                var check = $('<input type="'+type+'" name="'+name+'" value="'+value+'">');
-                if(checked) {
-                    check.prop({'checked':true}); // jQuery 1.6.1
-                    //check.attr('checked',true);
-                }
-                return $('<td class="center"></td>').append(check);
-            }
-            
-            function checkmedia(med,show) {
-                if(med) {
-                    if(med.show === undefined) {
-                        med.show = show;
-                    }
-                }
-                else {
-                    med = {show: show};
-                }
-                return med;
-            }
-            
-            var circle = 0;
-            $.each(data.series, function(i,serie) {
-                var oserie = null;
-                if(oseries.length > i) {
-                    var os = oseries[i];
-                    if(serie.label === os.label) {
-                        oserie = os;
-                    }
-                }
-                if(circle>1) {
-                    circle = 0;
-                }
-                if(!oserie) {
-                    serie.lines  = checkmedia(serie.lines,showplot(i));
-                    serie.points = checkmedia(serie.points,false);
-                    serie.bars   = checkmedia(serie.bars,false);
-                }
-                else {
-                    serie.lines  = oserie.lines;
-                    serie.points = oserie.points;
-                    serie.bars   = oserie.bars;
-                    serie.yaxis  = oserie.yaxis;
-                    serie.xaxis  = oserie.xaxis;
-                }
-                var trt = $('<tr class="line'+circle+' serie'+i+' serie-title"></tr>').appendTo(body);
-                var tr  = $('<tr class="line'+circle+' serie'+i+' serie-option"></tr>').appendTo(body);
-                trt.append($('<td class="label" colspan="6">'+serie.label+'</td>'));
-                tr.append(tdinp('checkbox','line','line', serie.lines.show));
-                tr.append(tdinp('checkbox','points','points', serie.points.show));
-                tr.append(tdinp('checkbox','bars','bars', serie.bars.show));
-                tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis===1 : i===0));
-                tr.append(tdinp('radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis===2 : i>0));
-                circle += 1;
-            });
-            return table;
-        }
-
-        /**
-         * Internal function for adding a new Flot canvas
-         */
-        function _add(options, el_, data_, oldcanvas, panel) {
-            el_.addClass(options.canvasClass);
-            var typ = data_.type;
-            $.ecoplot.log.debug('Adding '+ typ + ' data to flot canvases.');
-            if(typ === "timeseries") {
-                typ = "time";
-            }
-            else {
-                typ = null;
-            }
-            
-            function show_elem(typ,el) {
-                return $("input[name='"+typ+"']",el).attr('checked') ? true : false;
-            } 
-
-            var renderflot = function(height,opts) {
-                var zoptions;
-                if(opts) {zoptions = $.extend(true, {}, this.options, opts);}
-                else {zoptions = this.options;}
-                if(height) {
-                    this.height = height;
-                }
-                this.elem.height(this.height);
-                var adata = [];
-                var series = this.series;
-                this.edit.find('tr.serie-option').each(function(i) {
-                    var el = $(this);
-                    var serie = series[i];
-                    serie.lines.show  = show_elem('line',el);
-                    serie.points.show = show_elem('points',el);
-                    serie.bars.show = show_elem('bars',el);
-                    if($("input[value='y-ax1']",el).attr("checked")) {
-                        serie.yaxis = 1;
-                    }
-                    else {
-                        serie.yaxis = 2;
-                    }
-                    if(serie.lines.show || serie.points.show || serie.bars.show) {
-                        adata.push(serie);
-                    }
-                });
-                this.flot = $.plot(this.elem, adata, zoptions);
-                return this;
-            };
-
-            var showplot = options.showplot;
-            if(oldcanvas && oldcanvas.options.xaxis.mode === typ) {
-                oldcanvas.name = data_.name;
-                oldcanvas.edit = _editpanel(data_,showplot,oldcanvas);
-                oldcanvas.series = data_.series;
-                data_ = oldcanvas;
-            }
-            else {
-                data_.panel  = panel;
-                data_.render = renderflot;
-                data_.options = $.extend(true, {}, options.flot_options, data_.options);
-                data_.options.xaxis.mode = typ;
-                data_.edit = _editpanel(data_,showplot);
-                panel.html('').append($('<h2>Series options</h2>')).append(data_.edit);
-            }
-            data_.elem   = el_;
-            return data_;
-        }
-
-        /**
-         * Internal function for rendering flot
-         */
-        var _render = function(idx,opts) {
-            var all = this.all;
-            if(all.length > 0) {
-                var c = this.current;
-                if(idx!==undefined && idx>=0 && idx < all.length) {
-                    c = all[idx];
-                }
-                if(c !== this.current) {
-                    //if(this.current) {
-                    //	this.current.hide();
-                    //}
-                    this.current = c;
-                }
-                c.render(this.height,opts);
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-
-        /**
-         * Internal function for setting up one or more new flot plot depending on data.
-         * It creates the options.canvases object of the form:
-         * 
-         * options.canvases = {
-         *      all: Array of canvases
-         *      height: height of canvas
-         *      current: index of current canvas or null
-         *      }
-         * 
-         * @param $this jQuery ecoplot element
-         * @params data Json data
-         */
-        function _set_new_canavases($this,data) {
-            var options = $this[0].options;
-            var container = options.elems.canvas_cont;
-            container.children().fadeOut(options.defaultFade).remove();
-            var outer = $('<div></div>').appendTo(container).height(container.height());
-            var datac,typ;
-            var oldcanvases  = options.canvases; 
-            options.canvases = {current: null,
-                    render: _render};
-            canvases = [];
-            options.canvases.all = canvases;
-
-            var optpanel = function(c) {
-                // create options panel if not available
-                var cn = 'option'+c;
-                var opt = $('.secondary .panel.'+cn,$this);
-                if(!opt.length) {
-                    var holder = $('.secondary',$this);
-                    opt = $('<div class = "panel '+cn+'"></div>').appendTo(holder);
-                }
-                return opt;
-            };
-            var oldcanvas = function(c) {
-                if(oldcanvases) {
-                    if(oldcanvases.all.length > c) {
-                        return oldcanvases.all[c];
-                    }
-                }
-            };
-
-            if(data) {
-                if(data.length === 1) {
-                    canvases.push(_add(options,outer,data[0],oldcanvas(0),optpanel(0)));
-                }
-                /* Setup tabs if data has more than one plot*/
-                else {
-                    /* Setup tabs */
-                    var cid, cv;
-                    var ul = $('<ul></ul>').appendTo(outer);
-                    $.each(data, function(i,v) {
-                        cid = 'canvas' + i;
-                        ul.append($('<li><a href="#' + cid + '">' + v.name + '</a></li>'));
-                        cv  = $('<div></div>').attr('id',cid);
-                        outer.append(cv);
-                        canvases.push(_add(options,cv,v,oldcanvas(i),optpanel(i)));
-                    });
-                    outer.tabs({
-                        show: function(event,ui) {
-                            if(options.canvases.height) {
-                                options.canvases.render(ui.index);
-                            }
-                        }
-                    }); 
-                }
-            }
-            options.canvases.height = outer.height()- $('ul',outer).height();
-            options.canvases.render(0);
-        }
-
-        /**
-         * Render data.
-         * @param $this, the ecoplot element
-         * @param data, Array of plot canvases
-         * 
-         * }
-         */
-        function _finaliseLoad($this,data) {
-            var instance = $.ecoplot.instance($this),
-                options = instance.settings();
-            var elems = options.elems;
-            if(elems.info) {
-                elems.info.html("");
-            }
-            instance.replace_all_canvases(data);
-            //_set_new_canavases($this, data);
-        }
-
-        function _request($this)  {
-            var options  = $this[0].options,
-                log = $.ecoplot.log;
-            if(!options.url)  {return;}
-            var dataplot = _get_data($this);
-            if(!dataplot) {return;}
-            log.info("Sending ajax request to " + options.url);
-            log.debug(dataplot.command + ' from ' + dataplot.start + ' end '+ dataplot.end);
-            var params   = {
-                timestamp: +new Date()
-            };
-            $.each(options.requestparams, function(key, param) {
-                params[key] = typeof param === "function" ? param() : param;
-            });
-            $this.trigger('eco_before_load', params);
-            params = $.extend(true, params, dataplot);
-            options.startLoading($this);
-            $.ajax({
-                url: options.url,
-                type: options.requestMethod,
-                data: $.param(params),
-                dataType: options.responsetype,
-                success: function(data) {
-                    log.info("Got the response from server");
-                    var ok = true;
-                    if(options.parse)  {
-                        try {
-                            data = options.parse(data,$this);
-                        }
-                        catch(e) {
-                            ok = false;
-                            log.error("Failed to parse. Error in line ",e);
-                        }
-                    }
-                    options.stopLoading($this);
-                    if(ok)  {
-                        try {
-                            _finaliseLoad($this,data);
-                        }
-                        catch(e2) {
-                            log.error("Failed after data has loaded",e2);
-                        }
-                    }
-                }
             });
         }
         
@@ -979,16 +361,13 @@
                 this.options = options;
                 $this.hide().html("");
                 options.paginate($this);
-                
-                _registerEvents($this);
+                _registerEvents(instance);
                 //$this.fadeIn(options.defaultFade);
                 $this.show();
                 if(options.layout) {
                     options.layout($this);
                 }
-                if(options.autoload) {
-                    $this.trigger("load");
-                }
+                $this.trigger('ecoplot-ready',instance);
             });
         }
 
@@ -998,7 +377,6 @@
         /////////////////////////////////////////////////////////////////          
         return {
             construct: _construct,
-            loadData: _request,
             addEvent: function(e){_addelement(e,events);},
             removeEvent: function(id){delete events[id];},
             debug: function(){return debug;},
@@ -1023,9 +401,19 @@
                     return menu.create($this[0]);
                 }
             },
+            tool: function(name) {
+                return tools[name];
+            },
             plugin: function(pname, pdata) {
+                var tbs = pdata.tools || {};
+                $.each(tbs, function(name,val) {
+                    tools[name] = val;
+                });
                 defaults[pname] = pdata.defaults || {},
                 plugins[pname] = pdata;
+            },
+            resize: function() {
+                $(window).trigger('resize');
             }
         };
     }());
@@ -1035,32 +423,6 @@
     $.fn.extend({
         ecoplot: $.ecoplot.construct
     });
-
-
-///////////////////////////////////////////////////
-//  Some Random Functions
-///////////////////////////////////////////////////
-
-    /*
-     * Excel like functionality.
-     */
-    $.ecoplot.shiftf9 = function() {
-        $(document).bind('keydown','Shift+f9', function(event) {
-            $('.'+$.ecoplot.plugin_class).each(function() {
-                var $this = $(this); 
-                $this.trigger("load");
-                this.options.elems.commandline.bind('keydown','Shift+f9', function(event) {
-                    $this.trigger("load");
-                });
-                this.options.dates.start.bind('keydown','Shift+f9', function(event) {
-                    $this.trigger("load");
-                });
-                this.options.dates.end.bind('keydown','Shift+f9', function(event) {
-                    $this.trigger("load");
-                });
-            });
-        });
-    };
     
 ///////////////////////////////////////////////////
 //  Default plugins
@@ -1079,21 +441,22 @@
             current: null,
         },
         init: function() {
-            var that = this;
+            var instance = this;
             $(window).resize(function() {
-                that.canvas_render();
+                instance.canvas_render();
             });
         },
         get_canvas: function(idx) {
             var canvases = this.data.canvases;
-            if(idx === undefined) {
+            if($.isnothing(idx)) {
                 idx = canvases.current;
             }
-            if(idx !== null) {
-                return {
-                        index:idx,
-                        canvas:canvases.all[idx]
-                        }; 
+            if(!$.isnothing(idx)) {
+                var c = canvases.all[idx];
+                if(c) {
+                    c.index = idx;
+                    return c;
+                }
             }
         },
         canvas_container: function() {
@@ -1102,24 +465,34 @@
         _get_serie_data: function(idx,canvas) {
             return canvas.series;
         },
+        // Render a canvas. If idx is null or undefined it renders the current canvas
         canvas_render: function(idx,opts) {
-            var c = this.get_canvas(idx),
+            var canvas = this.get_canvas(idx),
                 container = this.canvas_container(),
-                canvas = c ? c.canvas : null,
                 height,zoptions,adata;
             if(!canvas) {return;}
+            zoptions = canvas.options;
             height = container.height() - $('ul',container).height();
             canvas.elem.height(height);
-            if(opts) {zoptions = $.extend(true, {}, canvas.options, opts);}
-            else {zoptions = canvas.options;}
-            adata = this._get_serie_data(idx,canvas);
+            if(opts) {
+                zoptions = $.extend(true, {}, canvas.options, opts);
+                canvas.zoptions = zoptions;
+            }
+            else if(opts === null) {
+                zoptions = canvas.options;
+            }
+            else if(canvas.zoptions) {
+                zoptions = canvas.zoptions;
+            }
+            adata = this._get_serie_data(canvas.index,canvas);
             canvas.flot = $.plot(canvas.elem, adata, zoptions);
-            this.data.canvases.current = idx;
+            this.data.canvases.current = canvas.index;
             return canvas;
         },
         // Add a new canvas to the list
         add_canvas: function(data, oldcanvas) {
             var options = this.settings(),
+                instance = this,
                 $this = this.container(),
                 container = this.canvas_container(),
                 canvases = this.data.canvases,
@@ -1170,7 +543,7 @@
             
             function oldcanvas(c) {
                 if(oldcanvases.length > c) {
-                    return oldcanvases.all[c];
+                    return oldcanvases[c];
                 }
             };
 
@@ -1196,25 +569,193 @@
         }
     });
     
-    
-    $.ecoplot.plugin('plotselect',{
+
+    ///////////////////////////////////////////////////
+    //  plugin for loading data via ajax
+    ///////////////////////////////////////////////////
+    $.ecoplot.plugin('jsondata',{
+        defaults: {
+            autoload:true,
+            responsetype: 'json',
+            requestMethod: 'get',
+            url: '.',
+            requestparams: {},
+            load_opacity: '0.7',
+            parse: function(data,instance){return data;},
+            startLoading: function(instance) {
+                var options = instance.settings();
+                $('.loader',instance.container()).show();
+                instance.canvas_container().css({'opacity':options.load_opacity});
+            },
+            stopLoading: function(instance) {
+                $('.loader',instance.container()).css({'display':'none'});
+                instance.canvas_container().css({'opacity':'1'});
+            }
+        },
+        tools: {
+            'reload': {
+                        classname: 'reload',
+                        title: "Refresh data",
+                        icon: "ui-icon-refresh",
+                        decorate: function(b,instance) {
+                            b.click(function(e,o) {
+                                var inst = $.ecoplot.instance(this);
+                                if(inst) {
+                                    inst.ajaxload();
+                                }
+                            });
+                        }
+                    }
+        },
         init: function() {
-            this.plotselecting = false;
+            var options = this.settings().jsondata;
+            if(options.autoload) {
+                this.container().bind('ecoplot-ready',function(e,instance) {
+                    instance.ajaxload();
+                });
+            }
+        },
+        ajaxdata: function() {
+            var options = this.settings(),
+                elems = options.elems,
+                ticker = elems.commandline.val();
+            if(!ticker) {return;}
+            return {
+                start: elems.dates.start.val(),
+                end: elems.dates.end.val(),
+                period:'',
+                command:ticker
+            };
+        },
+        ajaxload: function() {
+            var options  = this.settings().jsondata,
+                log = $.ecoplot.log,
+                instance = this,
+                dataplot;
+            if(!options.url)  {return;}
+            dataplot = this.ajaxdata();
+            if(!dataplot) {return;}
+            log.info("Sending ajax request to " + options.url);
+            log.debug(dataplot.command + ' from ' + dataplot.start + ' end '+ dataplot.end);
+            var params   = {
+                timestamp: +new Date()
+            };
+            $.each(options.requestparams, function(key, param) {
+                params[key] = typeof param === "function" ? param() : param;
+            });
+            params = $.extend(true, params, dataplot);
+            options.startLoading(this);
+            $.ajax({
+                url: options.url,
+                type: options.requestMethod,
+                data: $.param(params),
+                dataType: options.responsetype,
+                success: function(data) {
+                    log.info("Got the response from server");
+                    var ok = true;
+                    try {
+                        data = options.parse(data,instance);
+                    }
+                    catch(e) {
+                        ok = false;
+                        log.error("Failed to parse. Error in line ",e);
+                    }
+                    options.stopLoading(instance);
+                    if(ok)  {
+                        try {
+                            instance._ajaxdone(data);
+                        }
+                        catch(e2) {
+                            log.error("Failed after data has loaded",e2);
+                        }
+                    }
+                }
+            });
+        },
+        _ajaxdone: function(data) {
+            var options = this.settings(),
+                elems = options.elems;
+            if(elems.info) {
+                elems.info.html("");
+            }
+            this.replace_all_canvases(data);
+        }
+    });
+    
+    
+    $.ecoplot.plugin('zoom',{
+        tools: {
+                'zoomout': {
+                            classname: 'zoomout',
+                            title: "Zoom Out",
+                            icon: "ui-icon-zoomout",
+                            decorate: function(b) {
+                                b.click(function(e) {
+                                    var instance = $.ecoplot.instance(this);
+                                    if(instance) {
+                                        instance.canvas_render(null,null);
+                                    }
+                                });
+                            }
+                }
+        },
+        init: function() {
+            this.data.zoom.selecting = false;
             this.container().bind('plotselecting', function() {
                 var instance = $.ecoplot.instance(this);
-                instance.plotselecting = true;
-            }).bind('plotselected', function() {
+                instance.data.selecting = true;
+            }).bind('plotselected', function(event, ranges) {
                 var instance = $.ecoplot.instance(this);
-                instance.plotselecting = false;
+                instance.data.selecting = false;
+                instance.zoom(ranges);
             });
+        },
+        zoom: function(ranges) {
+            var canvas = this.get_canvas();
+                opts = {},
+                ax = canvas ? canvas.flot.getAxes() : null;
+            if(!ax) {return;}
+            function checkax(axis)  {
+                if(axis.to - axis.from < 0.00001)  {
+                    axis.to = axis.from + 0.00001;
+                }
+                return {min: axis.from, max: axis.to};
+            }
+            if(ax.xaxis && ranges.xaxis)  {
+                opts.xaxis = checkax(ranges.xaxis);
+            }
+            if(ax.yaxis && ranges.yaxis)  {
+                opts.yaxis = checkax(ranges.yaxis);
+            }
+            if(ax.x2axis && ranges.x2axis)  {
+                opts.x2axis = checkax(ranges.x2axis);
+            }
+            if(ax.y2axis && ranges.y2axis)  {
+                opts.y2axis = checkax(ranges.y2axis);
+            }
+            // do the zooming
+            this.canvas_render(null,opts);
         }
     });
     
     
     $.ecoplot.plugin('png',{
+        tools: {
+            'saveimage': {
+                           classname: 'save-image',
+                           title: "Save as image",
+                           icon: "ui-icon-image",
+                           decorate: function(b,el) {
+                               b.click(function() {
+                                   var plot = $.ecoplot.instance(this);
+                                   plot.saveAsPng();
+                               });
+                           }
+                          }
+        },
         saveAsPng: function() {
             var c = this.get_canvas();
-                elem = c ? c.canvas.flot : null;
+                elem = c ? c.flot : null;
             if(elem) {
                 Canvas2Image.saveAsPNG(elem.getCanvas());
             }
@@ -1228,16 +769,55 @@
     $.ecoplot.plugin('edit',{
         defaults: {
             container_class: 'secondary',
+            panel_class: 'panel'
+        },
+        tools: {
+            edit: {
+                classname: 'options',
+                title: "Edit plotting options",
+                icon: "ui-icon-copy",
+                type: "checkbox",
+                decorate: function(b,instance) {
+                    b.toggle(
+                            function() {
+                                instance.showPanel();
+                            },
+                            function() {
+                                instance.hidePanel();
+                            }
+                    );
+                }
+            }
         },
         init: function() {
+            var options = this.settings().edit;
+            this.data.edit.panel_selector = '.'+options.container_class+' .'+options.panel_class;
             this.container().bind('ecoplot-after-add_canvas', function(event, data, oldcanvas) {
                 var instance = $.ecoplot.instance(this);
                 instance.create_edit_panel(data,oldcanvas);
             });
         },
+        showPanel: function(idx) {
+            var canvas = this.get_canvas(idx),
+                options = this.settings();
+            this._edit_panels().hide();
+            if(canvas) {
+                options.elems.body.addClass('with-panel');
+                canvas.edit.show();
+            }
+            $.ecoplot.resize();
+        },
+        hidePanel: function() {
+            this._edit_panels().hide();
+            this.settings().elems.body.removeClass('with-panel');
+            $.ecoplot.resize();
+        },
+        _edit_panels: function() {
+            return $(this.data.edit.panel_selector,this.container());
+        },
         edit_container: function(idx,create) {
             var holder = $('.'+this.settings().edit.container_class,this.container());
-            if(idx!==null && holder.length) {
+            if(idx!==null && idx!==undefined && holder.length) {
                 var cn = 'option'+idx;
                     p = $('.panel.'+cn,holder);
                 if(!p.length && create) {
@@ -1290,6 +870,7 @@
             
             if(!oldcanvas) {
                 $.ecoplot.log.debug('Creating editing panel.');
+                edit_panel.children().remove();
                 edit_panel.append($('<h2>Series options</h2>'));
                 table = $('<table class="plot-options"></table>').appendTo(edit_panel);
                 var head = $('<tr></tr>').appendTo($('<thead></thead>').appendTo(table));
@@ -1364,63 +945,119 @@
             return data;
         }
     });
+    
 
-///////////////////////////////////////////////////
-//  DEFAULT EVENTS
-///////////////////////////////////////////////////
-    $.ecoplot.addEvent({
-        id: 'load',
-        register: function($this) {
-            $this.bind("load", function(event, elem) {
-                if(!elem) {
-                    elem = $(this);
+    $.ecoplot.plugin('tooltip',{
+        defaults: {
+            tooltip_class: 'econometric-plot-tooltip',
+            fadein: 50,
+            timeout: 200,
+            offset: 5,
+        },
+        init: function() {
+            this.container().bind("plothover", function(event, pos, item) {
+                var instance = $.ecoplot.instance(this),
+                    previous = instance.data.tooltip.previous;
+                
+                if(instance.data.selecting) {
+                    return;
                 }
-                $.ecoplot.loadData(elem);
-                elem.trigger('after-reload',[elem, this]);
+                //if(pos.x || pos.y) {
+                //    $("#x").text(pos.x.toFixed(2));
+                //    $("#y").text(pos.y.toFixed(2));
+                //}
+                if(item) {
+                    if(!previous || 
+                       (previous.dataIndex !== item.dataIndex ||
+                        previous.seriesIndex !== item.seriesIndex)) {
+                        var text = instance.tooltipText(item);
+                        instance.showTooltip(item.pageX, item.pageY, text);
+                        instance.data.tooltip.previous = item;
+                    }
+                }
+                else if(instance.data.tooltip.container) {
+                    instance.hideTooltip();
+                }
             });
-        }
-    });
 
-    $.ecoplot.addEvent({
-        id: 'zoom',
-        className: 'zoom-out',
-        register: function(elem) {
-            
-            function checkax(axis)  {
-                if(axis.to - axis.from < 0.00001)  {
-                    axis.to = axis.from + 0.00001;
-                }
-                return {min: axis.from, max: axis.to};
+        },
+        tooltipText: function(item) {
+            var x = item.datapoint[0].toFixed(2),
+                y = item.datapoint[1].toFixed(2),
+                d = item.series.data[item.dataIndex],
+                text = d.length == 3 ? d[2] : item.series.label,
+                canvas = this.get_canvas();
+            if(canvas.type === 'timeseries') {
+                x = new Date(parseFloat(x));
+                x = $.datepicker.formatDate(this.settings().dates.format, x);
             }
-            
-            elem.bind("plotselected", function (event, ranges) {
-                var comm,
-                    options = this.options,
-                    canvases = options.canvases,
-                    pl, ax, opts = {};
-                if(!canvases) { return; }
-                pl = canvases.current;
-                ax = pl.flot.getAxes();
-                if(ax.xaxis && ranges.xaxis)  {
-                    opts.xaxis = checkax(ranges.xaxis);
+            text += " (" + x + "," + y + ")";
+            return text;
+        },
+        clearTooltip: function() {
+            var tooltip = this.data.tooltip;
+            if(tooltip.container) {
+                tooltip.container.remove();
+            }
+            tooltip.container = null;
+            tooltip.previous = null;
+        },
+        hideTooltip: function() {
+            var instance = this,
+                options = this.settings().tooltip;
+            instance.data.tooltip.timeout = setTimeout(function(){
+                instance.clearTooltip();
+            }, options.timeout );
+        },
+        showTooltip: function(x, y, contents) {
+            var instance = this,
+                options = this.settings(),
+                elem = this.get_canvas().elem,
+                width = elem.width(),
+                height = elem.height(),
+                position = elem.offset(),
+                xr = parseInt(x - position.left),
+                yr = parseInt(y - position.top),
+                offset = options.tooltip.offset,
+                tltp,w,h;
+            this.clearTooltip();
+            tltp = $('<div></div>').css({display: 'none'
+            }).addClass(options.tooltip.tooltip_class)
+              .html(contents)
+              .mouseenter(function() {
+                var timeout = instance.data.tooltip.timeout;
+                if(timeout) {
+                    clearTimeout(timeout);
                 }
-                if(ax.yaxis && ranges.yaxis)  {
-                    opts.yaxis = checkax(ranges.yaxis);
-                }
-                if(ax.x2axis && ranges.x2axis)  {
-                    opts.x2axis = checkax(ranges.x2axis);
-                }
-                if(ax.y2axis && ranges.y2axis)  {
-                    opts.y2axis = checkax(ranges.y2axis);
-                }
-                // do the zooming
-                pl.render(canvases.height,opts);
-                // don't fire event on the overview to prevent eternal loop
-                //overview.setSelection(ranges, true);
-            });
+            }).mouseleave(function(){
+                instance.hideTooltip();
+            }).appendTo(elem);
+            this.data.tooltip.container = tltp;
+            w = tltp.width();
+            h = tltp.height();
+            if(xr+w > 0.9*width) {
+                xr = Math.max(xr - w - offset,0);
+            }
+            else {
+                xr = xr + offset;
+            }
+            if(yr+h > 0.9*height) {
+                yr = Math.max(yr - h - offset,0);
+            }
+            else {
+                yr = yr + offset;
+            }
+            tltp.css({
+                position: 'absolute',
+                top:yr,
+                left:xr});
+            tltp.fadeIn(options.tooltip.fadein);
         }
     });
 
+///////////////////////////////////////////////////
+//  EVENTS & MENUS
+///////////////////////////////////////////////////
 
     $.ecoplot.addEvent({
         id: 'datepicker',
@@ -1440,87 +1077,6 @@
             });
         }
     });
-
-
-    $.ecoplot.addEvent({
-        id: 'tooltip',
-        register: function(elem) {
-            var cl = 'econometric-plot-tooltip',
-                time_out = 500;
-            
-            function tooltip_out(tltp, options) {
-                var timeout = setTimeout(function(){
-                    tltp.remove();
-                    options.previousPoint = null;
-                }, time_out );
-                tltp.data('timeout',timeout);
-            }
-            
-            function showTooltip(x, y, contents, options) {
-                return $('<div class="'+cl+'">' + contents + '</div>').css( {
-                    position: 'absolute',
-                    display: 'none',
-                    top: y + 5,
-                    left: x + 5
-                }).fadeIn(200).mouseenter(function() {
-                    var timeout = $(this).data('timeout');
-                    if(timeout) {
-                        clearTimeout(timeout);
-                    }
-                }).mouseleave(function(){
-                    var that = $(this);
-                    tooltip_out(that, options);
-                });
-            }
-
-            elem.bind("plothover", function(event, pos, item) {
-                var instance = $.ecoplot.instance(this),
-                    options = instance.settings(),
-                    canvas = options.canvases.current,
-                    previousPoint = options.previousPoint,
-                    $this, tltp;
-                
-                if(!options.show_tooltip || instance.plotselecting) {
-                    return;
-                }
-                //if(pos.x || pos.y) {
-                //    $("#x").text(pos.x.toFixed(2));
-                //    $("#y").text(pos.y.toFixed(2));
-                //}
-                
-                that = $(this);
-                tltp = $("."+cl,that);
-                
-                if (item) {
-                    if(!previousPoint || 
-                       (previousPoint.dataIndex !== item.dataIndex ||
-                        previousPoint.seriesIndex !== item.seriesIndex)) {
-                        var x = item.datapoint[0].toFixed(2),
-                            y = item.datapoint[1].toFixed(2),
-                            d = item.series.data[item.dataIndex],
-                            text = d.length == 3 ? d[2] : item.series.label;
-                        tltp.remove();
-                        if(canvas.type === 'timeseries') {
-                            x = new Date(parseFloat(x));
-                            x = $.datepicker.formatDate(options.dates.format, x);
-                        }
-                        text += " (" + x + "," + y + ")";
-                        showTooltip(item.pageX, item.pageY, text, options).appendTo(that);
-                        options.previousPoint = item;
-                    }
-                }
-                else if(tltp.length) {
-                    tooltip_out(tltp,options);
-                }
-            });
-
-        }
-    });
-
-
-/////////////////////////////////////////////////////////////
-//  MENUBAR
-/////////////////////////////////////////////////////////////
 
     /**
      * Add Command Input
@@ -1576,50 +1132,56 @@
         name: 'toolbar',
         classname: 'toolbar',
         create: function(elem) {
-            var toolbar = elem.options.toolbar;
-            var el = $('<div class="'+ this.classname + ' menu-item"></div>');
-            var id = elem.id+'_'+this.classname;
-            var sl = $('<span id="'+id+'"></span>').appendTo(el);
-            $.each(toolbar, function(i,el) {
-                id = elem.id+'_'+el.classname;
-                var tel = null, eel = null;
-                var ico;
-                if(!el.type || el.type === 'button') {
-                    tel = $('<button id="'+id+'" class="'+el.classname+'">'+el.title+'</button>');
+            var instance = $.ecoplot.instance(elem),
+                options = instance.settings(),
+                outer = $('<div class="'+ this.classname + ' menu-item"></div>'),
+                cid = instance.container().attr('id')+'_'+this.classname,
+                container = $('<span id="'+cid+'"></span>').appendTo(outer);
+            $.each(options.toolbar, function(i,name) {
+                var menu = $.ecoplot.tool(name);
+                if(menu) {
+                    var tel,eel,ico;
+                    id = cid+'_'+menu.classname;
+                    if(!menu.type || menu.type === 'button') {
+                        tel = $('<button id="'+id+'" class="'+menu.classname+'">'+menu.title+'</button>');
+                    }
+                    else if(menu.type === 'checkbox') {
+                        tel = $('<input id="'+id+'" type="checkbox" class="'+menu.classname+'"/>');
+                        eel = $('<label for="'+id+'">'+menu.title+'</label>');
+                    }
+                    if(tel) {
+                        container.append(tel);
+                        if(eel) {
+                            container.append(eel);
+                        }
+                        ico = {};
+                        if(menu.icon) {
+                            ico.primary = menu.icon;  
+                        }
+                        tel.button({
+                            text: menu.text || false,
+                            icons: ico
+                        });
+                        if(menu.decorate) {
+                            menu.decorate(tel,instance);
+                        }
+                    }
                 }
-                else if(el.type === 'checkbox') {
-                    tel = $('<input id="'+id+'" type="checkbox" class="'+el.classname+'"/>');
-                    eel = $('<label for="'+id+'">'+el.title+'</label>');
-                }
-                if(tel) {
-                    sl.append(tel);
-                    if(eel) {
-                        sl.append(eel);
-                    }
-                    ico = {};
-                    if(el.icon) {
-                        ico.primary = el.icon;  
-                    }
-                    tel.button({
-                        text: el.text || false,
-                        icons: ico
-                    });
-                    if(el.decorate) {
-                        el.decorate(tel,elem);
-                    }
+                else {
+                    $.ecoplot.info('Menu '+name+' not available.');
                 }
             });
-            return el;
+            return outer;
         }
     });
 
 
-///////////////////////////////////////////////////
-//  DEFAULT PAGINATION
-//
-// To override this set ``paginate`` to
-// the options.
-///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    //  DEFAULT PAGINATION
+    //
+    // To override this set ``paginate`` to
+    // the options.
+    ///////////////////////////////////////////////////
     $.ecoplot.default_paginate = function($this) {
         var options = $this[0].options,
             elems = options.elems,
@@ -1664,6 +1226,27 @@
             elems.canvas_cont.height(h-10).css({'margin':'5px 0'});
             el.height('auto');
         };
+    };
+    
+    ///////////////////////////////////////////////////
+    //  Excel like functionality.
+    ///////////////////////////////////////////////////
+    $.ecoplot.shiftf9 = function() {
+        $(document).bind('keydown','Shift+f9', function(event) {
+            $('.'+$.ecoplot.plugin_class).each(function() {
+                var $this = $(this); 
+                $this.trigger("load");
+                this.options.elems.commandline.bind('keydown','Shift+f9', function(event) {
+                    $this.trigger("load");
+                });
+                this.options.dates.start.bind('keydown','Shift+f9', function(event) {
+                    $this.trigger("load");
+                });
+                this.options.dates.end.bind('keydown','Shift+f9', function(event) {
+                    $this.trigger("load");
+                });
+            });
+        });
     };
 
 }(jQuery));

@@ -36,7 +36,7 @@ for fetching data.'''
         widget = html.Widget('div', id = id, cn = 'econometric-plot')\
                 .addData('height',height)\
                 .addData('start',start)\
-                .addData('url',service_url)
+                .addData('jsondata',{'url':service_url})
         if code:
             widget.addData('commandline',{'show':False,'symbol':code})
         return widget

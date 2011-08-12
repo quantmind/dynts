@@ -26,7 +26,7 @@
                         shadowSize: 0
                     },
                     selector = '.'+$.ecoplot.plugin_class,
-                    parsedata = function(data,el) {
+                    parsedata = function(data,instance) {
                         var res = data.result;
                         if(!res) {
                             res = data;
@@ -40,7 +40,7 @@
                     var start,
                         el = $(this),
                         options = el.data();
-                    options.parse = parsedata;
+                    options.jsondata.parse = parsedata;
                     options.flot_options = poptions;
                     options.showplot = function(i) {
                         return i<=1;
