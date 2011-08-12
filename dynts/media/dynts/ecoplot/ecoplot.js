@@ -1214,9 +1214,9 @@
     $.ecoplot.plugin('png',{
         saveAsPng: function() {
             var c = this.get_canvas();
-                elem = c ? c.canvas.elem : null;
+                elem = c ? c.canvas.flot : null;
             if(elem) {
-                Canvas2Image.saveAsPNG(elem);
+                Canvas2Image.saveAsPNG(elem.getCanvas());
             }
         }
     });
