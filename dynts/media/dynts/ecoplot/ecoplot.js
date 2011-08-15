@@ -155,7 +155,10 @@ plots, you can just fix the size of their placeholders.
                    legend: {
                        show:true,
                        position: "ne"
-                       }
+                       },
+                   grid: {
+                       show: true
+                   }
                },
                paginate: null,
                infoPanel: 'ecoplot-info',
@@ -667,13 +670,13 @@ plots, you can just fix the size of their placeholders.
                 plotOffset = flot.getPlotOffset(),
                 opts = flot.getOptions(),
                 c = flot.getPlaceholder(),
-                lw,tw,p,m,leg;
+                lw,tw;
             if(!legend) {return;}
             $('td.legendColorBox',legend).css({'padding-right':'5px'});
             canvas.options.legend.relative_position = null;
             legend.appendTo(c);
             if(rpos) {
-                if(rpos.left && rpos.top) {
+                if(!$.isnothing(rpos.left) && !$.isnothing(rpos.top)) {
                     var w = c.width(), h = c.height();
                     lw = Math.min(w - legend.width() - 2*options.legend_padding - 2,parseInt(rpos.left*w));
                     tw = Math.min(h - legend.height() - 2*options.legend_padding - 2,parseInt(rpos.top*h));
@@ -681,9 +684,9 @@ plots, you can just fix the size of their placeholders.
                 }
             }
             else {
-                p = opts.legend.position;
-                m = opts.legend.margin;
-                if (m[0] === null) {
+                var p = opts.legend.position,
+                    m = opts.legend.margin;
+                if (!$.isArray(m)) {
                     m = [m, m];
                 }
                 if (p.charAt(0) == "n") {
@@ -875,7 +878,21 @@ plots, you can just fix the size of their placeholders.
     });
     
     
-    $.ecoplot.plugin('png',{
+    $.ecoplot.plugin('dialog', {
+        dialog: function (title,body,opts) {
+            var c = this.container(),
+                d = $("<div></div>").appendTo(c).attr('title',title).html(body);
+            d.dialog(opts).bind('dialogclose', function() {
+                $(this).remove();
+            }).dialog('open');
+        }
+    });
+    
+    $.ecoplot.plugin('image',{
+        defaults: {
+            title: 'Save as image',
+            formats: ['png','jpeg','bmp']
+        },
         tools: {
             'saveimage': {
                            classname: 'save-image',
@@ -883,18 +900,85 @@ plots, you can just fix the size of their placeholders.
                            icon: "ui-icon-image",
                            decorate: function (b,el) {
                                b.click(function () {
-                                   var plot = $.ecoplot.instance(this);
-                                   plot.saveAsPng();
+                                   var instance = $.ecoplot.instance(this),
+                                       body = instance.saveimagehtml(),
+                                       opts = {
+                                           buttons: {
+                                               'Preview': function() {
+                                                   var d = $(this),
+                                                       xdim = $('input[name="scalex"]').val(),
+                                                       ydim = $('input[name="scaley"]').val(),
+                                                       as = $('select[name="format"]').val(),
+                                                       preview = $('.preview',d),
+                                                       img;
+                                                   try {
+                                                       xdim = parseInt(xdim,10);
+                                                       ydim = parseInt(ydim,10);
+                                                   }
+                                                   catch(e) {
+                                                       xdim=0;ydim=0;
+                                                   }
+                                                   img = instance.saveimage(as,xdim,ydim);
+                                                   if(!preview.length) {
+                                                       preview = $('<div class="preview"></div>').css({'margin':'10px 0'}).insertAfter($('form',d));
+                                                   }
+                                                   preview.html(img);
+                                                },
+                                                'Cancel': function() {
+                                                    $( this ).dialog( "close" );
+                                                }
+                                           }
+                                       };
+                                   instance.dialog('Save as image',body,opts);
+                                   //plot.saveAsPng();
                                });
                            }
                           }
         },
-        saveAsPng: function () {
-            var c = this.get_canvas(),
-                elem = c ? c.flot : null;
-            if(elem) {
-                Canvas2Image.saveAsPNG(elem.getCanvas());
+        init: function() {
+            var fopts = this.settings().flot_options,
+                grid  = fopts.grid || {};
+            fopts.grid = grid;
+            if(grid.show) {
+                if(!grid.canvasText) {
+                    grid.canvasText = {};
+                }
+                grid.canvasText.show = true;
             }
+        },
+        saveimagehtml: function() {
+            var options = '',
+                options = this.settings().image;
+            $.each(options.formats,function(i,v) {
+                options += '<option value="'+v+'">'+v+'</option>';
+            });
+            return "<form>"+
+            "<label for='scalex'>X dimension</label><input name='scalex' value=''/><br />"+
+            "<label for='scaley'>Y dimension</label><input name='scaley' value=''/><br />"+
+            "<label for='format'>format</label><select name='format'>"+options+"</select>"+
+            "</form>";
+        },
+        saveimage: function (strType, xdim, ydim) {
+            var target = this.get_canvas(),
+                canvas,oImg;
+            
+            if(!target) {return;}
+
+            canvas = target.flot.getCanvas();
+            if(strType == 'png') {
+                oImg = Canvas2Image.saveAsPNG(canvas, true, xdim, ydim);
+            }
+            else if (strType == "bmp") {
+                oImg = Canvas2Image.saveAsBMP(canvas, true, xdim, ydim);
+            }
+            else if (strType == "jpeg") {
+                oImg = Canvas2Image.saveAsJPEG(canvas, true, xdim, ydim);
+            }
+            if (!oImg) {
+                alert("Sorry, this browser is not capable of saving " + strType + " files!");
+                return false;
+            }
+            return oImg;
         }
     });
     
@@ -1124,7 +1208,7 @@ plots, you can just fix the size of their placeholders.
         defaults: {
             tooltip_class: 'econometric-plot-tooltip ui-state-default',
             fadein: 50,
-            timeout: 200,
+            timeout: 500,
             offset: 10
         },
         init: function () {
@@ -1151,7 +1235,7 @@ plots, you can just fix the size of their placeholders.
                     }
                 }
                 else if(instance.data.tooltip.container) {
-                    instance.hideTooltip();
+                    instance.timeoutTooltip();
                 }
             });
 
@@ -1195,17 +1279,24 @@ plots, you can just fix the size of their placeholders.
                 tooltip.container.remove();
             }
             tooltip.container = null;
+            tooltip.over = null;
             tooltip.previous = null;
+            tooltip.timeout = null;
         },
-        hideTooltip: function () {
+        // Set a timeout to the tooltip
+        timeoutTooltip: function () {
             var instance = this,
-                options = this.settings().tooltip;
-            instance.data.tooltip.timeout = setTimeout(function (){
-                instance.clearTooltip();
-            }, options.timeout );
+                options = this.settings().tooltip,
+                tooltip = instance.data.tooltip;
+            if(!tooltip.over) {
+                tooltip.timeout = setTimeout(function (){
+                    instance.clearTooltip();
+                }, options.timeout );
+            }
         },
         showTooltip: function (x, y, contents) {
             var instance = this,
+                tooltip = instance.data.tooltip,
                 options = this.settings(),
                 elem = this.get_canvas().elem,
                 width = elem.width(),
@@ -1216,18 +1307,20 @@ plots, you can just fix the size of their placeholders.
                 offset = options.tooltip.offset,
                 tltp,w,h;
             this.clearTooltip();
-            tltp = $('<div></div>').css({display: 'none'
+            this.data.tooltip.container = tltp = $('<div></div>').css({display: 'none'
             }).addClass(options.tooltip.tooltip_class)
               .html(contents)
               .mouseenter(function () {
-                var timeout = instance.data.tooltip.timeout;
-                if(timeout) {
-                    clearTimeout(timeout);
-                }
+                  var timeout = tooltip.timeout;
+                  if(timeout) {
+                      clearTimeout(timeout);
+                      tooltip.timeout = null;
+                  }
+                  tooltip.over = true;
             }).mouseleave(function (){
-                instance.hideTooltip();
+                tooltip.over = false;
+                instance.timeoutTooltip();
             }).appendTo(elem);
-            this.data.tooltip.container = tltp;
             w = tltp.width();
             h = tltp.height();
             if(xr+w > 0.9*width) {

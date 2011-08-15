@@ -393,6 +393,7 @@
             ctx.strokeStyle = options.grid.color;
             
             function addLabels(axis, labelGenerator) {
+                if(!axis){return;}
                 for (var i = 0; i < axis.ticks.length; ++i) {
                     var tick = axis.ticks[i];
                     if (!tick.label || tick.v < axis.min || tick.v > axis.max)
