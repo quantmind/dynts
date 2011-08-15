@@ -3,8 +3,7 @@
 {% block body %}
 {{ tag }} .menu,
 {{ tag }} .body {
-	width: 100%;
-	float: left;
+    overflow: hidden;
 }
 {{ tag }} .main {
 	width: 100%;
@@ -14,9 +13,6 @@
 {{ tag }} .secondary {
 	float: right;
 	height: 100%;
-}
-{{ tag }} .legend {
-    width: 150px;
 }
 {{ tag }} .canvas-container {
 	float: none;

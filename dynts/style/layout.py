@@ -18,11 +18,6 @@ CssContext('ecoplot_tooltip',
            data = {'padding':'2px'}
            )
 
-CssContext('ecoplot_legend',
-           tag = '.econometric-plot .legend',
-           data = {'padding':'10px'}
-           )
-
 CssContext('ecoplot_secondary',
            tag = '.secondary .panel',
            parent = ecoplot,

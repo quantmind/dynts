@@ -16,7 +16,8 @@ for fetching data.'''
     isplugin = True
     plugin_form = EcoForm
     description = 'Timeseries and Scatter Plots'
-    flot_media = html.Media(js = ['dynts/flot/excanvas.min.js',
+    flot_media = html.Media(js = ['djpcms/colorpicker/js/colorpicker.js',
+                                  'dynts/flot/excanvas.min.js',
                                   'dynts/flot/jquery.flot.js',
                                   'dynts/flot/jquery.flot.selection.js',
                                   'dynts/jquery.flot.text.js',

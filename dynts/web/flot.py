@@ -77,7 +77,7 @@ class Serie(JSONobject):
         self.label = label
         if data is None:
             data = ()
-        if 'scatter' in kwargs and kwargs['scatter']['extratype'] == 'date':
+        if extratype == 'date':
             ndata = []
             for a,b,dt in data:
                 ndata.append((a,b,pydate2flot(dt)))
@@ -85,6 +85,7 @@ class Serie(JSONobject):
         self.data = data
         for k,v in kwargs.items():
             setattr(self,k,v)
+        self.extratype = extratype
         if is_string(color):
             if not color.startswith('#'):
                 color = '#%s' % color

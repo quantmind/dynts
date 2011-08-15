@@ -21,9 +21,9 @@ dates inputs and the toolbar.
     
     CssContext('ecoplot_body',
                tag = '.body',
-               parent = ecoplot,
-               data = {'border':'none'
-                }
+               parent = ecoplot
+               #data = {'border':'none'
+               # }
                )
     
     CssContext('ecoplot_commandline',

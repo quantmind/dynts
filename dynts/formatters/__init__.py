@@ -81,8 +81,8 @@ class ToFlot(BaseFormatter):
                                        data = serie.data,
                                        lines = {'show':serie.lines},
                                        points = {'show':True},
-                                       scatter = {'show':serie.points,
-                                                  'extratype':ts.extratype})
+                                       scatter = {'show':serie.points},
+                                       extratype = ts.extratype)
                     res.add(serie)
             else:
                 for name,serie in zip(ts.names(),ts.series()):
