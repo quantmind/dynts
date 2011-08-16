@@ -990,7 +990,18 @@ plots, you can just fix the size of their placeholders.
         defaults: {
             editing_class: 'with-panel',
             container_class: 'panel-options',
-            panel_class: 'panel'
+            panel_class: 'panel',
+            headers: ['line','points','bars','shadow','fill','yaxis1','yaxis2']
+        },
+        data: {
+            headers: {
+                yaxis1: {
+                    label: 'y-axis1'
+                },
+                yaxis2: {
+                    label: 'y-axis2'
+                }
+            }
         },
         tools: {
             edit: {
@@ -1067,8 +1078,14 @@ plots, you can just fix the size of their placeholders.
             var adata = [];
             function show_elem(typ,el) {
                 if($("input[name='"+typ+"']",el).attr('checked') ? true : false) {
-                    var w = $("input[name='"+typ+"_width']",el).val();
-                    return w ? parseInt(w) || 1 : 0;
+                    var w = $("input[name='"+typ+"_width']",el);
+                    if(w.length) {
+                        w = w.val();
+                        return w ? parseInt(w) || 1 : 0;
+                    }
+                    else {
+                        return true;
+                    }
                 }
             }
             this.edit_container(idx).find('tr.serie-option').each(function (i) {
@@ -1081,6 +1098,7 @@ plots, you can just fix the size of their placeholders.
                 serie.points.show = serie.points.radius ? true : false;
                 serie.bars.barWidth = show_elem('bars',el);
                 serie.bars.show = serie.bars.barWidth ? true : false;
+                serie.lines.fill = show_elem('fill',el);
                 if($("input[value='y-ax1']",el).attr("checked")) {
                     serie.yaxis = 1;
                 }
@@ -1097,12 +1115,14 @@ plots, you can just fix the size of their placeholders.
             // check if oldcanvas is the same. If so keep it!
             var idx = this.data.canvases.all.length-1,
                 options = this.settings(),
+                data = this.data.edit,
                 cn = 'option'+idx,
                 body  = null,
                 oldbody = null,
                 oseries = [],
                 showplot = options.showplot,
                 edit_panel = this.edit_container(idx,true),
+                colspan = options.edit.headers.length,
                 table;
             
             if(!edit_panel.length) {
@@ -1116,13 +1136,20 @@ plots, you can just fix the size of their placeholders.
                         var instance = $.ecoplot.instance(this);
                         instance._set_legend_position(instance.get_canvas());
                         instance.canvas_render();
-                    }).appendTo(top).css({'margin-left':'10px'}); 
+                    }).appendTo(top).css({'margin-left':'10px'}),
+                    head, head_val; 
                 $.ecoplot.log.debug('Creating editing panel.');
                 edit_panel.children().remove();
                 edit_panel.append(top);
                 table = $('<table class="plot-options"></table>').appendTo(edit_panel);
-                var head = $('<tr></tr>').appendTo($('<thead class="ui-widget-header"></thead>').appendTo(table));
-                head.html('<th>line</th><th>points</th><th>bars</th><th>shadow</th><th>y-axis1</th><th>y-axis2</th>');
+                head = $('<tr></tr>').appendTo($('<thead class="ui-widget-header"></thead>').appendTo(table));
+                head_val = '';
+                $.each(options.edit.headers, function() {
+                    var headdata = data.headers[this] || {},
+                        label = headdata.label || this;
+                    head_val+='<th>'+label+'</th>';
+                });
+                head.html(head_val);
                 body = $('<tbody class="ui-widget-content"></tbody>').appendTo(table);
             }
             else {
@@ -1173,6 +1200,7 @@ plots, you can just fix the size of their placeholders.
                     serie.lines  = checkmedia(serie.lines,showplot(i));
                     serie.points = checkmedia(serie.points,false);
                     serie.bars   = checkmedia(serie.bars,false);
+                    serie.color  = i;
                 }
                 else {
                     serie.lines  = oserie.lines;
@@ -1181,21 +1209,22 @@ plots, you can just fix the size of their placeholders.
                     serie.yaxis  = oserie.yaxis;
                     serie.xaxis  = oserie.xaxis;
                     serie.shadowSize = oserie.shadowSize;
-                    serie.color  = $.isnothing(oserie.color) ? i : oserie.color;  
+                    serie.color  = $.isnothing(oserie.color) ? i : oserie.color;
                 }
                 shadow = serie.shadowSize || 0;
                 shadow = $('<input type="input" name="shadow" value="'+ shadow +'">').width('2em');
                 var trt = $('<tr class="serie'+i+' serie-title"></tr>').appendTo(body);
                 var tr  = $('<tr class="serie'+i+' serie-option"></tr>').appendTo(body);
                 if(parseInt((i+1)/2)*2 === i+1) {
-                    trt.addClass('ui-state-default');
-                    tr.addClass('ui-state-default');
+                    trt.addClass('ui-state-default').css('border','none');
+                    tr.addClass('ui-state-default').css('border','none');
                 }
-                trt.append($('<td class="label" colspan="6">'+serie.label+'</td>'));
+                trt.append($('<td class="label" colspan="'+colspan+'">'+serie.label+'</td>'));
                 tr.append(tdinp('checkbox','line','line', serie.lines.show, serie.lines.lineWidth || 3));
                 tr.append(tdinp('checkbox','points','points', serie.points.show, serie.points.radius || 3));
                 tr.append(tdinp('checkbox','bars','bars', serie.bars.show, serie.bars.barWidth || 3));
                 $('<td></td>').append(shadow).appendTo(tr);
+                tr.append(tdinp('checkbox','fill','fill', serie.lines.fill));
                 tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis===1 : i===0));
                 tr.append(tdinp('radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis===2 : i>0));
             });

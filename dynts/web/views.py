@@ -3,10 +3,19 @@ from djpcms.utils import gen_unique_id
 
 from ccy import dateFromString
 
+#cwidget = lambda : html.TextInput(default_style = 'color-picker')
+#colorfield = lambda x, l='color' : forms.CharField(label=l, initial=x,
+#                                                   widget = cwidget())
+
 
 class EcoForm(forms.Form):
     height = forms.IntegerField()
     service_url = forms.CharField(required = False)
+    
+    
+class PlotSettings(forms.Form):
+    line_fill = forms.BooleanField()
+    bar_fill = forms.BooleanField()
     
 
 class TimeSeriesView(views.ModelView):
