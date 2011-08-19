@@ -10,8 +10,38 @@
 (function($) {
     /**
      * DJPCMS Decorator for Econometric ploting
-     */
-    if($.djpcms && $.plot) {
+     */    
+    if($.fn.sparkline) {
+        
+        var sparkline_decorator = function (elem,config) {
+            $.each($('.sparkline',elem),function() {
+                var v = $(this),
+                    data = v.data(),
+                    serie = data.data,
+                    options = data.options;
+                if(serie) {
+                    v.sparkline(serie,options);
+                }
+            });
+        };
+        
+        $.djpcms.decorator({
+            id:"sparkline",
+            config: {},
+            decorate: sparkline_decorator
+        });
+
+        if(!$.djpcms.options.datatable) {
+            $.djpcms.options.datatable = {fnRowCallbacks:[]};
+        }
+
+        $.djpcms.options.datatable.fnRowCallbacks.push(
+            function(nRow, aData, iDisplayIndex, iDisplayIndexFull){
+                sparkline_decorator(nRow);
+            });
+    }
+    
+    if($.plot) {
             
         $.djpcms.decorator({
             id:"econometric_plot",

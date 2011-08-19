@@ -321,12 +321,14 @@
 
                 $.fn.sparkline[options.get('type')].call(this, values, options, width, height);
             };
+            
+            render.call(this);
             // jQuery 1.3.0 completely changed the meaning of :hidden :-/
-            if (($(this).html() && $(this).is(':hidden')) || ($.fn.jquery < "1.3.0" && $(this).parents().is(':hidden')) || !$(this).parents('body').length) {
-                pending.push([this, render]);
-            } else {
-                render.call(this);
-            }
+            //if (($(this).html() && $(this).is(':hidden')) || ($.fn.jquery < "1.3.0" && $(this).parents().is(':hidden')) || !$(this).parents('body').length) {
+            //    pending.push([this, render]);
+            //} else {
+            //    render.call(this);
+            //}
         });
     };
 

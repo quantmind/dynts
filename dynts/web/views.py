@@ -7,6 +7,17 @@ from ccy import dateFromString
 #colorfield = lambda x, l='color' : forms.CharField(label=l, initial=x,
 #                                                   widget = cwidget())
 
+FLOT_MEDIA = html.Media(js = ['dynts/flot/excanvas.min.js',
+                              'dynts/flot/jquery.flot.js',
+                              'dynts/flot/jquery.flot.selection.js',
+                              'dynts/jquery.flot.text.js',
+                              'dynts/base64.js',
+                              'dynts/canvas2image.js',
+                              'dynts/ecoplot/ecoplot.js',
+                              'dynts/decorator.js'])
+
+SPARKLINE_MEDIA = html.Media(js = ['dynts/jquery.sparkline.js'])
+
 
 class EcoForm(forms.Form):
     height = forms.IntegerField()
@@ -25,15 +36,7 @@ for fetching data.'''
     isplugin = True
     plugin_form = EcoForm
     description = 'Timeseries and Scatter Plots'
-    flot_media = html.Media(js = ['djpcms/colorpicker/js/colorpicker.js',
-                                  'dynts/flot/excanvas.min.js',
-                                  'dynts/flot/jquery.flot.js',
-                                  'dynts/flot/jquery.flot.selection.js',
-                                  'dynts/jquery.flot.text.js',
-                                  'dynts/base64.js',
-                                  'dynts/canvas2image.js',
-                                  'dynts/ecoplot/ecoplot.js',
-                                  'dynts/decorator.js'])
+    flot_media = FLOT_MEDIA
     _methods = ('get',)
     
     def get_widget(self, djp):
