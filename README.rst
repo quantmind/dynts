@@ -144,6 +144,13 @@ Kudos
 * numpy_ developers.
 
 
+JavaScript
+------------
+* jQuery flot_ plugin for web graphs.
+* jQuery Sparklines_ plugin for inline plotting.
+
+
+
 Community
 =================
 Trying to use an IRC channel **#dynts** on ``irc.freenode.net``
@@ -168,3 +175,5 @@ __ http://github.com/quantmind/dynts/issues
 .. _djpcms: http://djpcms.com
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _cython: http://www.cython.org/
+.. _flot: http://code.google.com/p/flot/
+.. _Sparklines: http://www.omnipotent.net/jquery.sparkline/

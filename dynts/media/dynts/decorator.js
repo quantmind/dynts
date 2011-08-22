@@ -38,6 +38,23 @@
         $.djpcms.options.datatable.fnRowCallbacks.push(
             function(nRow, aData, iDisplayIndex, iDisplayIndexFull){
                 sparkline_decorator(nRow);
+                $('.color',nRow).each(function() {
+                    var el = $(this),
+                        val = el.html();
+                    try {
+                        val = parseFloat(val);
+                        if(val < 0) {
+                            el.addClass('ui-state-error-text');
+                        }
+                        if(el.hasClass('arrow') && val === val) {
+                            var ar = $('<span></span>').css({'margin-right':'.3em',
+                                                         'float':'right'});
+                            val > 0 ? ar.addClass('ui-icon ui-icon-arrowthick-1-n') :
+                                      ar.addClass('ui-icon ui-icon-arrowthick-1-s');
+                            el.append(ar);
+                        }
+                    }catch(e){}
+                });
             });
     }
     
