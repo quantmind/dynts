@@ -71,6 +71,7 @@ plots, you can just fix the size of their placeholders.
             authors = 'Luca Sbardella',
             home_page = 'https://github.com/quantmind/dynts',
             plugin_class = "econometric-plot",
+            idkey = 'ecoplot_instance_id',
             instances = [],
             plugins = {},
             extraTools = {},
@@ -324,13 +325,13 @@ plots, you can just fix the size of their placeholders.
             
             return this.each(function (i) {
                 var $this = $(this),
-                    instance_id = $this.data("ecoplot-instance-id"),
+                    instance_id = $this.data(idkey),
                     instance;
                 if(typeof instance_id !== "undefined" && instances[instance_id]) {
                     instances[instance_id].destroy();
                 }
                 instance_id = parseInt(instances.push({}),10) - 1;
-                $this.data('ecoplot-instance-id',instance_id)
+                $this.data(idkey,instance_id)
                      .attr({'id':plugin_class+"_"+instance_id})
                      .addClass(plugin_class);
                 
@@ -383,7 +384,7 @@ plots, you can just fix the size of their placeholders.
                 if(!o.length && typeof elem === "string") { o = $("#" + elem); }
                 if(!o.length) { return null; }
                 return instances[o.closest("."+plugin_class)
-                                 .data("ecoplot-instance-id")] || null;
+                                  .data(idkey)] || null;
             },
             log: default_logger,
             'version': version,
