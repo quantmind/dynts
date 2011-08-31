@@ -374,6 +374,7 @@ plots, you can just fix the size of their placeholders.
             construct: _construct,
             addEvent: function (e){_addelement(e,events);},
             removeEvent: function (id){delete events[id];},
+            'defaults': defaults,
             debug: function (){return debug;},
             setdebug: function (v){debug = v;},
             count: function () {return instances.length;},
@@ -986,12 +987,17 @@ plots, you can just fix the size of their placeholders.
     
     ///////////////////////////////////////////////////
     //  Edit plugin
+    //
+    // Plugin for editing series
     ///////////////////////////////////////////////////
     $.ecoplot.plugin('edit',{
         defaults: {
             editing_class: 'with-panel',
             container_class: 'panel-options',
             panel_class: 'panel',
+            popup: false,
+            autoredraw: false,
+            render_as: 'table',
             headers: ['line','points','bars','shadow','fill','yaxis1','yaxis2']
         },
         data: {
@@ -1019,6 +1025,9 @@ plots, you can just fix the size of their placeholders.
                                 instance.hidePanel();
                             }
                     );
+                    instance.container().bind('click-edit-options', function() {
+                    	b.click().button('refresh');
+                    });
                 }
             }
         },
@@ -1041,13 +1050,32 @@ plots, you can just fix the size of their placeholders.
         },
         showPanel: function (idx) {
             var canvas = this.get_canvas(idx),
-                options = this.settings();
-            this._edit_panels().hide();
+                options = this.settings(),
+                edit = options.edit;
             if(canvas) {
-                options.elems.body.addClass(options.edit.editing_class);
-                this.edit_container(canvas.index).show();
+            	if(edit.popup) {
+            		var c = this.edit_container(canvas.index),
+            			width = c.width(),
+            			height = c.height(),
+            			position = edit.popup.position || ['right','top'],
+            			title = edit.title || 'Series options';
+            		c.dialog({'width':'auto',
+            				  'height':'auto',
+            				  'position':position,
+            				  'title':title,
+            				  beforeClose: function(event, ui) {
+            					  var index = $(this).data('ecoplot'),
+            					  	  instance = $.ecoplot.instance(index);
+            					  instance.container().trigger('click-edit-options');
+            				  }}).data('ecoplot',this.index());
+            	}
+            	else {
+            		this._edit_panels().hide();
+            		options.elems.body.addClass(edit.editing_class);
+            		this.edit_container(canvas.index).show();
+            		$.ecoplot.resize();
+            	}
             }
-            $.ecoplot.resize();
         },
         hidePanel: function () {
             this._edit_panels().hide();
@@ -1057,6 +1085,19 @@ plots, you can just fix the size of their placeholders.
         _edit_panels: function () {
             return $(this.data.edit.panel_selector,this.container());
         },
+        //
+        // Get the series editing panel
+        _edit_panel: function(idx,create,holder) {
+        	var cn = 'panel ecoplot-' + this.index() + ' option-' + idx;
+        		se = $.selector_from_class(cn),
+        		p = $(se);
+        	if(!p.length && create) {
+        		p = $('<div class = "'+cn+'"></div>').appendTo(holder);
+        	}
+        	return p;
+        },
+        // The edit container for idx canvas
+        // idx is the canvas number, create is a flag which enable creation
         edit_container: function (idx,create) {
             var options = this.settings().edit,
                 holder = $('.'+options.container_class,this.container());
@@ -1064,12 +1105,7 @@ plots, you can just fix the size of their placeholders.
                 holder = $('<div></div>').addClass(options.container_class);
             }
             if(!$.isnothing(idx) && holder.length) {
-                var cn = 'option'+idx,
-                    p = $('.panel.'+cn,holder);
-                if(!p.length && create) {
-                    p = $('<div class = "panel '+cn+'"></div>').appendTo(holder);
-                }
-                return p;
+            	return this._edit_panel(idx,create,holder);
             }
             else {
                 return holder;
@@ -1112,10 +1148,12 @@ plots, you can just fix the size of their placeholders.
             });
             return adata;
         },
+        // Create the editing panel
         create_edit_panel: function (canvas) {
             // check if oldcanvas is the same. If so keep it!
             var idx = this.data.canvases.all.length-1,
                 options = this.settings(),
+                edit = options.edit,
                 data = this.data.edit,
                 cn = 'option'+idx,
                 body  = null,
@@ -1123,8 +1161,8 @@ plots, you can just fix the size of their placeholders.
                 oseries = [],
                 showplot = options.showplot,
                 edit_panel = this.edit_container(idx,true),
-                colspan = options.edit.headers.length,
-                table;
+                colspan = edit.headers.length,
+                series_container;
             
             if(!edit_panel.length) {
                 return;
@@ -1132,26 +1170,40 @@ plots, you can just fix the size of their placeholders.
             
             if(!canvas.oseries) {
                 var top = $('<div></div>').css({'overflow':'hidden','margin-bottom':'10px'}),
-                    h2 = $('<h2>Series</h2>').css({'float':'left','margin':0}).appendTo(top),
-                    redraw = $("<button>Redraw</button>").button().click(function() {
+                    head, head_val;
+                $.ecoplot.log.debug('Creating editing panel.');
+                if(edit.autoredraw) {
+                	edit_panel.data('ecoplot_instance',this.index());
+                	edit_panel.click(function() {
+                		 var instance = $.ecoplot.instance($(this).data('ecoplot_instance'));
+                		 instance._set_legend_position(instance.get_canvas());
+                         instance.canvas_render();
+                	});
+                }
+                else {
+                	$('<h2>Series</h2>').css({'float':'left','margin':0}).appendTo(top);
+                    $("<button>Redraw</button>").button().click(function() {
                         var instance = $.ecoplot.instance(this);
                         instance._set_legend_position(instance.get_canvas());
                         instance.canvas_render();
-                    }).appendTo(top).css({'margin-left':'10px'}),
-                    head, head_val; 
-                $.ecoplot.log.debug('Creating editing panel.');
+                    }).appendTo(top).css({'margin-left':'10px'});
+                }
                 edit_panel.children().remove();
                 edit_panel.append(top);
-                table = $('<table class="plot-options"></table>').appendTo(edit_panel);
-                head = $('<tr></tr>').appendTo($('<thead class="ui-widget-header"></thead>').appendTo(table));
-                head_val = '';
-                $.each(options.edit.headers, function() {
-                    var headdata = data.headers[this] || {},
-                        label = headdata.label || this;
-                    head_val+='<th>'+label+'</th>';
-                });
-                head.html(head_val);
-                body = $('<tbody class="ui-widget-content"></tbody>').appendTo(table);
+                if(edit.render_as === 'table') {
+	                series_container = $('<table class="plot-options"></table>');
+	                head = $('<tr></tr>').appendTo($('<thead class="ui-state-default"></thead>')
+	                					 .appendTo(series_container));
+	                head_val = '';
+	                $.each(options.edit.headers, function() {
+	                    var headdata = data.headers[this] || {},
+	                        label = headdata.label || this;
+	                    head_val+='<th class="center">'+label+'</th>';
+	                });
+	                head.html(head_val);
+	                body = $('<tbody class="ui-widget-content"></tbody>').appendTo(series_container);
+                }
+                series_container.appendTo(edit_panel).css({'margin':'0 auto 20px'})
             }
             else {
                 table = $('table',edit_panel);

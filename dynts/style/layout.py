@@ -26,8 +26,20 @@ CssContext('ecoplot_secondary',
 
 CssContext('ecoplot_plot_options',
            tag = 'table.plot-options th, table.plot-options td',
-           parent = ecoplot,
-           data = {'padding': '0 5px',
-                   'text_align': 'center'}
+           data = {'padding': '0 5px'}
+           )
+
+CssContext('ecoplot_plot_serie_title',
+           tag = 'table.plot-options tr.serie-title td',
+           data = {'font_size': '120%',
+                   'text_align':'left',
+                   'font_weight':'bold',
+                   'color':'#222',
+                   'padding': '10px 5px 5px'}
+           )
+
+CssContext('ecoplot_plot_serie_options',
+           tag = 'table.plot-options tr.serie-option td',
+           data = {'padding': '0 5px 5px'}
            )
 
