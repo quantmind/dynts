@@ -1,5 +1,5 @@
 from djpcms import views, forms, html
-from djpcms.utils import gen_unique_id
+from djpcms.utils import gen_unique_id, media
 
 from ccy import dateFromString
 
@@ -7,7 +7,7 @@ from ccy import dateFromString
 #colorfield = lambda x, l='color' : forms.CharField(label=l, initial=x,
 #                                                   widget = cwidget())
 
-FLOT_MEDIA = html.Media(js = ['dynts/flot/excanvas.min.js',
+FLOT_MEDIA = media.Media(js = ['dynts/flot/excanvas.min.js',
                               'dynts/flot/jquery.flot.js',
                               'dynts/flot/jquery.flot.selection.js',
                               'dynts/jquery.flot.text.js',
@@ -16,7 +16,7 @@ FLOT_MEDIA = html.Media(js = ['dynts/flot/excanvas.min.js',
                               'dynts/ecoplot/ecoplot.js',
                               'dynts/decorator.js'])
 
-SPARKLINE_MEDIA = html.Media(js = ['dynts/jquery.sparkline.js'])
+SPARKLINE_MEDIA = media.Media(js = ['dynts/jquery.sparkline.js'])
 
 
 class EcoForm(forms.Form):
@@ -79,6 +79,6 @@ for fetching data.'''
             end = dateFromString(str(end))
         return self.appmodel.getdata(request,cts,start,end)
     
-    def media(self):
+    def media(self, djp=None):
         return self.flot_media
     
