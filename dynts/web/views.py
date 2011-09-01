@@ -51,7 +51,7 @@ for fetching data.'''
                 .addData('start',start)\
                 .addData('jsondata',{'url':service_url})
         if code:
-            widget.addData('commandline',{'show':False,'symbol':code})
+            widget.addData('command',{'show':False,'symbol':code})
         return widget
             
     def render(self, djp):

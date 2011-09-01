@@ -28,7 +28,7 @@ plots, you can just fix the size of their placeholders.
 (function($,h,c){var a=$([]),e=$.resize=$.extend($.resize,{}),i,k="setTimeout",j="resize",d=j+"-special-event",b="delay",f="throttleWindow";e[b]=250;e[f]=true;$.event.special[j]={setup:function(){if(!e[f]&&this[k]){return false}var l=$(this);a=a.add(l);$.data(this,d,{w:l.width(),h:l.height()});if(a.length===1){g()}},teardown:function(){if(!e[f]&&this[k]){return false}var l=$(this);a=a.not(l);l.removeData(d);if(!a.length){clearTimeout(i)}},add:function(l){if(!e[f]&&this[k]){return false}var n;function m(s,o,p){var q=$(this),r=$.data(this,d);r.w=o!==c?o:q.width();r.h=p!==c?p:q.height();n.apply(this,arguments)}if($.isFunction(l)){n=l;return m}else{n=l.handler;l.handler=m}}};function g(){i=h[k](function(){a.each(function(){var n=$(this),m=n.width(),l=n.height(),o=$.data(this,d);if(m!==o.w||l!==o.h){n.trigger(j,[o.w=m,o.h=l])}});g()},e[b])}})(jQuery,this);
 
 
-/*global jQuery */
+/* global jQuery */
 (function ($) {
 
     $.isnothing = function (o) {
@@ -43,22 +43,20 @@ plots, you can just fix the size of their placeholders.
     };
     
     /*
-    Usage Note:  
-    -----------
-
-    $('.ploting-elems').ecoplot(options);
-
-    options is an object containing several input parameters. All parameters
-    have sensible default values apart from one which
-    needs to supplied.
-
-      url: String for the remote data provider URL.
-
-    The most common options are:
-
-     * flot_options: Object containing Flot-specific options
-     * dates: Object for specifying how dates are displayed
-     */    
+	 * Usage Note: -----------
+	 * 
+	 * $('.ploting-elems').ecoplot(options);
+	 * 
+	 * options is an object containing several input parameters. All parameters
+	 * have sensible default values apart from one which needs to supplied.
+	 * 
+	 * url: String for the remote data provider URL.
+	 * 
+	 * The most common options are:
+	 * 
+	 * flot_options: Object containing Flot-specific options dates: Object for
+	 * specifying how dates are displayed
+	 */    
     $.ecoplot = (function () {
         
         function console_logger(msg) {
@@ -75,7 +73,6 @@ plots, you can just fix the size of their placeholders.
             instances = [],
             plugins = {},
             extraTools = {},
-            events = {},
             menubar = {},
             debug = false,
             default_logger = {
@@ -83,11 +80,6 @@ plots, you can just fix the size of their placeholders.
                 info : function (msg) {console_logger(msg);},
                 debug : function (msg) {console_logger(msg);},
                 error : function (msg) {console_logger(msg);}                
-            },
-            default_command_line = {
-                css:null,
-                show:true,
-                symbol:null
             },
             tools = {
                   'legend': {
@@ -136,19 +128,6 @@ plots, you can just fix the size of their placeholders.
                             }
             },
             defaults = {
-               elems: {},
-               dates: {
-                   show: true,
-                   label: 'Period',
-                   format: "d M yy",
-                   cn: "ts-input-date",
-                   default_month_interval: 12,
-                   start: null,
-                   end: null
-               },
-               command: {show: true, entry: null},
-               toolbar: ['zoomout','reload','legend','edit','saveimage','about'],
-               commandline: default_command_line,
                showplot: function (i) {return true;},
                show_tooltip: true,
                flot_options: {
@@ -161,7 +140,6 @@ plots, you can just fix the size of their placeholders.
                        show: true
                    }
                },
-               paginate: null,
                infoPanel: 'ecoplot-info',
                min_height: 200,
                defaultFade: 300,
@@ -170,62 +148,25 @@ plots, you can just fix the size of their placeholders.
            };
         
         
-        ///////////////////////////////////////////////////////
-        //  DEFAULT PAGINATION
+        // /////////////////////////////////////////////////////
+        // DEFAULT PAGINATION
         //
-        // To override this set ``paginate`` int the options.
-        ///////////////////////////////////////////////////////
-        function default_paginate(instance) {
-            var options = instance.settings(),
-                container = instance.container(),
-                elems = options.elems,
-                cmdlin = options.commandline,
-                upperm = $('<div class="menubar upper ui-widget-header"></div>'),
-                lowerm = $('<div class="menubar lower ui-widget-header"></div>');
+        // To override create a plugin with paginate function.
+        // /////////////////////////////////////////////////////
+        function _set_dimensions(instance) {
+        	var options = instance.settings(),
+        		data = instance.data,
+                container = instance.container().show(),
+                height = container.height(),
+                h;
 
-            // Add to containers, the menu and the main body
-            elems.menu = $('<div class="menu"></div>').appendTo(container);
-            elems.body = $('<div class="body ui-widget-content"></div>')
-                            .appendTo(container).height(options.height);
-            
-            // Add two pages to the body container
-            var page  = $('<div class="main"></div>').appendTo(elems.body);
-            var page2 = $('<div class="secondary"></div>').appendTo(elems.body);
-
-            instance.canvas_container(true).appendTo(page);
-            
-            if(instance.edit_container) {
-                instance.edit_container(null,true).appendTo(page2);
+            if(height < 10) {
+                height = options.height || options.min_height;
             }
-
-            /* The menu bar */
-            elems.menu.append(upperm).append(lowerm);
-
-            elems.commandline = $.ecoplot.getmenu('command',container).appendTo(upperm);
-            $.ecoplot.getmenu('dates',container).appendTo(lowerm);
-            lowerm.append($.ecoplot.getmenu('toolbar',container));
-            lowerm.append($('<div></div>').addClass(options.jsondata.loader_class));
-
-            if(cmdlin.symbol)  {
-                elems.commandline.val(cmdlin.symbol+"");
-            }
-            if(!cmdlin.show) {
-                upperm.hide();
-            }
-            instance.layout = function () {
-                var options = this.settings(),
-                    elems = options.elems,
-                    container = this.container(),
-                    height = container.height(),
-                    h;
-                if(height < 10) {
-                    height = options.height || options.min_height;
-                }
-                h = Math.max(height - elems.menu.height(),30);
-                elems.body.height(h);
-                instance.canvas_container().height(h-10).css({'margin':'5px 0'});
-                container.height('auto');
-            };
+            h = Math.max(height - data.menu.container.height(),30);
+            data.canvases.body.height(h);
+            instance.canvas_container().height(h-10).css({'margin':'5px 0'});
+            container.height('auto');
         }
            
         function _addelement(el,holder) {
@@ -238,75 +179,37 @@ plots, you can just fix the size of their placeholders.
         }
 
         function _parseOptions(options_) {
-            var options = {
-                    elems: {}
-                },
-                cl;
+            var options = {};
             $.extend(true, options, defaults, options_);
-            cl = options.commandline;
-            if(!cl) {
-                cl = default_command_line;
-                options.commandline = cl;
-            }
-            if(cl.symbol) {
-                cl.show = false;
-            }
-            _set_default_dates(options.dates);
-            if(!options.paginate) {
-                options.paginate = default_paginate;
-            }
             return options;
-        }
-
-        /**
-         * Set default dates in the date panel.
-         */
-        function _set_default_dates(dates)  {
-            var td, v1, v2;
-            if(dates.end) {
-                td = new Date(dates.end);
-            }
-            else {
-                td = new Date();
-            }
-            v2 = $.datepicker.formatDate(dates.format, td);
-            if(!dates.start) {
-                td.setMonth(td.getMonth() - dates.default_month_interval);
-            }
-            else {
-                td = new Date(dates.start);
-            }
-            v1 = $.datepicker.formatDate(dates.format, td);
-            dates.start = v1;
-            dates.end = v2;
-        }
-
-        /**
-         * Register ecoplot events
-         */
-        function _registerEvents(instance) {
-            var $this = instance.container();
-            $.each(events, function (id,eve) {
-                $.ecoplot.log.debug('Registering event '+id);
-                eve.register($this);
-            });
         }
         
         function make_instance(index_, container_, settings_) {
-            return {
-                data: {},
-                settings: function () { return settings_; },
-                index: function () { return index_; },
-                container: function () { return container_; }
-            };
-        }
-        /**
-         * The jQuery plugin constructor
-         */
-        function _construct(options_) {
-            var options = _parseOptions(options_);
-            
-            function make_function (fname,func) {
+        	var _layouts = [],
+        		_inputs = [],
+        		instance = {
+	                data: {},
+	                settings: function () { return settings_; },
+	                index: function () { return index_; },
+	                container: function () { return container_; },
+	                paginate: function() {
+	                	container_.hide().html("");
+	                	$.each(_layouts, function(i,layout) {
+	                		layout();
+	                	});
+	                	_set_dimensions(this);
+	                	container_.trigger('ecoplot-ready',instance);
+	                },
+	                input_data: function() {
+	                	var d = {}
+	                	$.each(_inputs,function(i,inp) {
+	                		$.extend(d,inp());
+	                	});
+	                	return d;
+	                }
+            	};
+        	
+        	function make_function (fname,func) {
                 if(fname.charAt(0) == '_') {
                     return func;
                 }
@@ -322,7 +225,39 @@ plots, you can just fix the size of their placeholders.
                     };
                 }
             }
+        	
+        	// Add plugins
+            $.each(plugins, function (name,extension) {
+            	$.ecoplot.log.debug('Processing plugin '+name+' on instance '+index_);
+                instance.data[name] = $.extend({},extension.data || {});                    
+                $.each(extension,function (fname,elem) {
+                    if(fname == 'init') {
+                        elem.apply(instance);
+                    }
+                    else if(fname == 'layout') {
+                    	_layouts.push($.proxy(elem,instance));
+                    }
+                    else if(fname == 'get_input_data') {
+                    	_inputs.push($.proxy(elem,instance));
+                    }
+                    else if(fname !== 'data') {
+                        if($.isFunction(elem)) {
+                            elem = make_function (fname,elem);
+                        }
+                        instance[fname] = elem;
+                    }
+                });
+            });
             
+            return instance;
+        }
+        /**
+		 * The jQuery plugin constructor
+		 */
+        function _construct(options_) {
+            var options = _parseOptions(options_);
+            
+            // Loop over each element and initialize the jquery plugin.
             return this.each(function (i) {
                 var $this = $(this),
                     instance_id = $this.data(idkey),
@@ -337,42 +272,16 @@ plots, you can just fix the size of their placeholders.
                 
                 instance = instances[instance_id] = make_instance(
                         instance_id,$this, options);
-                
-                // Add plugins
-                $.each(plugins, function (name,extension) {
-                    instance.data[name] = $.extend({},extension.data || {});                    
-                    $.each(extension,function (fname,elem) {
-                        if(fname == 'init') {
-                            elem.apply(instance);
-                        }
-                        else if(fname !== 'data') {
-                            if($.isFunction(elem)) {
-                                elem = make_function (fname,elem);
-                            }
-                            instance[fname] = elem;
-                        }
-                    });
-                });
-                
-                this.options = options;
-                $this.hide().html("");
-                options.paginate(instance);
-                _registerEvents(instance);
-                $this.show();
-                if(instance.layout) {
-                    instance.layout();
-                }
-                $this.trigger('ecoplot-ready',instance);
+                instance.paginate();
             });
         }
 
 
-        /////////////////////////////////////////////////////////////////
-        //		API FUNCTIONS AND PROPERTIES
-        /////////////////////////////////////////////////////////////////          
+        // ///////////////////////////////////////////////////////////////
+        // API FUNCTIONS AND PROPERTIES
+        // ///////////////////////////////////////////////////////////////
         return {
             construct: _construct,
-            addEvent: function (e){_addelement(e,events);},
             removeEvent: function (id){delete events[id];},
             'defaults': defaults,
             debug: function (){return debug;},
@@ -421,7 +330,7 @@ plots, you can just fix the size of their placeholders.
     });
     
 
-    // Resizing plugin for flot    
+    // Resizing plugin for flot
     $.plot.plugins.push({
         options: {},
         name: 'resize',
@@ -454,16 +363,73 @@ plots, you can just fix the size of their placeholders.
         }
     });
     
-
-    //////////////////////////////////////////////////////////////////////////////
-    //  Canvases plugin
-    //  This is the main plugin which adds the standard plotting functionalities
-    //////////////////////////////////////////////////////////////////////////////
+    
+    /*========================================================================
+     * 
+     * PLUGINS
+     * An ecoplot plugin is created in the following way:
+     * 
+     * 
+     * 		$.ecoplot.plugin(plugin_name,{
+     * 								defaults : {...},
+     * 								data: {...},
+     * 								init: function() {...},
+     * 								layout: function() {...}
+     * 							});
+     * 
+     * 
+     *  - data
+     *  
+     *  An object which is added to the instance.data object so that
+     *  instance.data.plugin_name will contain its value.
+     *  It can be used to store dynamic data for the plugin.
+     *  
+     *  - layout
+     *  
+     *  An optional function, which will be called, if availale, during the
+     *  layout of the ecoplot instance.
+     */
+    
+    
+    /*================================================================
+     * 
+     * Menu plugin
+     * 
+     * 
+     */
+    $.ecoplot.plugin('menu',{
+    	defaults: {
+    		container: null,
+    		container_class: 'menu'
+    	},
+    	layout: function() {
+    		var options = this.settings(),
+    			omenu = options.menu,
+    			menu = this.data.menu,
+    			container = this.container(),
+    			mc = $(omenu.container);
+    		if(!mc.length) {
+    			mc = $('<div></div>').appendTo(container);
+    			menu.upper = $('<div class="menubar upper ui-widget-header"></div>').appendTo(mc).hide();
+        		menu.lower = $('<div class="menubar lower ui-widget-header"></div>').appendTo(mc);
+                //$.ecoplot.getmenu('dates',container).appendTo(menu.lower);
+                //menu.lower.append($.ecoplot.getmenu('toolbar',container));
+                menu.lower.append($('<div></div>').addClass(options.jsondata.loader_class));
+    		}
+    		menu.container = mc.addClass(omenu.container_class);
+    	}
+    });
+    
+    // ////////////////////////////////////////////////////////////////////////////
+    // Canvases plugin
+    // This is the main plugin which adds the standard plotting functionalities
+    // ////////////////////////////////////////////////////////////////////////////
     $.ecoplot.plugin('canvases',{
         defaults : {
             legend_class: 'ecolegend ui-state-default',
             legend_padding: 5,
             legend_draggable: true,
+            outer_body_class: 'body',
             container_class: 'canvas-container',
             canvas_class: 'ts-plot-module-canvas'
         },
@@ -472,13 +438,27 @@ plots, you can just fix the size of their placeholders.
             current: null
         },
         init: function() {
-            var instance = this;
-            this.data.canvases.legend_selector = $.selector_from_class(this.settings().canvases.legend_class);
+            var instance = this,
+            	opts = this.settings().canvases,
+            	cdata = this.data.canvases;
+            cdata.legend_selector = $.selector_from_class(opts.legend_class);
             this.container().bind('ecoplot-pre-resize',function() {
                 var canvas = instance.get_canvas();
                 $.ecoplot.log.debug('resizing canvas');
                 instance._set_legend_position(canvas);
             });
+        },
+        layout: function() {
+        	var options = this.settings(),
+        		canvases = options.canvases,
+				container = this.container(),
+				cdata = this.data.canvases;
+			cdata.body = $('<div class="ui-widget-content"></div>')
+			 			.addClass(canvases.outer_body_class)
+						.appendTo(container).height(options.height);
+			cdata.main = $('<div class="main"></div>').appendTo(cdata.body);
+			cdata.secondary = $('<div class="secondary"></div>').appendTo(cdata.body);
+			cdata.canvas_container = $('<div></div>').addClass(canvases.container_class).appendTo(cdata.main);
         },
         height: function () {
             var c = this.canvas_container();
@@ -497,17 +477,14 @@ plots, you can just fix the size of their placeholders.
                 }
             }
         },
-        canvas_container: function (create) {
-            var c = $('.'+this.settings().canvases.container_class,this.container());
-            if(!c.length && create) {
-                return $('<div></div>').addClass(this.settings().canvases.container_class);
-            }
-            return c;
+        canvas_container: function () {
+        	return this.data.canvases.canvas_container;
         },
         _get_serie_data: function (idx,canvas) {
             return canvas.series;
         },
-        // Render a canvas. If idx is null or undefined it renders the current canvas
+        // Render a canvas. If idx is null or undefined it renders the current
+		// canvas
         canvas_render: function (idx,opts) {
             var instance = this,
                 canvas = this.get_canvas(idx),
@@ -713,9 +690,9 @@ plots, you can just fix the size of their placeholders.
     });
     
 
-    ///////////////////////////////////////////////////
-    //  plugin for loading data via ajax
-    ///////////////////////////////////////////////////
+    // /////////////////////////////////////////////////
+    // plugin for loading data via ajax
+    // /////////////////////////////////////////////////
     $.ecoplot.plugin('jsondata',{
         defaults: {
             autoload:true,
@@ -762,15 +739,10 @@ plots, you can just fix the size of their placeholders.
         },
         ajaxdata: function () {
             var options = this.settings(),
-                elems = options.elems,
-                ticker = elems.commandline.val();
+            	data = this.input_data(),
+                ticker = data.command;
             if(!ticker) {return;}
-            return {
-                start: elems.dates.start.val(),
-                end: elems.dates.end.val(),
-                period:'',
-                command:ticker
-            };
+            return data;
         },
         ajaxload: function () {
             var options  = this.settings().jsondata,
@@ -818,11 +790,6 @@ plots, you can just fix the size of their placeholders.
             });
         },
         _ajaxdone: function (data) {
-            var options = this.settings(),
-                elems = options.elems;
-            if(elems.info) {
-                elems.info.html("");
-            }
             this.replace_all_canvases(data);
         }
     });
@@ -932,7 +899,7 @@ plots, you can just fix the size of their placeholders.
                                            }
                                        };
                                    instance.dialog('Save as image',body,opts);
-                                   //plot.saveAsPng();
+                                   // plot.saveAsPng();
                                });
                            }
                           }
@@ -985,17 +952,31 @@ plots, you can just fix the size of their placeholders.
     });
     
     
-    ///////////////////////////////////////////////////
-    //  Edit plugin
-    //
-    // Plugin for editing series
-    ///////////////////////////////////////////////////
+    /*
+	 * =================================================================
+	 * EDIT plugin - Plugin for editing series
+	 * 
+	 * To customize pass the edit dictionary in the ecoplot options
+	 * 
+	 * $(#myplot).ecomplot({..., edit: {popup: true, ...} });
+	 * 
+	 * Options:
+	 * 
+	 * container: the html container of the options panel. Default null popup:
+	 * If true a jquery dialog will be used to display options
+	 * 
+	 * 
+	 * 
+	 */
+    
     $.ecoplot.plugin('edit',{
         defaults: {
             editing_class: 'with-panel',
+            container: null,
             container_class: 'panel-options',
             panel_class: 'panel',
             popup: false,
+            title: 'Series options',
             autoredraw: false,
             render_as: 'table',
             headers: ['line','points','bars','shadow','fill','yaxis1','yaxis2']
@@ -1017,16 +998,19 @@ plots, you can just fix the size of their placeholders.
                 icon: "ui-icon-copy",
                 type: "checkbox",
                 decorate: function (b,instance) {
-                    b.toggle(
-                            function () {
-                                instance.showPanel();
-                            },
-                            function () {
-                                instance.hidePanel();
-                            }
-                    );
-                    instance.container().bind('click-edit-options', function() {
-                    	b.click().button('refresh');
+                	var edit = instance.data.edit;
+                    b.click(function() {
+                    	if(b.prop('checked')) {
+                    		instance.showPanel();
+                    	}
+                    	else {
+                    		instance.hidePanel();
+                    	}
+                    });
+                    instance.container().bind('close-edit-options', function() {
+                    	if(b.attr('checked')) {
+                    		b.prop('checked',false).button('refresh');
+                    	}
                     });
                 }
             }
@@ -1034,82 +1018,96 @@ plots, you can just fix the size of their placeholders.
         init: function () {
             var options = this.settings().edit,
                 instance = this;
-            this.data.edit.panel_selector = '.'+options.container_class+' .'+options.panel_class;
+            this.data.edit.panel_selector = $.selector_from_class(options.panel_class);
             this.container().bind('ecoplot-after-add_canvas', function (event, canvas, oldcanvas) {
                 var instance = $.ecoplot.instance(this);
                 instance.create_edit_panel(canvas,oldcanvas);
             }).bind('ecoplot-after-canvas_render', function (e) {
-                if(instance.edit_active()) {
+                if(instance.data.edit.isactive()) {
                     instance.showPanel();
                 }
             });
         },
-        edit_active: function () {
-            var options = this.settings();
-            return options.elems.body.hasClass(options.edit.editing_class);
+        layout: function() {
+        	var instance = this,
+        		options = this.settings().edit,
+        		edit = this.data.edit,
+        		c = $(options.container);
+        		in_canvas = true;
+        		
+        	if(!c.length) {
+        		in_canvas = true;
+        		c = $('<div></div>').appendTo(this.data.canvases.secondary);
+        	}
+        	edit.container = c.addClass(edit.container_class);
+        	
+        	if(options.popup) {
+        		var position = options.popup.position || ['right','top'];
+        		c = c.dialog({title:options.title,
+        					'position':position,
+        					width:'auto',
+        					height:'auto',
+        					autoOpen:false,
+        					close: function(e,ui) {
+        						instance.container().trigger('close-edit-options');
+        						//if(e.originalEvent) {
+        					//		instance.container().trigger('close-edit-options');
+        						//}
+        					}});
+        		edit.show = function() {this.container.dialog("open");};
+        		edit.hide = function() {this.container.dialog("close");};
+        		edit.isactive = function() {return this.container.dialog('isOpen');};
+        	}
+        	else if(in_canvas) {
+        		edit.show = function() {
+    				instance.canvases.body.addClass(options.editing_class);
+    				this.container.show();
+        		}
+        		edit.hide = function() {
+    				instance.canvases.body.removeClass(options.editing_class);
+    				this.container.hide();
+        		}
+        		edit.isactive = function() {
+        			return instance.canvases.body.hasClass(options.editing_class);
+        		}
+        	}
+        	else {
+        		edit.show = function(){};
+        		edit.hide = function(){};
+        		edit.isactive = function(){return true;};
+        	}
         },
         showPanel: function (idx) {
             var canvas = this.get_canvas(idx),
-                options = this.settings(),
-                edit = options.edit;
+                options = this.settings().edit,
+                edit = this.data.edit;
             if(canvas) {
-            	if(edit.popup) {
-            		var c = this.edit_container(canvas.index),
-            			width = c.width(),
-            			height = c.height(),
-            			position = edit.popup.position || ['right','top'],
-            			title = edit.title || 'Series options';
-            		c.dialog({'width':'auto',
-            				  'height':'auto',
-            				  'position':position,
-            				  'title':title,
-            				  beforeClose: function(event, ui) {
-            					  var index = $(this).data('ecoplot'),
-            					  	  instance = $.ecoplot.instance(index);
-            					  instance.container().trigger('click-edit-options');
-            				  }}).data('ecoplot',this.index());
-            	}
-            	else {
-            		this._edit_panels().hide();
-            		options.elems.body.addClass(edit.editing_class);
-            		this.edit_container(canvas.index).show();
-            		$.ecoplot.resize();
-            	}
+            	this.edit_panel().hide();
+            	this.edit_panel(canvas.index).show();
+            	edit.show();
             }
         },
         hidePanel: function () {
-            this._edit_panels().hide();
-            this.settings().elems.body.removeClass('with-panel');
-            $.ecoplot.resize();
-        },
-        _edit_panels: function () {
-            return $(this.data.edit.panel_selector,this.container());
+        	var edit = this.data.edit;
+        	edit.hide();
         },
         //
         // Get the series editing panel
-        _edit_panel: function(idx,create,holder) {
-        	var cn = 'panel ecoplot-' + this.index() + ' option-' + idx;
-        		se = $.selector_from_class(cn),
-        		p = $(se);
-        	if(!p.length && create) {
-        		p = $('<div class = "'+cn+'"></div>').appendTo(holder);
+        edit_panel: function(idx,create) {
+        	var edit = this.data.edit,
+        		options = this.settings().edit;
+        	if(!$.isnothing(idx)) {
+	        	var cn = options.panel_class + ' option-' + idx;
+	        		se = $.selector_from_class(cn),
+	        		p = $(se,edit.container);
+	        	if(!p.length && create) {
+	        		p = $('<div class = "'+cn+'"></div>').appendTo(edit.container);
+	        	}
+	        	return p;
         	}
-        	return p;
-        },
-        // The edit container for idx canvas
-        // idx is the canvas number, create is a flag which enable creation
-        edit_container: function (idx,create) {
-            var options = this.settings().edit,
-                holder = $('.'+options.container_class,this.container());
-            if(!holder.length && create) {
-                holder = $('<div></div>').addClass(options.container_class);
-            }
-            if(!$.isnothing(idx) && holder.length) {
-            	return this._edit_panel(idx,create,holder);
-            }
-            else {
-                return holder;
-            }
+        	else {
+        		return $($.selector_from_class(options.panel_class),edit.container);
+        	}
         },
         _get_serie_data: function (idx,canvas) {
             var adata = [];
@@ -1125,7 +1123,7 @@ plots, you can just fix the size of their placeholders.
                     }
                 }
             }
-            this.edit_container(idx).find('tr.serie-option').each(function (i) {
+            this.edit_panel(idx).find('tr.serie-option').each(function (i) {
                 var el = $(this);
                 var serie = canvas.series[i];
                 serie.shadowSize = parseInt($("input[name='shadow']",el).val());
@@ -1160,7 +1158,7 @@ plots, you can just fix the size of their placeholders.
                 oldbody = null,
                 oseries = [],
                 showplot = options.showplot,
-                edit_panel = this.edit_container(idx,true),
+                edit_panel = this.edit_panel(idx,true),
                 colspan = edit.headers.length,
                 series_container;
             
@@ -1210,13 +1208,13 @@ plots, you can just fix the size of their placeholders.
                 body = $('tbody',table).html('');
                 oseries = canvas.oseries;
             }
-            //Add a column element to a series row
+            // Add a column element to a series row
             function tdinp(type,name,value,checked,w) {
                 var check = $('<input type="'+type+'" name="'+name+'" value="'+value+'">'),
                     r;
                 if(checked) {
                     check.prop({'checked':true}); // jQuery 1.6.1
-                    //check.attr('checked',true);
+                    // check.attr('checked',true);
                 }
                 r = $('<td class="center"></td>').append(check);
                 if(w) {
@@ -1425,145 +1423,205 @@ plots, you can just fix the size of their placeholders.
         }
     });
 
-///////////////////////////////////////////////////
-//  EVENTS & MENUS
-///////////////////////////////////////////////////
 
-    $.ecoplot.addEvent({
-        id: 'datepicker',
-        register: function ($this) {
-            var options = $this[0].options.dates;
-            $('.'+options.cn,$this).datepicker({
+    $.ecoplot.plugin('command',{
+    	defaults : {
+    		show: true,
+    		entry: null,
+    		classname: 'command',
+    		container: null,
+    		symbol: null,
+    	},
+        layout: function () {
+        	var command = this.settings().command,
+        		container = $(container);
+        	if(!container.length) {
+        		container = this.data.menu.upper;
+        	}
+        	if(!container.length) {
+        		$.ecoplot.error('Could not find a suitable container for the command plugin');
+        	}
+        	else {
+        		var inp = $('input[type="text"]',container);
+        		if(!inp.length) {
+        			inp = $('<input type="text">').appendTo(container);
+        		}
+        		inp.attr('name',"commandline");
+        		if(command.symbol)  {
+        			inp.val(command.symbol+"");
+        		}
+        		if(command.show) {
+        			container.show();
+        		}
+        		this.data.command.input = inp;
+        	}
+        },
+        get_input_data: function() {
+        	var input = this.data.command.input;
+        	if(input) {
+        		return {'command':input.val()}
+        	}
+        }
+    });
+    
+
+    $.ecoplot.plugin('dates',{
+    	defaults: {
+            show: true,
+            label: 'Period',
+            middle: '-',
+            format: "d M yy",
+            cn: "ts-input-date",
+            default_month_interval: 12,
+            start: null,
+            end: null,
+            classname: 'dateholder menu-item',
+        },
+        layout: function() {
+        	var options = this.settings().dates,
+        		dates = this.data.dates,
+                el = $('<div></div>').addClass(options.classname).appendTo(this.data.menu.lower);
+            dates.start = $('<input type="text" name="start">').addClass(options.cn).val(options.start),
+            dates.end = $('<input type="text" name="end">').addClass(options.cn).val(options.end);
+            if(options.label) {
+                el.append($('<label>'+options.label+'</label>'));
+            }
+            el.append(dates.start);
+            if(options.middle) {
+            	el.append($('<label class="middle">'+options.middle+'</label>'));
+            }
+            el.append(dates.end);
+            if(!options.show) {
+                el.hide();
+            }
+            this.decorate_dates();
+        },
+        decorate_dates: function() {
+        	var options = this.settings().dates;
+            $('.'+options.cn,this.container()).datepicker({
                 defaultDate: +0,
                 showStatus: true,
                 beforeShowDay: $.datepicker.noWeekends,
                 dateFormat: options.format, 
                 firstDay: 1, 
                 changeFirstDay: false
-                //statusForDate: highlightToday, 
-                //showOn: "both", 
-                //buttonImage: prosp._classConfig.media_files_url + "img/icons/calendar_edit.png",
-                //buttonImageOnly: true
             });
+        },
+        init : function() {
+        	var dates = this.settings().dates,
+            	td, v1, v2;
+            if(dates.end) {
+                td = new Date(dates.end);
+            }
+            else {
+                td = new Date();
+            }
+            v2 = $.datepicker.formatDate(dates.format, td);
+            if(!dates.start) {
+                td.setMonth(td.getMonth() - dates.default_month_interval);
+            }
+            else {
+                td = new Date(dates.start);
+            }
+            v1 = $.datepicker.formatDate(dates.format, td);
+            dates.start = v1;
+            dates.end = v2;
+        },
+        get_input_data: function() {
+        	var dates = this.data.dates;
+        	return {'start':dates.start.val(),
+        			'end':dates.end.val()};
         }
     });
 
     /**
-     * Add Command Input
-     */
-    $.ecoplot.addMenu({
-        name: 'command',
-        classname: 'command',
-        create: function (elem) {
-            var command = elem.options.command;
-            var el = $('<input type="text" name="commandline">');
-            if(!command.show) {
-                el.hide();
+	 * Add Toolbar items as specified in the options.toolbar array.
+	 */
+    $.ecoplot.plugin('toolbar',{
+    	defaults: {
+    		render_as: 'buttons',
+    		classname: 'toolbar',
+    		display: ['zoomout','reload','legend','edit','saveimage','about']
+    	},
+    	layout: function () {
+            var options = this.settings().toolbar,
+            	container = $('<div></div>').addClass(options.classname);
+            
+            if(options.render_as == 'buttons') {
+            	var inner = $('<span></span>').appendTo(container);
+            	this.data.toolbar.container = inner;
+            	container.addClass('menu-item');
+            	container.appendTo(this.data.menu.lower);
+            	container.show();
             }
-            return el;
-        }
-    });
-
-    /**
-     * Add Date inputs menu creator
-     */
-    $.ecoplot.addMenu({
-        name: 'dates',
-        classname: 'dateholder',
-        create: function (elem) {
-            var dates = elem.options.dates,
-                elems = elem.options.elems,
-                el = $('<div class="'+ this.classname + ' menu-item"></div>'),
-                start_id = elem.id+'_start',
-                end_id = elem.id+'_end',
-                start = $('<input id="'+start_id+'" class="'+dates.cn+'" type="text" name="start">'),
-                end   = $('<input id="'+end_id+'" class="'+dates.cn+'" type="text" name="end">');
-            start.val(dates.start);
-            end.val(dates.end);
-            if(dates.label) {
-                el.append($('<label for_id="'+start_id+'">'+dates.label+'</label>'));
+            else {
+            	this.data.toolbar.container = container.hide();
             }
-            el.append(start);
-            el.append($('<label class="middle">-</label>'));
-            el.append(end);
-            if(!dates.show) {
-                el.hide();
-            }
-            elems.dates = {'start':start,'end':end};
-            return el;
-        }
-    });
-
-
-    /**
-     * Add Toolbar items as specified in the options.toolbar array.
-     */
-    $.ecoplot.addMenu({
-        name: 'toolbar',
-        classname: 'toolbar',
-        create: function (elem) {
-            var instance = $.ecoplot.instance(elem),
-                options = instance.settings(),
-                outer = $('<div class="'+ this.classname + ' menu-item"></div>'),
-                cid = instance.container().attr('id')+'_'+this.classname,
-                container = $('<span id="'+cid+'"></span>').appendTo(outer);
-            $.each(options.toolbar, function (i,name) {
-                var menu = $.ecoplot.tool(name);
-                if(menu) {
-                    var tel,eel,ico,
-                        id = cid+'_'+menu.classname;
-                    if(!menu.type || menu.type === 'button') {
-                        tel = $('<button id="'+id+'" class="'+menu.classname+'">'+menu.title+'</button>');
-                    }
-                    else if(menu.type === 'checkbox') {
-                        tel = $('<input id="'+id+'" type="checkbox" class="'+menu.classname+'"/>');
-                        eel = $('<label for="'+id+'">'+menu.title+'</label>');
-                    }
-                    if(tel) {
-                        container.append(tel);
-                        if(eel) {
-                            container.append(eel);
-                        }
-                        ico = {};
-                        if(menu.icon) {
-                            ico.primary = menu.icon;  
-                        }
-                        tel.button({
-                            text: menu.text || false,
-                            icons: ico
-                        });
-                        if(menu.decorate) {
-                            menu.decorate(tel,instance);
-                        }
-                    }
-                }
-                else {
-                    $.ecoplot.info('Menu '+name+' not available.');
-                }
+            
+            this.container().bind('ecoplot-ready', function(e,instance) {
+            	var options = instance.settings().toolbar,
+            		toolbar = instance.data.toolbar,
+            		container = toolbar.container,
+            		cid = instance.container().attr('id');
+            	
+            	$.each(options.display, function (i,name) {
+	                var menu = $.ecoplot.tool(name);
+	                if(menu) {
+	                    var tel,eel,ico;
+	                    	id = cid+'_'+menu.classname;
+	                    if(!menu.type || menu.type === 'button') {
+	                    	tel = $('<button>'+menu.title+'</button>').attr('title',menu.title);
+	                    }
+	                    else if(menu.type === 'checkbox') {
+	                        tel = $('<input type="checkbox"/>');
+	                        eel = $('<label>'+menu.title+'</label>').attr('for',id);
+	                    }
+	                    if(tel) {
+	                    	tel.addClass(menu.classname).attr('id',id).appendTo(container);
+	                        if(eel) {
+	                            container.append(eel);
+	                        }
+	                        ico = {};
+	                        if(menu.icon) {
+	                            ico.primary = menu.icon;  
+	                        }
+	                        tel.button({
+	                            text: menu.text || false,
+	                            icons: ico
+	                        });
+	                        if(menu.decorate) {
+	                            menu.decorate(tel,instance);
+	                        }
+	                    }
+	                }
+	                else {
+	                    $.ecoplot.info('Menu '+name+' not available.');
+	                }
+	            });
+            	
             });
-            return outer;
         }
     });
     
-    ///////////////////////////////////////////////////
-    //  Excel like functionality.
-    ///////////////////////////////////////////////////
-    $.ecoplot.shiftf9 = function () {
-        $(document).bind('keydown','Shift+f9', function (event) {
-            $('.'+$.ecoplot.plugin_class).each(function () {
-                var $this = $(this); 
-                $this.trigger("load");
-                this.options.elems.commandline.bind('keydown','Shift+f9', function (event) {
-                    $this.trigger("load");
-                });
-                this.options.dates.start.bind('keydown','Shift+f9', function (event) {
-                    $this.trigger("load");
-                });
-                this.options.dates.end.bind('keydown','Shift+f9', function (event) {
-                    $this.trigger("load");
-                });
-            });
-        });
-    };
+    // /////////////////////////////////////////////////
+    // Excel like functionality.
+    // /////////////////////////////////////////////////
+    //$.ecoplot.shiftf9 = function () {
+    //    $(document).bind('keydown','Shift+f9', function (event) {
+    //        $('.'+$.ecoplot.plugin_class).each(function () {
+    //            var $this = $(this); 
+    //            $this.trigger("load");
+    //            this.options.elems.commandline.bind('keydown','Shift+f9', function (event) {
+    //                $this.trigger("load");
+    //           });
+    //            this.options.dates.start.bind('keydown','Shift+f9', function (event) {
+    //                $this.trigger("load");
+    //            });
+    //            this.options.dates.end.bind('keydown','Shift+f9', function (event) {
+    //                $this.trigger("load");
+    //            });
+    //        });
+    //    });
+    //};
 
 }(jQuery));
