@@ -872,6 +872,8 @@ plots, you can just fix the size of their placeholders.
                                    var instance = $.ecoplot.instance(this),
                                        body = instance.saveimagehtml(),
                                        opts = {
+                                	   	   width: 'auto',
+                                	   	   height: 'auto',
                                            buttons: {
                                                'Preview': function() {
                                                    var d = $(this),
@@ -977,9 +979,9 @@ plots, you can just fix the size of their placeholders.
             panel_class: 'panel',
             popup: false,
             title: 'Series options',
-            autoredraw: false,
+            autoredraw: true,
             render_as: 'table',
-            headers: ['line','points','bars','shadow','fill','yaxis1','yaxis2']
+            headers: ['line','points','bars','shadow','fill','y-axis']
         },
         data: {
             headers: {
@@ -1060,15 +1062,15 @@ plots, you can just fix the size of their placeholders.
         	}
         	else if(in_canvas) {
         		edit.show = function() {
-    				instance.canvases.body.addClass(options.editing_class);
+    				instance.data.canvases.body.addClass(options.editing_class);
     				this.container.show();
         		}
         		edit.hide = function() {
-    				instance.canvases.body.removeClass(options.editing_class);
+    				instance.data.canvases.body.removeClass(options.editing_class);
     				this.container.hide();
         		}
         		edit.isactive = function() {
-        			return instance.canvases.body.hasClass(options.editing_class);
+        			return instance.data.canvases.body.hasClass(options.editing_class);
         		}
         	}
         	else {
@@ -1109,6 +1111,8 @@ plots, you can just fix the size of their placeholders.
         		return $($.selector_from_class(options.panel_class),edit.container);
         	}
         },
+        //
+        // Override the get serie data
         _get_serie_data: function (idx,canvas) {
             var adata = [];
             function show_elem(typ,el) {
@@ -1149,7 +1153,8 @@ plots, you can just fix the size of their placeholders.
         // Create the editing panel
         create_edit_panel: function (canvas) {
             // check if oldcanvas is the same. If so keep it!
-            var idx = this.data.canvases.all.length-1,
+            var instance = this,
+            	idx = this.data.canvases.all.length-1,
                 options = this.settings(),
                 edit = options.edit,
                 data = this.data.edit,
@@ -1167,28 +1172,28 @@ plots, you can just fix the size of their placeholders.
             }
             
             if(!canvas.oseries) {
-                var top = $('<div></div>').css({'overflow':'hidden','margin-bottom':'10px'}),
-                    head, head_val;
                 $.ecoplot.log.debug('Creating editing panel.');
+                edit_panel.children().remove();
                 if(edit.autoredraw) {
                 	edit_panel.data('ecoplot_instance',this.index());
-                	edit_panel.click(function() {
-                		 var instance = $.ecoplot.instance($(this).data('ecoplot_instance'));
-                		 instance._set_legend_position(instance.get_canvas());
-                         instance.canvas_render();
+                	edit_panel.change(function(e) {
+                		var target = $(e.target);
+                		if(target.is('input')) {
+                			instance._set_legend_position(instance.get_canvas());
+	                		instance.canvas_render();
+                		}
                 	});
                 }
                 else {
-                	$('<h2>Series</h2>').css({'float':'left','margin':0}).appendTo(top);
+                	$('<h2>Series</h2>').css({'float':'left','margin':0}).appendTo(edit_panel);
                     $("<button>Redraw</button>").button().click(function() {
                         var instance = $.ecoplot.instance(this);
                         instance._set_legend_position(instance.get_canvas());
                         instance.canvas_render();
-                    }).appendTo(top).css({'margin-left':'10px'});
+                    }).appendTo(edit_panel).css({'margin-left':'10px'});
                 }
-                edit_panel.children().remove();
-                edit_panel.append(top);
                 if(edit.render_as === 'table') {
+                	var head, head_val;
 	                series_container = $('<table class="plot-options"></table>');
 	                head = $('<tr></tr>').appendTo($('<thead class="ui-state-default"></thead>')
 	                					 .appendTo(series_container));
@@ -1208,22 +1213,33 @@ plots, you can just fix the size of their placeholders.
                 body = $('tbody',table).html('');
                 oseries = canvas.oseries;
             }
-            // Add a column element to a series row
-            function tdinp(type,name,value,checked,w) {
-                var check = $('<input type="'+type+'" name="'+name+'" value="'+value+'">'),
-                    r;
-                if(checked) {
-                    check.prop({'checked':true}); // jQuery 1.6.1
-                    // check.attr('checked',true);
+            // Add a column element
+            function makeinp(i,type,name,value,checked,label) {
+            	var id = cn+'-'+name+'-serie'+i,
+            		inp = $('<input id="'+id+'" type="'+type+'" name="'+name+'" value="'+value+'">');
+            	if(checked) {
+                    inp.prop({'checked':true});
                 }
-                r = $('<td class="center"></td>').append(check);
-                if(w) {
-                    var inp = $('<input type="input" name="'+name+'_width" value="'+w+'">')
-                                .width('2em')
-                                .css({'margin-left':'3px'});
-                    r.append(inp);
+            	if(label) {
+            		return $.merge(inp,$('<label for="'+id+'">'+label+'</label>'));
+            	}
+            	return inp;
+            }
+            
+            function tdinp(i,type,name,value,tag,checked,w) {
+                var inp = makeinp(i,type,name,value,checked);
+                if(tag) {
+                	tag = $('<'+tag+'></'+tag+'>').append(inp);
                 }
-                return r;
+                if(tag) {
+                	if(w) {
+                		return tag.append($('<input class="tiny" type="input" name="'+name+'_width" value="'+w+'">'));
+                	}
+                	return tag;
+                }
+                else {
+                	return inp;
+                }
             }
             
             function checkmedia(med,show) {
@@ -1240,7 +1256,7 @@ plots, you can just fix the size of their placeholders.
             
             $.each(canvas.series, function (i,serie) {
                 var oserie = null,
-                    shadow;
+                    shadow, radio;
                 if(oseries.length > i) {
                     var os = oseries[i];
                     if(serie.label === os.label) {
@@ -1263,7 +1279,7 @@ plots, you can just fix the size of their placeholders.
                     serie.color  = $.isnothing(oserie.color) ? i : oserie.color;
                 }
                 shadow = serie.shadowSize || 0;
-                shadow = $('<input type="input" name="shadow" value="'+ shadow +'">').width('2em');
+                shadow = $('<input class="tiny" type="input" name="shadow" value="'+ shadow +'">');
                 var trt = $('<tr class="serie'+i+' serie-title"></tr>').appendTo(body);
                 var tr  = $('<tr class="serie'+i+' serie-option"></tr>').appendTo(body);
                 if(parseInt((i+1)/2)*2 === i+1) {
@@ -1271,13 +1287,17 @@ plots, you can just fix the size of their placeholders.
                     tr.addClass('ui-state-default').css('border','none');
                 }
                 trt.append($('<td class="label" colspan="'+colspan+'">'+serie.label+'</td>'));
-                tr.append(tdinp('checkbox','line','line', serie.lines.show, serie.lines.lineWidth || 3));
-                tr.append(tdinp('checkbox','points','points', serie.points.show, serie.points.radius || 3));
-                tr.append(tdinp('checkbox','bars','bars', serie.bars.show, serie.bars.barWidth || 3));
+                tr.append(tdinp(i,'checkbox','line','line', 'td', serie.lines.show, serie.lines.lineWidth || 3));
+                tr.append(tdinp(i,'checkbox','points','points', 'td', serie.points.show, serie.points.radius || 3));
+                tr.append(tdinp(i,'checkbox','bars','bars', 'td', serie.bars.show, serie.bars.barWidth || 3));
                 $('<td></td>').append(shadow).appendTo(tr);
-                tr.append(tdinp('checkbox','fill','fill', serie.lines.fill));
-                tr.append(tdinp('radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis===1 : i===0));
-                tr.append(tdinp('radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis===2 : i>0));
+                tr.append(tdinp(i,'checkbox','fill','fill', 'td', serie.lines.fill));
+                
+                // Axis radio button
+                $('<div></div>').appendTo($('<td></td>').appendTo(tr))
+                				.append(makeinp(i+'1','radio','axis'+i,'y-ax1',serie.yaxis ? serie.yaxis===1 : i===0,'1'))
+                				.append(makeinp(i+'2','radio','axis'+i,'y-ax2',serie.yaxis ? serie.yaxis===2 : i>0,'2'))
+                				.buttonset();
             });
             return canvas;
         }
@@ -1601,6 +1621,19 @@ plots, you can just fix the size of their placeholders.
             	
             });
         }
+    });
+    
+    
+    $.ecoplot.plugin('resizable', {
+    	defaults: {
+    		disabled: true
+    	},
+    	init: function () {
+    		var options = this.settings().resizable;
+    		if(!options.disabled) {
+    			this.container().resizable(options);
+    		}
+    	}
     });
     
     // /////////////////////////////////////////////////

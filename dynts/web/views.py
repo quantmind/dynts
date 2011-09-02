@@ -1,6 +1,7 @@
 from djpcms import views, forms, html
 from djpcms.utils import gen_unique_id, media
 
+import dynts
 from ccy import dateFromString
 
 #cwidget = lambda : html.TextInput(default_style = 'color-picker')
@@ -27,6 +28,16 @@ class EcoForm(forms.Form):
 class PlotSettings(forms.Form):
     line_fill = forms.BooleanField()
     bar_fill = forms.BooleanField()
+    
+    
+class TimeSeriesAppMixin(object):
+    
+    def get_code_object(self, djp):
+        return None
+    
+    def getdata(self, request, expression, start, end, **kwargs):
+        res = dynts.evaluate(expression, start = start, end = end)
+        return res.dump('flot')
     
 
 class TimeSeriesView(views.ModelView):
