@@ -16,12 +16,12 @@ MakeUpperMenu(ecoplot,
 CssContext('ecoplot_tooltip',
            tag = '.econometric-plot-tooltip',
            data = {'padding':'2px',
-                   'font_size':'80%'}
+                   'font_size':'90%'}
            )
 
 CssContext('ecolegend',
            tag = '.ecolegend',
-           data = {'font_size':'80%'}
+           data = {'font_size':'90%'}
            )
 
 CssContext('ts-input-date',
