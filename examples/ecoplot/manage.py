@@ -30,7 +30,6 @@ class Loader(djpcms.SiteLoader):
             DEFAULT_LAYOUT = 1, #Floating layout
             FAVICON_MODULE = 'dynts',
             PROFILING_KEY = 'prof',
-            STYLING = 'dark',
             DEBUG = True
         )
     

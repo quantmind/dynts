@@ -4,13 +4,17 @@ Created using ply (http://www.dabeaz.com/ply/) a pure Python implementation
 of the popular compiler construction tools lex and yacc.
 '''
 from dynts.conf import settings
-from dynts.exceptions import DyntsException
+from dynts.exceptions import DyntsException, ExpressionError
 from dynts.backends import istimeseries, isxy
 from dynts.utils.py2py3 import to_string
 from dynts.data import providers
 
-from .grammar import *
 from .registry import FunctionBase, ComposeFunction, function_registry
+
+try:
+    from .rules import parsefunc
+except ImportError:
+    parsefunc = None
 
 try:
     strtype = basestring
@@ -40,16 +44,11 @@ For examples and usage check the :ref:`dsl documentation <dsl>`.
 
 .. _ply: http://www.dabeaz.com/ply/
 '''
-    from ply import yacc
-    from .rules import rules
+    if not parsefunc:
+        raise ExpressionError('Could not parse. No parser installed.')
     functions = functions if functions is not None else function_registry
-    ru = rules(functions)
-    ru.build()
-    ru.input(to_string(timeseries_expression).lower())
-    tokens     = ru.tokens
-    precedence = ru.precedence
-    yacc       = yacc.yacc(method = method or 'SLR')
-    return yacc.parse(lexer = ru.lexer, debug = debug)
+    expr_str = to_string(timeseries_expression).lower()
+    return parsefunc(expr_str, functions, method, debug)
 
 
 def merge(series):

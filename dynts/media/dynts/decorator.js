@@ -82,12 +82,17 @@
                             return res.plots;
                         }
                     };
+                    
+                function errorback(data,instance) {
+                    $.djpcms.jsonParse(data,instance.container());
+                }
                 
                 $(selector,elem).each(function() {
                     var start,
                         el = $(this),
                         options = el.data();
                     options.jsondata.parse = parsedata;
+                    options.jsondata.errorcallbacks = [errorback];
                     options.flot_options = poptions;
                     options.showplot = function(i) {
                         return i<=1;

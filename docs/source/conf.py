@@ -49,8 +49,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'dynts'
-copyright = u'2010, Luca Sbardella'
+project = 'dynts'
+copyright = '2010-2011, Luca Sbardella'
 
 
 exclude_trees = []

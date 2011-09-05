@@ -1,5 +1,8 @@
+from ply import yacc, lex
+
 from dynts.conf import settings
-import ply.lex as lex
+
+from .grammar import *
 
 
 class rules(object):
@@ -19,6 +22,8 @@ class rules(object):
     t_SPLIT   = r'\%s' % settings.separator_operator
 
     def __init__(self, oper = None):
+        self.t_CONCAT  = r'\%s' % settings.concat_operator
+        self.t_SPLIT   = r'\%s' % settings.separator_operator
         self.lexer = None
         self.oper  = oper or {}
         
@@ -105,3 +110,12 @@ class rules(object):
         self.lexer.input(data)
     
 
+def parsefunc(timeseries_expression, functions, method, debug):
+    ru = rules(functions)
+    ru.build()
+    ru.input(timeseries_expression)
+    # Important! needed by yacc
+    tokens     = ru.tokens
+    precedence = ru.precedence
+    p = yacc.yacc(method = method or 'SLR')
+    return p.parse(lexer = ru.lexer, debug = debug)

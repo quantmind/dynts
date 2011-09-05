@@ -12,27 +12,8 @@
 {% block breadcrumbs %}{% endblock %}
 
 {% block page_body %}
-<div class="{{ grid.column_2_3 }}">
-    {{ inner }}
-    
-  <div class="djpcms-html-box ui-widget">
-    <div class="hd ui-widget-header"><h2>Javascript logging</h2></div>
-    <div class="bd ui-widget-content djp-logging-panel"></div>
-  </div>
-</div>
-<div class="{{ grid.column_1_3 }}">
- <div class="djpcms-html-box ui-widget">
-   <div class="hd ui-widget-header hd"><h2>Styling</h2></div>
-    <div class="ui-widget-content bd">
-     <ul class='vertical'>{% for style in styles %}
-     <li><a href='/?style={{ style }}'>{{ style }}</a></li>{% endfor %}
-     </ul>
-    </div>
- </div>
-</div>
-{{ grid.clear }}
- 
- {% endblock %}
+{{ inner }}
+{% endblock %}
    
 {% block site_footer %}
 <a id="python-link" href="/" style="float:right;">

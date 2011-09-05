@@ -13,3 +13,4 @@ profile/*.prof
 parser.out
 parsetab.py
 MANIFEST
+examples/ecoplot/media/ecoplot/rst/*

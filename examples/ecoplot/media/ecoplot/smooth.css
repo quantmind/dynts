@@ -2,10 +2,450 @@
 /*
 ------------------------------------------------------------------
 ------------------------------------------------------------------
-Created by medplate  2011-09-02T11:22:14.159000
+Created by medplate  2011-09-04T11:13:42.335221
 ------------------------------------------------------------------
 ------------------------------------------------------------------ */
 
+
+/*! normalize.css 2011-08-31T22:02 UTC · http://github.com/necolas/normalize.css */
+
+/* =============================================================================
+   HTML5 display definitions
+   ========================================================================== */
+
+/*
+ * Corrects block display not defined in IE6/7/8/9 & FF3
+ */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section {
+    display: block;
+}
+
+/*
+ * Corrects inline-block display not defined in IE6/7/8/9 & FF3
+ */
+
+audio,
+canvas,
+video {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+
+/*
+ * Prevents modern browsers from displaying 'audio' without controls
+ */
+
+audio:not([controls]) {
+    display: none;
+}
+
+/*
+ * Addresses styling for 'hidden' attribute not present in IE7/8/9, FF3, S4
+ * Known issue: no IE6 support
+ */
+
+[hidden] {
+    display: none;
+}
+
+
+/* =============================================================================
+   Base
+   ========================================================================== */
+
+/*
+ * 1. Corrects text resizing oddly in IE6/7 when body font-size is set using em units
+ *    http://clagnut.com/blog/348/#c790
+ * 2. Keeps page centred in all browsers regardless of content height
+ * 3. Prevents iOS text size adjust after orientation change, without disabling user zoom
+ *    www.456bereastreet.com/archive/201012/controlling_text_size_in_safari_for_ios_without_disabling_user_zoom/
+ */
+
+html {
+    font-size: 100%; /* 1 */
+    overflow-y: scroll; /* 2 */
+    -webkit-text-size-adjust: 100%; /* 3 */
+    -ms-text-size-adjust: 100%; /* 3 */
+}
+
+/*
+ * Addresses margins handled incorrectly in IE6/7
+ */
+
+body {
+    margin: 0;
+}
+
+/* 
+ * Addresses font-family inconsistency between 'textarea' and other form elements.
+ */
+
+body,
+button,
+input,
+select,
+textarea {
+    font-family: sans-serif;
+}
+
+
+/* =============================================================================
+   Links
+   ========================================================================== */
+
+a {
+    color: #00e;
+}
+
+a:visited {
+    color: #551a8b;
+}
+
+/*
+ * Addresses outline displayed oddly in Chrome
+ */
+
+a:focus {
+    outline: thin dotted;
+}
+
+/*
+ * Improves readability when focused and also mouse hovered in all browsers
+ * people.opera.com/patrickl/experiments/keyboard/test
+ */
+
+a:hover,
+a:active {
+    outline: 0;
+}
+
+
+/* =============================================================================
+   Typography
+   ========================================================================== */
+
+/*
+ * Addresses styling not present in IE7/8/9, S5, Chrome
+ */
+
+abbr[title] {
+    border-bottom: 1px dotted;
+}
+
+/*
+ * Addresses style set to 'bolder' in FF3/4, S4/5, Chrome
+*/
+
+b, 
+strong { 
+    font-weight: bold; 
+}
+
+blockquote {
+    margin: 1em 40px;
+}
+
+/*
+ * Addresses styling not present in S5, Chrome
+ */
+
+dfn {
+    font-style: italic;
+}
+
+/*
+ * Addresses styling not present in IE6/7/8/9
+ */
+
+mark {
+    background: #ff0;
+    color: #000;
+}
+
+/*
+ * Corrects font family set oddly in IE6, S4/5, Chrome
+ * en.wikipedia.org/wiki/User:Davidgothberg/Test59
+ */
+
+pre,
+code,
+kbd,
+samp {
+    font-family: monospace, serif;
+    _font-family: 'courier new', monospace;
+    font-size: 1em;
+}
+
+/*
+ * Improves readability of pre-formatted text in all browsers
+ */
+
+pre {
+    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/*
+ * 1. Addresses CSS quotes not supported in IE6/7
+ * 2. Addresses quote property not supported in S4
+ */
+
+/* 1 */
+
+q {
+    quotes: none;
+}
+
+/* 2 */
+
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+
+small {
+    font-size: 75%;
+}
+
+/*
+ * Prevents sub and sup affecting line-height in all browsers
+ * gist.github.com/413930
+ */
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+
+/* =============================================================================
+   Lists
+   ========================================================================== */
+
+ul,
+ol {
+    margin: 1em 0;
+    padding: 0 0 0 40px;
+}
+
+dd {
+    margin: 0 0 0 40px;
+}
+
+nav ul,
+nav ol {
+    list-style: none;
+    list-style-image: none;
+}
+
+
+/* =============================================================================
+   Embedded content
+   ========================================================================== */
+
+/*
+ * 1. Removes border when inside 'a' element in IE6/7/8/9, F3
+ * 2. Improves image quality when scaled in IE7
+ *    code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/
+ */
+
+img {
+    border: 0; /* 1 */
+    -ms-interpolation-mode: bicubic; /* 2 */
+}
+
+/*
+ * Corrects overflow displayed oddly in IE9 
+ */
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+
+/* =============================================================================
+   Figures
+   ========================================================================== */
+
+/*
+ * Addresses margin not present in IE6/7/8/9, S5, O11
+ */
+
+figure {
+    margin: 0;
+}
+
+
+/* =============================================================================
+   Forms
+   ========================================================================== */
+
+/*
+ * Corrects margin displayed oddly in IE6/7
+ */
+
+form {
+    margin: 0;
+}
+
+/*
+ * Define consistent margin and padding
+ */
+
+fieldset {
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+/*
+ * 1. Corrects color not being inherited in IE6/7/8/9
+ * 2. Corrects alignment displayed oddly in IE6/7
+ */
+
+legend {
+    border: 0; /* 1 */
+    *margin-left: -7px; /* 2 */
+}
+
+/*
+ * 1. Corrects font size not being inherited in all browsers
+ * 2. Addresses margins set differently in IE6/7, F3/4, S5, Chrome
+ * 3. Improves appearance and consistency in all browsers
+ */
+
+button,
+input,
+select,
+textarea {
+    font-size: 100%; /* 1 */
+    margin: 0; /* 2 */
+    vertical-align: baseline; /* 3 */
+    *vertical-align: middle; /* 3 */
+}
+
+/*
+ * 1. Addresses FF3/4 setting line-height using !important in the UA stylesheet
+ * 2. Corrects inner spacing displayed oddly in IE6/7
+ */
+
+button,
+input {
+    line-height: normal; /* 1 */
+    *overflow: visible;  /* 2 */
+}
+
+/*
+ * Corrects overlap and whitespace issue for buttons and inputs in IE6/7
+ * Known issue: reintroduces inner spacing
+ */
+
+table button,
+table input {
+    *overflow: auto;
+}
+
+/*
+ * 1. Improves usability and consistency of cursor style between image-type 'input' and others
+ * 2. Corrects inability to style clickable 'input' types in iOS
+ */
+
+button,
+html input[type="button"], 
+input[type="reset"], 
+input[type="submit"] {
+    cursor: pointer; /* 1 */
+    -webkit-appearance: button; /* 2 */
+}
+
+/*
+ * 1. Addresses box sizing set to content-box in IE8/9
+ * 2. Addresses excess padding in IE8/9
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+}
+
+/*
+ * 1. Addresses appearance set to searchfield in S5, Chrome
+ * 2. Addresses box sizing set to border-box in S5, Chrome (include -moz to future-proof)
+ */
+
+input[type="search"] {
+    -webkit-appearance: textfield; /* 1 */
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box; /* 2 */
+    box-sizing: content-box;
+}
+
+/*
+ * Corrects inner padding displayed oddly in S5, Chrome on OSX
+ */
+
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/*
+ * Corrects inner padding and border displayed oddly in FF3/4
+ * www.sitepen.com/blog/2008/05/14/the-devils-in-the-details-fixing-dojos-toolbar-buttons/
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/*
+ * 1. Removes default vertical scrollbar in IE6/7/8/9
+ * 2. Improves readability and alignment in all browsers
+ */
+
+textarea {
+    overflow: auto; /* 1 */
+    vertical-align: top; /* 2 */
+}
+
+
+/* =============================================================================
+   Tables
+   ========================================================================== */
+
+/* 
+ * Remove most spacing between table cells
+ */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
 
 /*
  * jQuery UI CSS Framework @VERSION
@@ -851,55 +1291,6 @@ a:hover {
 
 
 
-
-/*
------------------------------------------------
-.ui-widget-content a
------------------------------------------------ */
-
-
-/* .ui-widget-content a tag properties. */
-.ui-widget-content a { 
-	color: #026890;
-	text-decoration: none;
-}
-
-
-
-
-.ui-widget-content a:link,
-.ui-widget-content a:visited {
-    color: #026890;
-}
-.ui-widget-content a:hover { 
-    color: #6eac2c;
-}
-
-
-
-
-
-/*
------------------------------------------------
-a.ui-hoverable
------------------------------------------------ */
-
-
-/* a.ui-hoverable tag properties. */
-a.ui-hoverable { 
-	display: inline;
-	height: 18px;
-	width: 18px;
-	border: none
-}
-
-
-
-
-
-
-
-
 /*
 -----------------------------------------------
 ul.main-nav
@@ -1683,6 +2074,7 @@ div.object-definition.w50 dl dt {
 
 /* .data-table tbody td tag properties. */
 .data-table tbody td { 
+	vertical-align: center;
 	padding: 4px;
 }
 
@@ -1798,7 +2190,6 @@ input {
 
 
 .djpcms-html-box .bd.ui-widget-content {
-    background: transparent;
     border: 0;
 }
 .djpcms-html-box.collapsed > .bd {
@@ -1841,7 +2232,6 @@ div.edit-menu {
 
 /* .djpcms-html-box .hd tag properties. */
 .djpcms-html-box .hd { 
-	font-weight:normal;
 	overflow: hidden;
 	padding: 6px 5px;
 }
@@ -1849,13 +2239,27 @@ div.edit-menu {
 
 
 
-.djpcms-html-box .hd h2 {
-    float: left;
-    margin:0;
-    padding:0;
-    font-weight: normal;
-    font-size: 110%;
+
+
+
+/*
+-----------------------------------------------
+.djpcms-html-box .hd h2
+----------------------------------------------- */
+
+
+/* .djpcms-html-box .hd h2 tag properties. */
+.djpcms-html-box .hd h2 { 
+	font-size:110%;
+	font-weight:normal;
+	padding: 0;
+	float: left;
+	margin: 0;
 }
+
+
+
+
 
 
 
@@ -1916,7 +2320,6 @@ div.edit-menu {
 
 
 .djpcms-html-box.edit-block .bd.ui-widget-content {
-    background: transparent;
     border: 0;
 }
 .djpcms-html-box.edit-block.collapsed > .bd {
@@ -2103,7 +2506,6 @@ div.flat-box {
 
 
 div.flat-box .bd.ui-widget-content {
-    background: transparent;
     border: 0;
 }
 div.flat-box.collapsed > .bd {
@@ -2146,7 +2548,6 @@ div.flat-box div.hd
 
 /* div.flat-box div.hd tag properties. */
 div.flat-box div.hd { 
-	font-weight:bold;
 	overflow: hidden;
 	padding: 6px 5px;
 }
@@ -2154,13 +2555,27 @@ div.flat-box div.hd {
 
 
 
-div.flat-box div.hd h2 {
-    float: left;
-    margin:0;
-    padding:0;
-    font-weight: bold;
-    font-size: 110%;
+
+
+
+/*
+-----------------------------------------------
+div.flat-box div.hd h2
+----------------------------------------------- */
+
+
+/* div.flat-box div.hd h2 tag properties. */
+div.flat-box div.hd h2 { 
+	font-size:110%;
+	font-weight:normal;
+	padding: 0;
+	float: left;
+	margin: 0;
 }
+
+
+
+
 
 
 
@@ -2869,6 +3284,23 @@ div.text-select .target {
 
 /*
 -----------------------------------------------
+.econometric-plot .secondary
+----------------------------------------------- */
+
+
+/* .econometric-plot .secondary tag properties. */
+.econometric-plot .secondary { 
+	overflow: auto;
+}
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
 .econometric-plot .secondary .panel
 ----------------------------------------------- */
 
@@ -2886,6 +3318,7 @@ div.text-select .target {
 
 
 
+
 /*
 -----------------------------------------------
 .econometric-plot-tooltip
@@ -2894,6 +3327,7 @@ div.text-select .target {
 
 /* .econometric-plot-tooltip tag properties. */
 .econometric-plot-tooltip { 
+	font-size:80%;
 	padding: 2px;
 }
 
@@ -2906,12 +3340,178 @@ div.text-select .target {
 
 /*
 -----------------------------------------------
-table.plot-options th, table.plot-options td
+.ecolegend
 ----------------------------------------------- */
 
 
-/* table.plot-options th, table.plot-options td tag properties. */
-table.plot-options th, table.plot-options td { 
+/* .ecolegend tag properties. */
+.ecolegend { 
+	font-size:80%;
+}
+
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.ts-input-date
+----------------------------------------------- */
+
+
+/* .ts-input-date tag properties. */
+.ts-input-date { 
+	width: 90px;
+	padding: 4px;
+	margin: 0;
+}
+
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.plot-options
+----------------------------------------------- */
+
+
+/* .plot-options tag properties. */
+.plot-options { 
+	font-size:90%;
+}
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.plot-options th
+----------------------------------------------- */
+
+
+/* .plot-options th tag properties. */
+.plot-options th { 
+	font-weight:bold;
+}
+
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.plot-options td
+----------------------------------------------- */
+
+
+/* .plot-options td tag properties. */
+.plot-options td { 
+	font-weight:normal;
+}
+
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.plot-options input
+----------------------------------------------- */
+
+
+/* .plot-options input tag properties. */
+.plot-options input { 
+	margin: 0;
+}
+
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.plot-options input.tiny
+----------------------------------------------- */
+
+
+/* .plot-options input.tiny tag properties. */
+.plot-options input.tiny { 
+	width: 1em;
+}
+
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.plot-options .ui-button-text-only .ui-button-text
+----------------------------------------------- */
+
+
+/* .plot-options .ui-button-text-only .ui-button-text tag properties. */
+.plot-options .ui-button-text-only .ui-button-text { 
+	padding: 0 0.5em;
+}
+
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.plot-options tr.serie-title td
+----------------------------------------------- */
+
+
+/* .plot-options tr.serie-title td tag properties. */
+.plot-options tr.serie-title td { 
+	font-size:100%;
+	font-weight:bold;
+	text-align: left;
+	padding: 5px 5px 0;
+}
+
+
+
+
+
+
+
+
+/*
+-----------------------------------------------
+.plot-options tr.serie-option td
+----------------------------------------------- */
+
+
+/* .plot-options tr.serie-option td tag properties. */
+.plot-options tr.serie-option td { 
 	padding: 0 5px;
 }
 
@@ -2922,37 +3522,18 @@ table.plot-options th, table.plot-options td {
 
 
 
-/*
------------------------------------------------
-table.plot-options tr.serie-title td
------------------------------------------------ */
-
-
-/* table.plot-options tr.serie-title td tag properties. */
-table.plot-options tr.serie-title td { 
-	color: #222;
-	font-size:120%;
-	font-weight:bold;
-	text-align: left;
-	padding: 10px 5px 5px;
-}
-
-
-
-
-
-
-
 
 /*
 -----------------------------------------------
-table.plot-options tr.serie-option td
+.plot-options th, .plot-options td
 ----------------------------------------------- */
 
 
-/* table.plot-options tr.serie-option td tag properties. */
-table.plot-options tr.serie-option td { 
-	padding: 0 5px 5px;
+/* .plot-options th, .plot-options td tag properties. */
+.plot-options th, .plot-options td { 
+	vertical-align: middle;
+	text-align: center;
+	padding: 0 5px;
 }
 
 
@@ -3034,91 +3615,5 @@ table.plot-options tr.serie-option td {
 
 
 
-
-
-
-
-pre {
-	font-family: monospace;
-	font-size: 100%;
-}
-h1 {
-	font-size:180%;
-	line-height:1.1em;
-	margin-bottom:1em;
-}
-h2 {
-	font-size:150%;
-	line-height:1.2em;
-	margin-bottom:0.8em;
-}
-h3 {
-	font-size:120%;
-	line-height:1.2em;
-	margin-bottom:0.6em;
-}
-p {
-    text-align: left;
-	margin-bottom: 0.6em;
-}
-blockquote div.body-quote {
-	font-style: italic;
-	font-size: 100%;
-	font-family: Georgia,"Times New Roman",Times,serif;
-}
-
-
-
-
-
-/* Actions menu
---------------------------------------------------------- */
-div.edit-menu {
-	float: right;
-}
-div.edit-menu.left {
-	float: left;
-}
-div.edit-menu a {
-	display:inline;
-	float:left;
-	border:none;
-	margin:0 0 0 3px;
-	text-indent:-9999em;
-	padding:0;
-	height:14px;
-	width:14px;
-}
-a:link.headerlink,
-a:visited.headerlink {
-	color: transparent;
-}
-a:hover.headerlink {
-	color: #666;
-}
-
-
-
-
-/* AUTOCOMPLETE
--------------------------------------------------------*/
-
-.djp-autocomplete {
-	overflow: hidden;
-	/*float: left;*/
-}
-.djp-autocomplete input.multi {
-	clear: both;
-}
-.djp-autocomplete div.selected {
-	float: left;
-	width: 98%;
-}
-	
-.djp-autocomplete div.to_delete {
-	margin-top: 3px;
-	line-height: 1.2em;
-	overflow: hidden;
-}
 
 

@@ -103,33 +103,12 @@ plots, you can just fix the size of their placeholders.
                                            }
                                   );
                                }
-                            },
-                   'about': {
-                               classname: 'about',
-                               title: 'About Economeric Plotting Plugin',
-                               icon: "ui-icon-contact",
-                               decorate: function (b,el) {
-                                   b.click(function (e) {
-                                       var html = "<div class='econometric-about-panel definition-list'>" +
-                                                  "<dl><dt>Version</dt><dd>"+version+"</dd></dl>"+
-                                                  "<dl><dt>Author</dt><dd>" + authors + "</dd></dl>" +
-                                                  "<dl><dt>Web page</dt><dd><a href='" + home_page +
-                                                  "' target='_blank'>" + home_page + "</a></dd></dl>" +
-                                                  "<dl><dt>jQuery</dt><dd>" + $.fn.jquery + "</dd></dl>" +
-                                                  "<dl><dt>Flot</dt><dd>" + $.plot.version + "</dd></dl>" +
-                                                  "</div>";
-                                       $('<div title="Econometric plugin"></div>').html(html)
-                                            .dialog({modal: true,
-                                                    draggable: false,
-                                                    resizable: false,
-                                                    width: 500});
-                                   });
-                               }
                             }
             },
             defaults = {
                showplot: function (i) {return true;},
                show_tooltip: true,
+               plugins: [],
                flot_options: {
                    xaxis: {},
                    legend: {
@@ -227,26 +206,29 @@ plots, you can just fix the size of their placeholders.
             }
         	
         	// Add plugins
-            $.each(plugins, function (name,extension) {
-            	$.ecoplot.log.debug('Processing plugin '+name+' on instance '+index_);
-                instance.data[name] = $.extend({},extension.data || {});                    
-                $.each(extension,function (fname,elem) {
-                    if(fname == 'init') {
-                        elem.apply(instance);
-                    }
-                    else if(fname == 'layout') {
-                    	_layouts.push($.proxy(elem,instance));
-                    }
-                    else if(fname == 'get_input_data') {
-                    	_inputs.push($.proxy(elem,instance));
-                    }
-                    else if(fname !== 'data') {
-                        if($.isFunction(elem)) {
-                            elem = make_function (fname,elem);
+            $.each(settings_.plugins, function (i,name) {
+                var extension = plugins[name];
+                if(extension) {
+                	$.ecoplot.log.debug('Processing plugin '+name+' on instance '+index_);
+                    instance.data[name] = $.extend({},extension.data || {});                    
+                    $.each(extension,function (fname,elem) {
+                        if(fname == 'init') {
+                            elem.apply(instance);
                         }
-                        instance[fname] = elem;
-                    }
-                });
+                        else if(fname == 'layout') {
+                        	_layouts.push($.proxy(elem,instance));
+                        }
+                        else if(fname == 'get_input_data') {
+                        	_inputs.push($.proxy(elem,instance));
+                        }
+                        else if(fname !== 'data') {
+                            if($.isFunction(elem)) {
+                                elem = make_function (fname,elem);
+                            }
+                            instance[fname] = elem;
+                        }
+                    });
+                }
             });
             
             return instance;
@@ -298,6 +280,9 @@ plots, you can just fix the size of their placeholders.
             },
             log: default_logger,
             'version': version,
+            info: function() {return {'version':version,
+                                      'authors':authors,
+                                      'home_page':home_page};},
             'plugin_class': plugin_class,
             addMenu: function (menu) {menubar[menu.name] = menu;},
             getmenu: function (name,$this) {
@@ -312,10 +297,14 @@ plots, you can just fix the size of their placeholders.
             plugin: function (pname, pdata) {
                 var tbs = pdata.tools || {};
                 $.each(tbs, function (name,val) {
+                    val.plugin = pname;
                     tools[name] = val;
                 });
                 defaults[pname] = pdata.defaults || {};
                 plugins[pname] = pdata;
+                if(pdata.isdefault) {
+                    defaults.plugins.push(pname);
+                }
             },
             resize: function () {
                 $(window).trigger('resize');
@@ -398,6 +387,7 @@ plots, you can just fix the size of their placeholders.
      * 
      */
     $.ecoplot.plugin('menu',{
+        isdefault: true,
     	defaults: {
     		container: null,
     		container_class: 'menu'
@@ -412,8 +402,6 @@ plots, you can just fix the size of their placeholders.
     			mc = $('<div></div>').appendTo(container);
     			menu.upper = $('<div class="menubar upper ui-widget-header"></div>').appendTo(mc).hide();
         		menu.lower = $('<div class="menubar lower ui-widget-header"></div>').appendTo(mc);
-                //$.ecoplot.getmenu('dates',container).appendTo(menu.lower);
-                //menu.lower.append($.ecoplot.getmenu('toolbar',container));
                 menu.lower.append($('<div></div>').addClass(options.jsondata.loader_class));
     		}
     		menu.container = mc.addClass(omenu.container_class);
@@ -425,6 +413,7 @@ plots, you can just fix the size of their placeholders.
     // This is the main plugin which adds the standard plotting functionalities
     // ////////////////////////////////////////////////////////////////////////////
     $.ecoplot.plugin('canvases',{
+        isdefault: true,
         defaults : {
             legend_class: 'ecolegend ui-state-default',
             legend_padding: 5,
@@ -694,11 +683,13 @@ plots, you can just fix the size of their placeholders.
     // plugin for loading data via ajax
     // /////////////////////////////////////////////////
     $.ecoplot.plugin('jsondata',{
+        isdefault: true,
         defaults: {
             autoload:true,
             responsetype: 'json',
             requestMethod: 'get',
             url: '.',
+            errorcallbacks: [],
             requestparams: {},
             load_opacity: '0.7',
             loader_class: 'loader',
@@ -769,22 +760,30 @@ plots, you can just fix the size of their placeholders.
                 dataType: options.responsetype,
                 success: function (data) {
                     log.info("Got the response from server");
-                    var ok = true;
+                    var pdata;
                     try {
-                        data = options.parse(data,instance);
+                        pdata = options.parse(data,instance);
+                        if(!pdata) {
+                            log.error("Failed to parse.");
+                        }
                     }
                     catch(e) {
-                        ok = false;
                         log.error("Failed to parse. Error in line ",e);
                     }
                     options.stopLoading(instance);
-                    if(ok)  {
+                    if(pdata)  {
                         try {
-                            instance._ajaxdone(data);
+                            instance._ajaxdone(pdata);
                         }
                         catch(e2) {
+                            pdata = false;
                             log.error("Failed after data has loaded",e2);
                         }
+                    }
+                    if(!pdata) {
+                        $.each(options.errorcallbacks, function(i,f) {
+                            f(data,instance);
+                        });
                     }
                 }
             });
@@ -796,6 +795,7 @@ plots, you can just fix the size of their placeholders.
     
     
     $.ecoplot.plugin('zoom',{
+        isdefault: true,
         tools: {
                 'zoomout': {
                             classname: 'zoomout',
@@ -848,6 +848,7 @@ plots, you can just fix the size of their placeholders.
     
     
     $.ecoplot.plugin('dialog', {
+        isdefault: true,
         dialog: function (title,body,opts) {
             var c = this.container(),
                 d = $("<div></div>").appendTo(c).attr('title',title).html(body);
@@ -972,6 +973,7 @@ plots, you can just fix the size of their placeholders.
 	 */
     
     $.ecoplot.plugin('edit',{
+        isdefault: true,
         defaults: {
             editing_class: 'with-panel',
             container: null,
@@ -1305,6 +1307,7 @@ plots, you can just fix the size of their placeholders.
     
 
     $.ecoplot.plugin('tooltip',{
+        isdefault: true,
         defaults: {
             tooltip_class: 'econometric-plot-tooltip ui-state-default',
             fadein: 50,
@@ -1445,6 +1448,7 @@ plots, you can just fix the size of their placeholders.
 
 
     $.ecoplot.plugin('command',{
+        isdefault: true,
     	defaults : {
     		show: true,
     		entry: null,
@@ -1486,6 +1490,7 @@ plots, you can just fix the size of their placeholders.
     
 
     $.ecoplot.plugin('dates',{
+        isdefault: true,
     	defaults: {
             show: true,
             label: 'Period',
@@ -1558,13 +1563,15 @@ plots, you can just fix the size of their placeholders.
 	 * Add Toolbar items as specified in the options.toolbar array.
 	 */
     $.ecoplot.plugin('toolbar',{
+        isdefault: true,
     	defaults: {
     		render_as: 'buttons',
     		classname: 'toolbar',
     		display: ['zoomout','reload','legend','edit','saveimage','about']
     	},
     	layout: function () {
-            var options = this.settings().toolbar,
+            var plugins = this.settings().plugins,
+                options = this.settings().toolbar,
             	container = $('<div></div>').addClass(options.classname);
             
             if(options.render_as == 'buttons') {
@@ -1586,7 +1593,7 @@ plots, you can just fix the size of their placeholders.
             	
             	$.each(options.display, function (i,name) {
 	                var menu = $.ecoplot.tool(name);
-	                if(menu) {
+	                if(menu && plugins.indexOf(menu.plugin) !== -1) {
 	                    var tel,eel,ico;
 	                    	id = cid+'_'+menu.classname;
 	                    if(!menu.type || menu.type === 'button') {
@@ -1625,6 +1632,7 @@ plots, you can just fix the size of their placeholders.
     
     
     $.ecoplot.plugin('resizable', {
+        isdefault: true,
     	defaults: {
     		disabled: true
     	},
@@ -1634,6 +1642,35 @@ plots, you can just fix the size of their placeholders.
     			this.container().resizable(options);
     		}
     	}
+    });
+    
+    
+    $.ecoplot.plugin('about', {
+        tools: {
+            about: {
+                classname: 'about',
+                title: 'About Economeric Plotting Plugin',
+                icon: "ui-icon-contact",
+                decorate: function (b,el) {
+                    b.click(function (e) {
+                        var info = $.ecoplot.info(),
+                            html = "<div class='econometric-about-panel definition-list'>" +
+                                   "<dl><dt>Version</dt><dd>"+info.version+"</dd></dl>"+
+                                   "<dl><dt>Author</dt><dd>" + info.authors + "</dd></dl>" +
+                                   "<dl><dt>Web page</dt><dd><a href='" + info.home_page +
+                                   "' target='_blank'>" + info.home_page + "</a></dd></dl>" +
+                                   "<dl><dt>jQuery</dt><dd>" + $.fn.jquery + "</dd></dl>" +
+                                   "<dl><dt>Flot</dt><dd>" + $.plot.version + "</dd></dl>" +
+                                   "</div>";
+                        $('<div title="Econometric plugin"></div>').html(html)
+                             .dialog({modal: true,
+                                     draggable: false,
+                                     resizable: false,
+                                     width: 500});
+                    });
+                }
+            }
+        }
     });
     
     // /////////////////////////////////////////////////
