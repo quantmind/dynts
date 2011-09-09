@@ -1,17 +1,22 @@
-
 class DyntsException(Exception):
     '''Base class of exceptions raised by ``dynts``'''
     pass
 
-class InvalidBackEnd(DyntsException):
+
+class NotAvailable(DyntsException):
+    pass
+
+class InvalidBackEnd(NotAvailable):
     '''A :class:`DyntsException` exception raised when
 an invalid :class:`dynts.TimeSeries` bcakend name is given.'''
     pass
 
-class MissingPackage(DyntsException):
+
+class MissingPackage(NotAvailable):
     pass
 
-class MissingDataProvider(DyntsException):
+
+class MissingDataProvider(NotAvailable):
     '''A :class:`DyntsException` exception raised when
 a Data provider is not available'''
     pass

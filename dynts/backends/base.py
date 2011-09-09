@@ -20,7 +20,8 @@ This class expose all the main functionalities of a timeseries
 
 .. attribute:: type
 
-    string indicating the backend type (``zoo``, ``rmetrics``, ``numpy``, etc...)
+    string indicating the backend type (``zoo``, ``rmetrics``,
+    ``numpy``, etc...)
     
 .. attribute:: shape
 
@@ -28,6 +29,7 @@ This class expose all the main functionalities of a timeseries
     '''
     type = None
     default_align = 'right'
+    _algorithms = {}
     
     def __init__(self, name = '', date = None, data = None, info = None):
         super(TimeSeries,self).__init__(name,info)
@@ -39,12 +41,88 @@ This class expose all the main functionalities of a timeseries
     __div__ = operators.div
     __truediv__ = operators.div # Python 3
     
+    def getalgo(self, operation, name):
+        '''Return the algorithm for *operation* named *name*'''
+        if operation not in self._algorithms:
+            raise NotAvailable('{0} not registered.'.format(operation))
+        oper = self._algorithms[operation]
+        try:
+            return oper[name]
+        except KeyError:
+            raise NotAvailable('{0} algorithm {1} not registered.'\
+                               .format(operation,name))
+    
+    @classmethod
+    def register_algorithm(cls, operation, name, callable):
+        if hasattr(callable,'__call__'):
+            algorithms = cls._algorithms
+            if operation not in algorithms:
+                algorithms[operation] = {}
+            oper = algorithms[operation]
+            oper[name] = callable
+            
+    ######################################################################
+    # METADATA FUNCTIONS
+    ######################################################################
+    
     def __len__(self):
         return self.shape[0]
     
     def count(self):
         '''Number of series in timeseries.'''
         return self.shape[1]
+    
+    def dates(self, desc = None):
+        '''Returns an iterable over ``datetime.date`` instances
+in the timeseries.'''
+        c = self.dateinverse
+        for key in self.keys(desc = desc):
+            yield c(key)
+            
+    def keys(self, desc = None):
+        '''Returns an iterable over ``raw`` keys. The keys may be different
+from dates for same backend implementations.'''
+        raise NotImplementedError
+            
+    def values(self, desc = None):
+        '''Returns a ``numpy.ndarray`` containing the values of the timeseries.
+Implementations should try not to copy data if possible. This function
+can be used to access the timeseries as if it was a matrix.'''
+        raise NotImplementedError
+    
+    def items(self, desc = None):
+        '''Returns a python ``generator`` which can be used to iterate over
+:func:`dynts.TimeSeries.dates` and :func:`dynts.TimeSeries.values`
+returning a two dimensional
+tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
+function. The additional input parameter *desc* can be used to iterate from
+the greatest to the smallest date in the timeseries by passing ''desc=True``'''
+        for d,v in zip(self.dates(desc = desc),self.values(desc = desc)):
+            yield d,v
+            
+    def series(self):
+        '''Generator of single series data (no dates are included).'''
+        data = self.values()
+        if len(data):
+            for c in range(self.count()):
+                yield data[:,c]
+        else:
+            raise StopIteration
+        
+    def named_series(self):
+        '''Generator of tuples with name and serie data.'''
+        return zip(self.names(),self.series())
+            
+    def serie(self, index):
+        return self.values()[:,index]
+    
+    def display(self):
+        for d,v in self.items():
+            print('%s: %s' % (d,v))
+    
+    ######################################################################
+    # OTHER REPRESENTATIONS of TIMESERIE
+    ######################################################################
     
     def asbtree(self):
         '''Return an instance of :class:`dynts.utils.wrappers.asbtree`
@@ -56,11 +134,45 @@ which exposes binary tree like functionalities of ``self``.'''
 which exposes hash-table like functionalities of ``self``.'''
         return ashash(self)
     
+    # DATE OPERATORS
+    
     def dateconvert(self, dte):
         return dte
     
     def dateinverse(self, key):
         return key
+    
+    ######################################################################
+    # OPERATIONS RETURNING NEW SERIES
+    ######################################################################
+    
+    def window(self, start, end):
+        raise NotImplementedError
+    
+    def merge(self, ts, all = True):
+        raise NotImplementedError
+    
+    def clone(self, date = None, data = None, name = None):
+        '''Create a clone of timeseries'''
+        name = name or self.name
+        data = data if data is not None else self.values()
+        ts = self.__class__(name)
+        if date is None:
+            ts.make(self.keys(),data,raw=True)
+        else:
+            ts.make(date,data)
+        return ts
+    
+    def reduce(self, size, method = 'simple', **kwargs):
+        '''Trim timeseries to a new *size* using the algorithm *method*.
+If *size* is greater or equal than len(self) it does nothing.'''
+        if size >= len(self):
+            return self
+        return self.getalgo('reduce',method)(self,size,**kwargs)
+    
+    ######################################################################
+    # SCALAR STANDARD FUNCTIONS
+    ######################################################################
     
     def max(self, fallback = False):
         '''Max values by series'''
@@ -89,48 +201,6 @@ the median is then usually defined to be the mean of the two middle values'''
     def returns(self, fallback = False):
         '''Calculate returns as delta(log(self)) by series'''
         return self.logdelta(fallback = fallback)
-    
-    def dates(self, desc = None):
-        '''Returns an iterable over ``datetime.date`` instances in the timeseries.'''
-        c = self.dateinverse
-        for key in self.keys(desc = desc):
-            yield c(key)
-            
-    def keys(self, desc = None):
-        '''Returns an iterable over ``raw`` keys. The keys may be different from dates
-for same backend implementations.'''
-        raise NotImplementedError
-            
-    def values(self, desc = None):
-        '''Returns a ``numpy.ndarray`` containing the values of the timeseries.
-Implementations should try not to copy data if possible. This function
-can be used to access the timeseries as if it was a matrix.'''
-        raise NotImplementedError
-    
-    def items(self, desc = None):
-        '''Returns a python ``generator`` which can be used to iterate over
-:func:`dynts.TimeSeries.dates` and :func:`dynts.TimeSeries.values` returning a two dimensional
-tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
-function. The additional input parameter *desc* can be used to iterate from
-the greatest to the smallest date in the timeseries by passing ''desc=True``'''
-        for d,v in zip(self.dates(desc = desc),self.values(desc = desc)):
-            yield d,v
-            
-    def series(self):
-        '''Generator of single series.'''
-        data = self.values()
-        if len(data):
-            for c in range(self.count()):
-                yield data[:,c]
-        else:
-            raise StopIteration
-            
-    def serie(self, index):
-        return self.values()[:,index]
-    
-    def display(self):
-        for d,v in self.items():
-            print('%s: %s' % (d,v))
     
     def isconsistent(self):
         '''Check if the timeseries is consistent'''
@@ -295,22 +365,6 @@ Same as::
         ts = self.rollapply('sd',**kwargs)
         if scale != 1:
             ts *= scale
-        return ts
-    
-    def window(self, start, end):
-        raise NotImplementedError
-    
-    def merge(self, ts, all = True):
-        raise NotImplementedError
-    
-    def clone(self, date = None, data = None, name = None):
-        name = name or self.name
-        data = data if data is not None else self.values()
-        ts = self.__class__(name)
-        if date is None:
-            ts.make(self.keys(),data,raw=True)
-        else:
-            ts.make(date,data)
         return ts
     
     # INTERNALS

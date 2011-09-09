@@ -9,6 +9,7 @@ except ImportError as e:
 else:
     import fallback
     
+from .defaults import *
     
 def makeskiplist(data = None, expected_size = 10000, use_fallback = False):
     '''Create a new skiplist'''
