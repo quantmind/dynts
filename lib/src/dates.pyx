@@ -1,6 +1,35 @@
 cdef int _EPOCH_ORD = 719163
 
-from datetime import date, datetime
+cdef extern from "datetime.h":
+    
+    ctypedef class datetime.date [object PyDateTime_Date]:
+        # cdef int *data
+        # cdef long hashcode
+        # cdef char hastzinfo
+        pass
+    
+    ctypedef class datetime.datetime [object PyDateTime_DateTime]:
+        # cdef int *data
+        # cdef long hashcode
+        # cdef char hastzinfo
+        pass
+
+    int PyDateTime_GET_YEAR(datetime o)
+    int PyDateTime_GET_MONTH(datetime o)
+    int PyDateTime_GET_DAY(datetime o)
+    int PyDateTime_DATE_GET_HOUR(datetime o)
+    int PyDateTime_DATE_GET_MINUTE(datetime o)
+    int PyDateTime_DATE_GET_SECOND(datetime o)
+    int PyDateTime_DATE_GET_MICROSECOND(datetime o)
+    int PyDateTime_TIME_GET_HOUR(datetime o)
+    int PyDateTime_TIME_GET_MINUTE(datetime o)
+    int PyDateTime_TIME_GET_SECOND(datetime o)
+    int PyDateTime_TIME_GET_MICROSECOND(datetime o)
+    bint PyDateTime_Check(object o)
+    void PyDateTime_IMPORT()
+
+# import datetime C API
+PyDateTime_IMPORT
 
 
 cdef inline int64_t jstimestamp(object dt):
@@ -13,7 +42,7 @@ cdef inline int64_t jstimestamp(object dt):
 
     hours = 24 * (date(y, m, 1).toordinal() - _EPOCH_ORD + d - 1)
     
-    if isinstance(dt,date):
+    if isinstance(dt,datetime.date):
         ts = 3600000 * hours
     else:
         hours += PyDateTime_DATE_GET_HOUR(dt)

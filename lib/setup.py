@@ -1,5 +1,10 @@
-#
-# Required by Cython to build extensions
+'''\
+Required by Cython to build extensions
+
+To compile extension only type::
+
+    python setup.py build_ext
+'''
 #from numpy.distutils.core import setup
 from distutils.core import setup
 from distutils.extension import Extension

@@ -1,5 +1,5 @@
 include "common.pyx"
-#include "dates.pyx"
+include "dates.pyx"
 include "skiplist.pyx"
 include "rolling.pyx"
 include "simplefunc.pyx"

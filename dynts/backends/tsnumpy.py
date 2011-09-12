@@ -138,6 +138,18 @@ class TimeSeries(dynts.TimeSeries):
             hash[dt] = mdt(dt)
         return hash.getts()
     
+    def min(self):
+        return self._data.min(0)
+    
+    def mean(self):
+        return self._data.mean(0)
+    
+    def max(self):
+        return self._data.max(0)
+    
+    def var(self, ddof = 0):
+        return self._data.var(0, ddof = ddof)
+    
     def log(self, name = None, **kwargs):
         v = np.log(self._data)
         name = name or composename('log',*self.names())

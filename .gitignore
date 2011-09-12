@@ -1,5 +1,6 @@
 *.pyc
 *.pyd
+*.so
 _dep.py
 .project
 .pydevproject
