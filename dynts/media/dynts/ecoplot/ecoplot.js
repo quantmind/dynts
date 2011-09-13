@@ -1269,7 +1269,7 @@ plots, you can just fix the size of their placeholders.
                     serie.lines  = checkmedia(serie.lines,showplot(i));
                     serie.points = checkmedia(serie.points,false);
                     serie.bars   = checkmedia(serie.bars,false);
-                    serie.color  = i;
+                    serie.color  = serie.color || i;
                 }
                 else {
                     serie.lines  = oserie.lines;
