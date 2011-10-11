@@ -12,6 +12,11 @@ from dynts.data import providers
 from .registry import FunctionBase, ComposeFunction, function_registry
 
 try:
+    from ccy import todate
+except ImportError:
+    todate = lambda x : x
+
+try:
     from .rules import parsefunc
 except ImportError:
     parsefunc = None
@@ -185,6 +190,8 @@ Typical usage::
     if expression.malformed():
         raise CouldNotParse(expression)
     symbols = expression.symbols()
+    start = start if not start else todate(start)
+    end = end if not end else todate(end)
     data = providers.load(symbols, start, end, loader = loader,
                           logger = logger, backend = backend, **kwargs)
     return dslresult(expression, data, backend = backend)

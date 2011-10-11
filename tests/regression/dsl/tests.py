@@ -142,4 +142,10 @@ class TestDsl(unittest.TestCase):
             expected_name = '__'.join(expr.split(','))
             self.assertEqual(name, expected_name)
             
+    def testTimesMinus(self):
+        result = dynts.parse('EUR*-3')
+        self.assertEqual(result.symbols(),['EUR'])
+        self.assertEqual(len(result),2)
+        self.assertEqual(str(result[0]),'EUR')
+        self.assertEqual(str(result[1]),'-3')
         

@@ -693,6 +693,7 @@ plots, you can just fix the size of their placeholders.
             requestparams: {},
             load_opacity: '0.7',
             loader_class: 'loader',
+            data2body : null,
             parse: function (data,instance){return data;},
             startLoading: function (instance) {
                 var options = instance.settings().jsondata;
@@ -752,11 +753,14 @@ plots, you can just fix the size of their placeholders.
                 params[key] = typeof param === "function" ? param() : param;
             });
             params = $.extend(true, params, dataplot);
+            if (options.data2body) {
+            	params = options.data2body(params);
+            }
             options.startLoading(this);
             $.ajax({
                 url: options.url,
                 type: options.requestMethod,
-                data: $.param(params),
+                data: params,
                 dataType: options.responsetype,
                 success: function (data) {
                     log.info("Got the response from server");

@@ -50,6 +50,11 @@ def p_expression_number(p):
 def p_expression_id(p):
     '''expression : ID'''
     p[0] = Symbol(p[1])
+    
+
+def p_expression_minus_number(p):
+    '''expression : MINUS NUMBER'''
+    p[0] = Number(-p[2][0])
 
 
 def p_expression_id2(p):

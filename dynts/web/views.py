@@ -23,6 +23,8 @@ SPARKLINE_MEDIA = media.Media(js = ['dynts/jquery.sparkline.js'])
 class EcoForm(forms.Form):
     height = forms.IntegerField()
     service_url = forms.CharField(required = False)
+    method = forms.ChoiceField(choices = (('get','get'),('post','post')),
+                               default = 'get')
     
     
 class PlotSettings(forms.Form):
@@ -54,13 +56,15 @@ for fetching data.'''
         kwargs = djp.kwargs
         height = max(int(kwargs.get('height',400)),30)
         service_url = kwargs.get('service_url',self.path)
+        requestMethod = kwargs.get('method','get')
         start = kwargs.get('start',None)
         code = self.get_code_object(djp)
         id = gen_unique_id()
         widget = html.Widget('div', id = id, cn = 'econometric-plot')\
                 .addData('height',height)\
                 .addData('start',start)\
-                .addData('jsondata',{'url':service_url})
+                .addData('jsondata',{'url':service_url,
+                                     'requestMethod':requestMethod})
         if code:
             widget.addData('command',{'show':False,'symbol':code})
         return widget
