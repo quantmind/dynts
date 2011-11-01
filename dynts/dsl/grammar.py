@@ -1,4 +1,7 @@
-from dynts.dsl.ast import *
+from dynts.conf import settings
+
+from .ast import *
+
 
 def p_expression_string(p):
     '''expression : QUOTE expression QUOTE'''

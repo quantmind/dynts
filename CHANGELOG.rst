@@ -1,6 +1,7 @@
 Ver. 0.4.2 - Development
 ================================
 * Improved documentation.
+* Several bug fixes.
 * Introduced :attr:`dynts.conf.Settings.desc` for specifying the order of dates in timeseries.
 * Added `about` menu to :ref:`Ecoplot plugin <ecoplot-web>`.
 * :ref:`Ecoplot plugin <ecoplot-web>` updated to work with jQuery_ 1.6.1. Changes are mainly in the

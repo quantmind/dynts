@@ -27,11 +27,11 @@ class rpyobject(object):
     @classmethod
     def load(cls):
         if not cls._robj:
-            cls._robj = r
             for lib in cls.libraries:
                 loadlib(lib)
             for script in cls.scripts:
                 r(script)
+            cls._robj = r
             
         return cls._robj
     

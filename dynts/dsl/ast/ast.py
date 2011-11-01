@@ -1,4 +1,6 @@
-from dynts.dsl.ast.binmath import *
+from .astbase import Bracket
+
+__all__ = ['Function']
 
 class Function(Bracket):
     '''A :class:`dynts.dsl.Bracket` representing a function *func*, an instance of :class:`dynts.dsl.FunctionBase`.

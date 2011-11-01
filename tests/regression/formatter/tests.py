@@ -22,7 +22,7 @@ class TestFlot(unittest.TestCase):
         self.assertEqual(dts['type'],'multiplot')
         self.assertEqual(len(dts['plots']),1)
         plot = dts['plots'][0]
-        self.assertEqual(plot['type'],'scatter')
+        self.assertEqual(plot['type'],'xy')
         self.assertEqual(len(plot['series']),1)
         serie = plot['series'][0]
         #self.assertEqual(serie['extratype'],'date')
