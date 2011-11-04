@@ -13,8 +13,7 @@ class CustomLoader(TimeSerieLoader):
     
     def onresult(self, symbol, result, logger, backend, **kwargs):
         '''Store result in the class data dictionary'''
-        ticker = self.getsymbol(symbol.ticker, symbol.field, symbol.provider.code)
-        self.data[ticker] = result
+        self.data[symbol.full()] = result
         return result
         
 

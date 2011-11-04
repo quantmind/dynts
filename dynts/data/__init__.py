@@ -59,6 +59,12 @@ It doesn't do anything special.
     def __str__(self):
         return self.ticker
     
+    def full(self):
+        c = settings.field_separator
+        f = '' if not self.field else '%s%s' % (c,self.field)
+        p = '' if not self.provider else '%s%s' % (c,self.provider.code)
+        return '%s%s%s' % (self.ticker,f,p)
+    
 
 class TimeSerieLoader(object):
     '''Cordinates the loading of timeseries data
@@ -217,17 +223,17 @@ information about the data provider, the data provider ticker name
 and the data provider field.'''
         provider = provider or settings.default_provider
         if provider:
-            provider  = providers.get(provider,None)
+            provider = providers.get(provider,None)
         return self.symboldata(ticker,field,provider)
     
-    def getsymbol(self, ticker, field, provider):
-        '''Convert *ticker*, *field* and *provider* to symbol code.
-The inverse of :meth:`dynts.data.TimeSerieLoader.parse_symbol`.'''
-        c = settings.field_separator
-        f = '' if not field else '%s%s' % (c,field)
-        d = provider == self.default_provider_for_ticker(ticker, field)
-        p = '' if d else '%s%s' % (c,provider)
-        return '%s%s%s' % (ticker,f,p)
+    #def getsymbol(self, ticker, field, provider):
+#        '''Convert *ticker*, *field* and *provider* to symbol code.
+#The inverse of :meth:`dynts.data.TimeSerieLoader.parse_symbol`.'''
+#        c = settings.field_separator
+#        f = '' if not field else '%s%s' % (c,field)
+#        d = provider == self.default_provider_for_ticker(ticker, field)
+#        p = '' if d else '%s%s' % (c,provider)
+#        return '%s%s%s' % (ticker,f,p)
     
     def preprocess(self, ticker, start, end, logger, backend, **kwargs):
         '''Preprocess **hook**. This is first loading hook and it is

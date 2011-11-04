@@ -1,4 +1,4 @@
-'''Timeseries Numpy implementation'''
+'''Timeseries numpy implementation (default)'''
 import dynts
 from regression import tsinterface, tsop, tsdelta, tsscalar, stat
 

@@ -138,13 +138,13 @@ class TimeSeries(dynts.TimeSeries):
             hash[dt] = mdt(dt)
         return hash.getts()
     
-    def min(self):
+    def min(self, fallback = False):
         return self._data.min(0)
     
-    def mean(self):
+    def mean(self, fallback = False):
         return self._data.mean(0)
     
-    def max(self):
+    def max(self, fallback = False):
         return self._data.max(0)
     
     def var(self, ddof = 0):

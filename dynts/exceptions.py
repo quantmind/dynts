@@ -6,6 +6,7 @@ class DyntsException(Exception):
 class NotAvailable(DyntsException):
     pass
 
+
 class InvalidBackEnd(NotAvailable):
     '''A :class:`DyntsException` exception raised when
 an invalid :class:`dynts.TimeSeries` bcakend name is given.'''

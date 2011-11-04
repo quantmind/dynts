@@ -8,6 +8,7 @@ except ImportError:
 import dynts
 from dynts.conf import settings
 from dynts import dsl
+from dynts.dsl import ast
 
 class TestDsl(unittest.TestCase):
     names = ['eur','1eur','eu3r','eur4567']
