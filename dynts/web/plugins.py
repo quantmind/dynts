@@ -1,7 +1,7 @@
 '''Web plugins for djpcms
 https://github.com/lsbardel/djpcms
 '''
-from djpcms import sites, plugins, forms, html, memoized
+from djpcms import plugins, forms, html, memoized
 from djpcms.utils import markups
 from djpcms.template import loader
 

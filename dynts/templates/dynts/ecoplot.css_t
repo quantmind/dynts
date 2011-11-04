@@ -54,7 +54,7 @@
     margin: 0;
 }
 {{ tag }} .loader {
-    background-image: url("{{ MEDIA_URL }}/dynts/ecoplot/img/ajax-loader.gif");
+    background-image: url("{{ MEDIA_URL }}dynts/ecoplot/img/ajax-loader.gif");
     background-position: center center;
     background-repeat: no-repeat;
     display: none;

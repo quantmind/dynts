@@ -4,7 +4,7 @@ Created using ply (http://www.dabeaz.com/ply/) a pure Python implementation
 of the popular compiler construction tools lex and yacc.
 '''
 from dynts.conf import settings
-from dynts.exceptions import DyntsException, ExpressionError
+from dynts.exceptions import DyntsException, ExpressionError, CouldNotParse
 from dynts.backends import istimeseries, isxy
 from dynts.utils.py2py3 import to_string
 from dynts.data import providers
@@ -187,7 +187,7 @@ Typical usage::
     '''
     if isinstance(expression,strtype):
         expression = parse(expression)
-    if expression.malformed():
+    if not expression or expression.malformed():
         raise CouldNotParse(expression)
     symbols = expression.symbols()
     start = start if not start else todate(start)
