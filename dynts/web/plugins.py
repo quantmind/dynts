@@ -3,7 +3,6 @@ https://github.com/lsbardel/djpcms
 '''
 from djpcms import plugins, forms, html, memoized
 from djpcms.utils import markups
-from djpcms.template import loader
 
 from dynts import function_registry, function_title_and_body
 
