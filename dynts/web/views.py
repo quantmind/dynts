@@ -34,7 +34,7 @@ class PlotSettings(forms.Form):
     
 class TimeSeriesAppMixin(object):
     
-    def get_code_object(self, djp):
+    def get_code_object(self, request):
         return None
     
     def getdata(self, request, expression, start, end, **kwargs):
@@ -52,13 +52,13 @@ for fetching data.'''
     flot_media = FLOT_MEDIA
     _methods = ('get',)
     
-    def get_widget(self, djp):
-        kwargs = djp.kwargs
+    def get_widget(self, request):
+        kwargs = request.urlargs
         height = max(int(kwargs.get('height',400)),30)
         service_url = kwargs.get('service_url',self.path)
         requestMethod = kwargs.get('method','get')
         start = kwargs.get('start',None)
-        code = self.get_code_object(djp)
+        code = self.get_code_object(request)
         id = gen_unique_id()
         widget = html.Widget('div', id = id, cn = 'econometric-plot')\
                 .addData('height',height)\
@@ -69,14 +69,13 @@ for fetching data.'''
             widget.addData('command',{'show':False,'symbol':code})
         return widget
             
-    def render(self, djp):
-        return self.get_widget(djp).render(djp)
+    def render(self, request):
+        return self.get_widget(request).render(request)
     
-    def get_code_object(self, djp):
-        return self.appmodel.get_code_object(djp)
+    def get_code_object(self, request):
+        return self.appmodel.get_code_object(request)
     
-    def ajax_get_response(self, djp):
-        request = djp.request
+    def ajax_get_response(self, request):
         return self.econometric_data(request, dict(request.GET.items()))
            
     def econometric_data(self, request, data):
@@ -94,6 +93,6 @@ for fetching data.'''
             end = dateFromString(str(end))
         return self.appmodel.getdata(request,cts,start,end)
     
-    def media(self, djp=None):
+    def media(self, request):
         return self.flot_media
     

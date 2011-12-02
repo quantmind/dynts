@@ -6,6 +6,7 @@ from dynts.exceptions import FormattingException
 from dynts.backends import istimeseries
 from dynts.utils import asarray
 
+
 default_converter = lambda x : x.isoformat()
 
 
@@ -47,9 +48,11 @@ class ToExcel(BaseFormatter):
     
         return rtn
 
+
 class ToFlot(BaseFormatter):
     type = 'json'
     default = True
+    
     def __call__(self, ts, container = None, desc = False,
                  series_info = None, **kwargs):
         '''Dump timeseries as a JSON string compatible with ``flot``'''
@@ -58,14 +61,13 @@ class ToFlot(BaseFormatter):
         
         pydate2flot = flot.pydate2flot
         result = container or flot.MultiPlot()
-        df = {}
-        series_info = series_info or df
+        series_info = self.get_serie_info(series_info)
         if istimeseries(ts):
             res = flot.Flot(ts.name, type = 'timeseries', **series_info)
             dates  = asarray(ts.dates())
             missing = settings.ismissing
             for name,serie in ts.named_series():
-                info = series_info.get(name,df) 
+                info = self.get_serie_info(series_info,name) 
                 data = []
                 append = data.append
                 for dt,val in zip(dates,serie):
@@ -93,6 +95,12 @@ class ToFlot(BaseFormatter):
                     res.add(serie)
         result.add(res)
         return result
+    
+    def get_serie_info(self, serie_info, name = None):
+        if not name:
+            return series_info or {}
+        else:
+            return series_info.get(name,{})
 
 
 class ToJsonVba(BaseFormatter):

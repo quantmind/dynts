@@ -95,5 +95,9 @@ class Serie(JSONobject):
             self.color = color
         if shadowSize:
             self.shadowSize = shadowSize
+            
+    def __str__(self):
+        return self.label
+    __repr__ = __str__
 
 
