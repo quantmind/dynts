@@ -46,31 +46,28 @@ class TimeSeriesView(views.ModelView):
     '''``djpcms`` application view for retrieving time-series data as object.
 It renders as an econometric plot jQuery plugin and it has an AJAX get response
 for fetching data.'''
-    isplugin = True
+    has_plugins = True
     plugin_form = EcoForm
     description = 'Timeseries and Scatter Plots'
     flot_media = FLOT_MEDIA
     _methods = ('get',)
     
-    def get_widget(self, request):
-        kwargs = request.urlargs
-        height = max(int(kwargs.get('height',400)),30)
-        service_url = kwargs.get('service_url',self.path)
-        requestMethod = kwargs.get('method','get')
-        start = kwargs.get('start',None)
+    def get_widget(self, request, height = 400, service_url = None,
+                   method = 'get', start = None, **kwargs):
+        service_url = service_url or self.path
         code = self.get_code_object(request)
         id = gen_unique_id()
         widget = html.Widget('div', id = id, cn = 'econometric-plot')\
                 .addData('height',height)\
                 .addData('start',start)\
                 .addData('jsondata',{'url':service_url,
-                                     'requestMethod':requestMethod})
+                                     'requestMethod':method})
         if code:
             widget.addData('command',{'show':False,'symbol':code})
         return widget
             
-    def render(self, request):
-        return self.get_widget(request).render(request)
+    def render(self, request, **kwargs):
+        return self.get_widget(request, **kwargs).render(request, **kwargs)
     
     def get_code_object(self, request):
         return self.appmodel.get_code_object(request)
