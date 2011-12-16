@@ -13,51 +13,28 @@
      */    
     if($.fn.sparkline) {
         
-        var sparkline_decorator = function (elem,config) {
-            $.each($('.sparkline',elem),function() {
-                var v = $(this),
-                    data = v.data(),
-                    serie = data.data,
-                    options = data.options;
-                if(serie) {
-                    v.sparkline(serie,options);
-                }
-            });
-        };
-        
-        $.djpcms.decorator({
-            id:"sparkline",
-            config: {},
-            decorate: sparkline_decorator
+    	$.djpcms.decorator({
+    		id: "sparkline",
+            config: {
+            	selector: '.sparkline'
+            },
+            decorate: function(elem,config) {
+            	var opts = config.sparkline;
+            	$.each($(opts.selector,elem),function() {
+	                var v = $(this),
+	                    data = v.data(),
+	                    serie = data.data,
+	                    options = data.options;
+	                if(serie) {
+	                    v.sparkline(serie,options);
+	                }
+	            });
+            }
         });
-
-        if(!$.djpcms.options.datatable) {
-            $.djpcms.options.datatable = {fnRowCallbacks:[]};
-        }
-
-        $.djpcms.options.datatable.fnRowCallbacks.push(
-            function(nRow, aData, iDisplayIndex, iDisplayIndexFull){
-                sparkline_decorator(nRow);
-                $('.color',nRow).each(function() {
-                    var el = $(this),
-                        val = el.html();
-                    try {
-                        val = parseFloat(val);
-                        if(val < 0) {
-                            el.addClass('ui-state-error-text');
-                        }
-                        if(el.hasClass('arrow') && val === val) {
-                            var ar = $('<span></span>').css({'margin-right':'.3em',
-                                                         'float':'right'});
-                            val > 0 ? ar.addClass('ui-icon ui-icon-arrowthick-1-n') :
-                                      ar.addClass('ui-icon ui-icon-arrowthick-1-s');
-                            el.append(ar);
-                        }
-                    }catch(e){}
-                });
-            });
+    	
     }
-    
+
+
     if($.plot) {
             
         $.djpcms.decorator({
