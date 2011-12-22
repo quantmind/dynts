@@ -17,8 +17,6 @@ FLOT_MEDIA = media.Media(js = ['dynts/flot/excanvas.min.js',
                               'dynts/ecoplot/ecoplot.js',
                               'dynts/decorator.js'])
 
-SPARKLINE_MEDIA = media.Media(js = ['dynts/jquery.sparkline.js'])
-
 
 class EcoForm(forms.Form):
     height = forms.IntegerField()
