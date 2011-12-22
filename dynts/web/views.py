@@ -65,7 +65,7 @@ for fetching data.'''
         return widget
             
     def render(self, request, **kwargs):
-        return self.get_widget(request, **kwargs).render(request, **kwargs)
+        return self.get_widget(request, **kwargs).render(request)
     
     def get_code_object(self, request):
         return self.appmodel.get_code_object(request)
