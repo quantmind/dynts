@@ -55,7 +55,7 @@ class TimeSeries(dynts.TimeSeries):
     '''A timeserie based on numpy'''
     type = 'numpy'
     
-    def make(self, date, data, raw = False, val_type = np.double):
+    def make(self, date, data, **params):
         if date is not None:
             date = asarray(date)
         if date is None or not len(date):
@@ -63,10 +63,17 @@ class TimeSeries(dynts.TimeSeries):
             self._data = None
         else:
             self._date = date
-            data = asarray(data, val_type)
+            data = asarray(data, self._dtype)
             if len(data.shape) == 1:
                 data = data.reshape(len(data),1)
             self._data = data
+    
+    @property
+    def dtype(self):
+        if self._data is None:
+            return self._dtype
+        else:
+            return self._data.dtype
     
     @property
     def shape(self):

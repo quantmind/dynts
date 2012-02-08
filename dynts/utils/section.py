@@ -6,6 +6,10 @@ crossoperator = lambda func,*args : [func(*vals) for vals in zip(*args)]
 
 scalarasiter = lambda x: x if hasattr(x,'__iter__') else [x] 
 
+from numpy import array, ndarray, double, dtype
+
+object_type = dtype(object)
+
 
 __all__ = ['cross','asarray','ascolumn','assimple',
            'scalarasiter']
@@ -13,14 +17,19 @@ __all__ = ['cross','asarray','ascolumn','assimple',
 
 def asarray(x, dtype = None):
     '''Convert ``x`` into a ``numpy.ndarray``.'''
-    from numpy import array, ndarray, double
     iterable = scalarasiter(x)
     if isinstance(iterable,ndarray):
         return iterable
     else:
         if not hasattr(iterable,'__len__'):
             iterable = list(iterable)
-        return array(iterable, dtype = dtype)
+        if dtype == object_type:
+            a = ndarray((len(iterable),), dtype = dtype)
+            for i,v in enumerate(iterable):
+                a[i] = v
+            return a
+        else:
+            return array(iterable, dtype = dtype)
         
 
 

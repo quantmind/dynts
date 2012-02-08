@@ -25,6 +25,7 @@ class Node(object):
     def __init__(self, value, next, width):
         self.value, self.next, self.width = value, next, width
 
+
 class End(object):
     'Sentinel object that always compares greater than another object'
     def __cmp__(self, other):
@@ -45,7 +46,8 @@ NIL = Node(End(), [], [])               # Singleton terminator node
 
 
 class skiplist(object):
-    'Sorted collection supporting O(lg n) insertion, removal, and lookup by rank.'
+    '''Sorted collection supporting O(lg n) insertion,
+removal, and lookup by rank.'''
 
     def __init__(self, expected_size=100):
         self.size = 0

@@ -1,5 +1,7 @@
 from bisect import bisect_left, bisect_right
 
+from numpy import ndarray
+
 from dynts.conf import settings
 from dynts.utils.section import asarray
 from dynts.exceptions import *
@@ -14,7 +16,7 @@ class TimeSerieWrap(object):
         self.modified = False
         self.names = ts.names()
         self.wrap(**kwargs)
-        
+    
     def wrap(self, **kwargs):
         pass
         
@@ -107,44 +109,62 @@ exception will raise.
         return '%s(%s)' % (self.__class__.__name__,self.ts)
 
 
-class ashash(TimeSerieWrap):
+class ashash(TimeSerieWrap,dict):
     
     def wrap(self):
         ts = self.ts
         hash = {}
-        self.hash   = hash
-        for dt,v in ts.items():
-            hash[dt] = v
+        self.hash = hash
+        dict.__init__(self, ts.items())
     
-    def __len__(self):
-        return len(self.hash)
-        
     def __getitem__(self, dt):
         '''Get the value at *dt* otherwise it raises
 an :class:`dynts.exceptions.DateNotFound`.'''
         try:
-            return self.hash[dt]
+            return dict.__getitem__(self,dt)
         except KeyError:
             raise DateNotFound
     
     def __setitem__(self, dt, item):
-        self.hash[dt] = item
+        # if the timeseries contains objects, the items must be a numpy array
+        # otherwise we put it into a 1 element array.
+        if self.ts.is_object and not isinstance(item,ndarray):
+            t, item = item, ndarray((1,), dtype = self.ts.dtype)
+            item[0] = t
+        dict.__setitem__(self, dt, item)
         self.modified = True
 
+    def __iter__(self):
+        dates = sorted(dict.__iter__(self))
+        if settings.desc:
+            dates = reversed(dates)
+        return iter(dates)
+    
     def items(self):
-        h = self.hash
-        for dt in sorted(self.hash):
-            yield dt,h[dt]
+        for dt in self:
+            yield dt,self[dt]
             
     def getts(self):
         if self.modified:
-            name   = settings.splittingnames.join(self.names)
-            hash   = self.hash
-            dates  = sorted(self.hash)
-            if settings.desc:
-                dates = list(reversed(dates))
-            values = (hash[dt] for dt in dates)
+            name = settings.splittingnames.join(self.names)
+            dates = list(self)
+            values = (self[dt] for dt in dates)
             return self.ts.clone(name = name, date = dates, data = values)
         else:
             return self.ts
+    
+    
+class pair(object):
+    __slots__ = ('time','value')
+    def __init__(self, time, value):
+        self.time, self.value = time, value
+    
+    def __eq__(self, other):
+        return self.time == other.time
+    
+    def __gt__(self, other):
+        return self.time > other.time
+    
+    def __lt__(self, other):
+        return self.time < other.time
     

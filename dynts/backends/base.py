@@ -4,6 +4,7 @@ except:
     pass
 
 import numpy as np
+
 from dynts.utils import laggeddates, ashash, asbtree, asarray
 from dynts.backends.xy import *
 from dynts.exceptions import *
@@ -12,7 +13,7 @@ from dynts.backends import operators
 
 ops = operators._ops
 ts_bin_op = operators._handle_ts_or_scalar
-
+object_type = np.dtype(object)
 
 class TimeSeries(DynData):
     '''A :class:`dynts.DynData` specialisation for timeseries back-ends.
@@ -32,8 +33,9 @@ This class expose all the main functionalities of a timeseries
     _algorithms = {}
     
     def __init__(self, name = '', date = None, data = None, info = None,
-                 **params):
+                 dtype = np.double, **params):
         super(TimeSeries,self).__init__(name, info)
+        self._dtype = np.dtype(dtype)
         self.make(date, data, **params)
     
     __add__ = operators.add
@@ -41,6 +43,15 @@ This class expose all the main functionalities of a timeseries
     __mul__ = operators.mul
     __div__ = operators.div
     __truediv__ = operators.div # Python 3
+    
+    @property
+    def dtype(self):
+        return self._dtype
+    
+    @property
+    def is_object(self):
+        '''This property is ``True`` when the timeseries contains objects'''
+        return self.dtype == object_type
     
     def getalgo(self, operation, name):
         '''Return the algorithm for *operation* named *name*'''
@@ -98,8 +109,9 @@ returning a two dimensional
 tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
 function. The additional input parameter *desc* can be used to iterate from
 the greatest to the smallest date in the timeseries by passing ''desc=True``'''
-        for d,v in zip(self.dates(desc = desc),self.values(desc = desc)):
-            yield d,v
+        if self:
+            for d,v in zip(self.dates(desc = desc),self.values(desc = desc)):
+                yield d,v
             
     def series(self):
         '''Generator of single series data (no dates are included).'''
@@ -158,6 +170,7 @@ which exposes hash-table like functionalities of ``self``.'''
         name = name or self.name
         data = data if data is not None else self.values()
         ts = self.__class__(name)
+        ts._dtype = self._dtype
         if date is None:
             ts.make(self.keys(),data,raw=True)
         else:

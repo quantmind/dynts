@@ -6,7 +6,9 @@
 #
 from datetime import date
 
-from dynts import test
+from numpy import array
+
+from dynts import test, timeseries
 from dynts.utils.py2py3 import zip
 from dynts.utils import cross, asarray
 from dynts.exceptions import *
@@ -144,6 +146,11 @@ class TestTS(TestFunctionTS):
         self.assertEqual(len(dts),len(ts)+1)
         self.assertEqual(dts.count(),ts.count())
         self.assertTrue(dts.isconsistent())
+        
+    def testEmptyHashWrapper(self):
+        ts = timeseries()
+        hash = ts.ashash()
+        self.assertFalse(hash)
         
     def testCSVformatter(self):
         ts = self.randomts(name = self.tsname("serie1","serie2"),
