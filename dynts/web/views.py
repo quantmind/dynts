@@ -4,18 +4,7 @@ from djpcms.utils import gen_unique_id, media
 import dynts
 from ccy import dateFromString
 
-#cwidget = lambda : html.TextInput(default_style = 'color-picker')
-#colorfield = lambda x, l='color' : forms.CharField(label=l, initial=x,
-#                                                   widget = cwidget())
-
-FLOT_MEDIA = media.Media(js = ['dynts/flot/excanvas.min.js',
-                              'dynts/flot/jquery.flot.js',
-                              'dynts/flot/jquery.flot.selection.js',
-                              'dynts/jquery.flot.text.js',
-                              'dynts/base64.js',
-                              'dynts/canvas2image.js',
-                              'dynts/ecoplot/ecoplot.js',
-                              'dynts/decorator.js'])
+from .html import FLOT_MEDIA
 
 
 class EcoForm(forms.Form):

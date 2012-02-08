@@ -56,11 +56,13 @@ class TimeSeries(dynts.TimeSeries):
     type = 'numpy'
     
     def make(self, date, data, raw = False, val_type = np.double):
-        if date is None:
+        if date is not None:
+            date = asarray(date)
+        if date is None or not len(date):
             self._date = None
             self._data = None
         else:
-            self._date = asarray(date)
+            self._date = date
             data = asarray(data, val_type)
             if len(data.shape) == 1:
                 data = data.reshape(len(data),1)
@@ -92,10 +94,12 @@ class TimeSeries(dynts.TimeSeries):
         return self.dates(desc = desc)
     
     def start(self):
-        return self._date[0]
+        if self:
+            return self._date[0]
     
     def end(self):
-        return self._date[-1]
+        if self:
+            return self._date[-1]
     
     def isregular(self):
         dates = self.dates().__iter__()
