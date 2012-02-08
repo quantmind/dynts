@@ -55,13 +55,13 @@ class TimeSeries(dynts.TimeSeries):
     '''A timeserie based on numpy'''
     type = 'numpy'
     
-    def make(self, date, data, raw = False):
+    def make(self, date, data, raw = False, val_type = np.double):
         if date is None:
             self._date = None
             self._data = None
         else:
             self._date = asarray(date)
-            data = asarray(data, np.double)
+            data = asarray(data, val_type)
             if len(data.shape) == 1:
                 data = data.reshape(len(data),1)
             self._data = data

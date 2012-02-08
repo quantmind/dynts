@@ -31,9 +31,10 @@ This class expose all the main functionalities of a timeseries
     default_align = 'right'
     _algorithms = {}
     
-    def __init__(self, name = '', date = None, data = None, info = None):
-        super(TimeSeries,self).__init__(name,info)
-        self.make(date,data)
+    def __init__(self, name = '', date = None, data = None, info = None,
+                 **params):
+        super(TimeSeries,self).__init__(name, info)
+        self.make(date, data, **params)
     
     __add__ = operators.add
     __sub__ = operators.sub
