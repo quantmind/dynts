@@ -4,6 +4,7 @@
 # This module is imported in regression.tsnumpy and regression.tszoo
 # to perform tests across different backends
 #
+__test__ = False
 from datetime import date
 
 from numpy import array
@@ -12,6 +13,33 @@ from dynts import test, timeseries
 from dynts.utils.py2py3 import zip
 from dynts.utils import cross, asarray
 from dynts.exceptions import *
+
+
+class TestDates(test.TestCase):
+    
+    def fill(self):
+        dates = [1,2.1,3.5]
+        values = [[1.0,5],[0.2,3],[-1.0,2.5]]
+        ts = self.timeseries(date = dates, data = values)
+        self.assertEqual(len(ts),3)
+        self.assertEqual(ts.shape,(3,2))
+        self.assertTrue(ts.isconsistent())
+        return ts
+    
+    def testSimple(self):
+        ts = self.fill()
+        ts.insert(4.5,[-4.5,67])
+        self.assertEqual(len(ts),4)
+        self.assertEqual(ts.shape,(4,2))
+        self.assertEqual(list(ts[3]),[-4.5,67])
+        
+    def testInsertMiddle(self):
+        ts = self.fill()
+        ts.insert(3,[-4.5,67])
+        self.assertEqual(len(ts),4)
+        self.assertEqual(ts.shape,(4,2))
+        self.assertEqual(list(ts[2]),[-4.5,67])
+        self.assertEqual(list(ts[3]),[-1.0,2.5])
 
 
 class TestFunctionTS(test.TestCase):

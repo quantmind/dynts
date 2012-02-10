@@ -67,10 +67,7 @@ class rollingOperation(object):
         window = self.window
         it = iter(self.iterable)
         queue = deque(islice(it, window))
-        ol    = self.skiplist(window)
-        for elem in queue:
-            if not ismissing(elem):
-                ol.insert(elem)
+        ol = self.skiplist((e for e in queue if e == e))
         yield op(ol,missing)
         for newelem in it:
             oldelem = queue.popleft()

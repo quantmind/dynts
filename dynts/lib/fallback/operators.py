@@ -63,7 +63,7 @@ def smedian(olist,nobs):
 def rollingOperation(iterable, window, op, skiplist_class = skiplist):
     it = iter(iterable)
     queue = deque(islice(it, window))
-    ol    = skiplist_class(window)
+    ol    = skiplist_class()
     nobs  = 0
     for elem in queue:
         if elem == elem:

@@ -48,8 +48,7 @@ class TestCase(unittest.TestCase):
     def getts(self, returndata = False, delta = 1, cols = 1, size = 100):
         '''Return a timeseries filled with random data'''
         dates,data = self.getdata(size,cols,delta)
-        ts   = self.timeseries(name = 'test', date = dates, data = data,
-                               backend = self.backend)
+        ts   = self.timeseries(name = 'test', date = dates, data = data)
         self.assertEqual(ts.shape,(size,cols))
         self.assertEqual(len(ts),size)
         self.assertEqual(ts.count(),cols)
@@ -105,8 +104,6 @@ class TestCase(unittest.TestCase):
             else:
                 self.assertAlmostEqual(a,b)
 
-
-        
 
 class TestSuite(unittest.TestSuite):
     pass

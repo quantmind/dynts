@@ -8,6 +8,7 @@ import numpy as np
 
 import dynts
 from dynts import lib, composename
+from dynts.lib import skiplist
 from dynts.conf import settings
 from dynts.utils import laggeddates, asarray
 
@@ -55,9 +56,13 @@ class TimeSeries(dynts.TimeSeries):
     '''A timeserie based on numpy'''
     type = 'numpy'
     
-    def make(self, date, data, **params):
+    def make(self, date, data, raw = False, **params):
         if date is not None:
+            if not raw:
+                c = self.dateinverse
+                date = (c(d) for d in date)
             date = asarray(date)
+        self.__skl = skiplist(date)
         if date is None or not len(date):
             self._date = None
             self._data = None
@@ -107,7 +112,28 @@ class TimeSeries(dynts.TimeSeries):
     def end(self):
         if self:
             return self._date[-1]
-    
+        
+    def insert(self, dte, values):
+        dte = self.dateconvert(dte)
+        if not self:
+            c = len(values)
+            if c:
+                self._date = np.array([dte])
+                self._data = np.array([values])
+        else:
+            index = self.__skl.rank(dte)
+            if index < 0:
+                self.__skl.insert(dte)
+                index = 1-index
+                N = len(self._data)
+                self._date.resize((N+1,))
+                self._data.resize((N+1,self.count()))
+                if index < N:
+                    self._date[index+1:] = self._date[index:-1]
+                    self._data[index+1:] = self._data[index:-1]
+            self._date[index] = dte
+            self._data[index] = values
+        
     def isregular(self):
         dates = self.dates().__iter__()
         d0 = next(dates)

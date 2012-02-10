@@ -22,6 +22,8 @@ class TestDeltaNumpy(tsscalar.TestCase):
 class TestStatNumpy(stat.TestStat):
     backend = 'numpy'
 
+class TestDateNumpy(tsinterface.TestDates):
+    backend = 'numpy'
 
 if dynts.hasextensions():
     

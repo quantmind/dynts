@@ -6,14 +6,19 @@ except:
 import numpy as np
 
 from dynts.utils import laggeddates, ashash, asbtree, asarray
-from dynts.backends.xy import *
 from dynts.exceptions import *
-from dynts.backends import operators 
+from .xy import *
+from . import operators 
 
+nan = np.nan
 
 ops = operators._ops
 ts_bin_op = operators._handle_ts_or_scalar
 object_type = np.dtype(object)
+
+
+__all__ = ['TimeSeries', 'ops', 'ts_bin_op', 'nan']
+
 
 class TimeSeries(DynData):
     '''A :class:`dynts.DynData` specialisation for timeseries back-ends.
@@ -156,6 +161,15 @@ which exposes hash-table like functionalities of ``self``.'''
         return key
     
     ######################################################################
+    # OPERATIONS WHICH MODIFY TIMESERIES
+    ######################################################################
+    
+    def append(self, dte, value):
+        '''Append a new date-value pair at the end of the timeseries.'''
+        raise NotImplementedError
+    
+    
+    ######################################################################
     # OPERATIONS RETURNING NEW SERIES
     ######################################################################
     
@@ -172,9 +186,10 @@ which exposes hash-table like functionalities of ``self``.'''
         ts = self.__class__(name)
         ts._dtype = self._dtype
         if date is None:
-            ts.make(self.keys(),data,raw=True)
+            # dates not provided
+            ts.make(self.keys(), data, raw = True)
         else:
-            ts.make(date,data)
+            ts.make(date, data)
         return ts
     
     def reduce(self, size, method = 'simple', **kwargs):
