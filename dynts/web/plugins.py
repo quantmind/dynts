@@ -11,7 +11,7 @@ def docs(request):
     try:
         rst = markups.get('rst')['handler']
     except:
-        rst = lambda x : x
+        rst = lambda request, x : x
     choices = [('','-----------')]
     text = []
     for name in sorted(function_registry):

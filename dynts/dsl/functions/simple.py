@@ -130,7 +130,7 @@ Arithmetic moving average function simply defined by
 
 :parameter window ``w``: the rolling window in units. Default ``20``
 """
-    description = 'arithmetic moving avarage'
+    description = 'arithmetic moving average'
     def apply(self, ts, **kwargs):
         return ts.rollmean(**kwargs)
     
