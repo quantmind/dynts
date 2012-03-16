@@ -15,7 +15,7 @@ class BinMathOp(BinOp):
     def _unwind(self, values, backend, full = False, **kwargs):
         le = self.left.unwind(values, backend, **kwargs)
         ri = self.right.unwind(values, backend, **kwargs)
-        return ts_bin_op(self.op_name,le,ri,name=str(self))
+        return ts_bin_op(self.op_name, le, ri, name=str(self))
     
     def lineardecomp(self):
         if isinstance(self.left,Number):

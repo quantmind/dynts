@@ -83,13 +83,16 @@ def _handle_scalar_ts(op_name, op, scalar, ts, fill_fn):
     return dts, result
 
 def _handle_ts_scalar(op_name, op, ts, scalar, fill_fn):
-    fill_vec = _create_fill_vec(ts, fill_fn)
     values = ts.values()
-    shape = values.shape
-    v2 = _toVec(shape, scalar)
-    dts = ts.dates()
-    result = applyfn(op, values, v2, fill_vec)
-    return dts, result
+    if values is not None:
+        fill_vec = _create_fill_vec(ts, fill_fn)
+        shape = values.shape
+        v2 = _toVec(shape, scalar)
+        dts = ts.dates()
+        result = applyfn(op, values, v2, fill_vec)
+        return dts, result
+    else:
+        return None, None
 
 def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
     if ts.count() != ts2.count():
