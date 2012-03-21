@@ -10,12 +10,22 @@ from dynts.utils import asarray
 default_converter = lambda x : x.isoformat()
 
 
-def tsiterator(ts, dateconverter = None, desc = None):
+def nanvalue(value):
+    for v in value:
+        if v != v:
+            return True
+                    
+def tsiterator(ts, dateconverter = None, desc = None,
+               clean = False, **kwargs):
+    '''An iterator of timeseries as tuples.'''
     dateconverter = dateconverter or default_converter
     yield ['Date']+ts.names()
     for dt,value in ts.items(desc = desc):
         dt = dateconverter(dt)
-        yield [dt]+list(value)
+        value = tuple(value)
+        if clean and nanvalue(value):
+            continue            
+        yield (dt,)+value
 
 
 class BaseFormatter(object):
@@ -109,20 +119,14 @@ VBA. For unserializing check http://code.google.com/p/vba-json/
 
 The unserializer is also included in the directory extras'''
     type = 'json'
-    def __call__(self, ts, container = None, desc = False, **kwargs):
+    def __call__(self, ts, container = None, **kwargs):
         '''Dump timeseries as a JSON string VBA-Excel friendly'''
         from ccy import date2juldate
         from dynts.utils.anyjson import JSONdatainfo
         if istimeseries(ts):
-            return list(tsiterator(ts,
-                                   dateconverter=date2juldate,
-                                   desc = desc))
-            #return JSONdatainfo(list(tsiterator(ts,
-            #                                    dateconverter=date2juldate,
-            #                                    desc = desc)),
-            #                    info = ts.info)
+            return list(tsiterator(ts, dateconverter=date2juldate, **kwargs))
         else:
-            raise NotImplementedError
+            raise NotImplementedError()
 
 
 class ToXls(BaseFormatter):
