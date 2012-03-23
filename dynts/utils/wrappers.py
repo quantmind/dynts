@@ -109,7 +109,7 @@ exception will raise.
         return '%s(%s)' % (self.__class__.__name__,self.ts)
 
 
-class ashash(TimeSerieWrap,dict):
+class ashash(TimeSerieWrap, dict):
     
     def wrap(self):
         ts = self.ts

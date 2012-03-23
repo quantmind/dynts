@@ -34,6 +34,7 @@ which, nevertheless, can have close tights with other series in the dataset.
     additional information regarding data object.
     
 '''
+    namespace = None
     
     def __init__(self, name, info):
         self.name = str(name)
@@ -53,7 +54,7 @@ which, nevertheless, can have close tights with other series in the dataset.
     def description(self):
         return self.name
     
-    def names(self):
+    def names(self, with_namespace = False):
         '''List of names for series in dataset. It will always return a list or names with
 length given by :class:`dynts.DynData.count`.'''
         N = self.count()
@@ -62,7 +63,12 @@ length given by :class:`dynts.DynData.count`.'''
         while len(names) < N:
             n += 1
             names.append('unnamed%s' % n)
-        return names
+        if with_namespace and self.namespace:
+            n = self.namespace
+            s = settings.field_separator
+            return [n+s+f for f in names]
+        else:
+            return names
     
     def count(self):
         '''Number of series in dataset.'''

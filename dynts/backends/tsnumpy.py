@@ -163,12 +163,20 @@ class TimeSeries(dynts.TimeSeries):
         if dynts.istimeseries(tserie):
             tserie = [tserie]
         alldates = set(self.dates())
-        hash     = self.ashash()
+        hash = self.ashash()
+        namespace = self.namespace
+        with_namespace = False
+        for ts in tserie:
+            if ts.namespace != namespace:
+                with_namespace = True
+                break
         thashes  = [(hash,np.array([fill]*self.count()))]
+        names = self.names(with_namespace)
         for ts in tserie:
             alldates = alldates.union(ts.dates())
-            hash.names.extend(ts.names())
+            names.extend(ts.names(with_namespace))
             thashes.append((ts.ashash(),np.array([fill]*ts.count())))
+        hash.names = names
         stack = np.hstack
         mdt = lambda dt: stack((h.get(dt,ln) for h,ln in thashes))
         for dt in alldates:

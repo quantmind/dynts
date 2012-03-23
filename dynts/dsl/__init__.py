@@ -113,7 +113,7 @@ high level function.
         return self._xy
         
     def _unwind(self):
-        res = self.expression.unwind(self.data,self.backend)
+        res = self.expression.unwind(self.data, self.backend)
         self._ts = None
         self._xy = None
         if istimeseries(res):
@@ -186,7 +186,7 @@ Typical usage::
     min(GS,window=30)
     >>> ts = r.ts()
     '''
-    if isinstance(expression,strtype):
+    if isinstance(expression, strtype):
         expression = parse(expression)
     if not expression or expression.malformed():
         raise CouldNotParse(expression)

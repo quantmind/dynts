@@ -177,7 +177,9 @@ which exposes hash-table like functionalities of ``self``.'''
         raise NotImplementedError
     
     def merge(self, ts, all = True):
-        raise NotImplementedError
+        '''Merge this :class:`TimeSeries` with one or more :class:`TimeSeries`
+and return a new one.'''
+        raise NotImplementedError()
     
     def clone(self, date = None, data = None, name = None):
         '''Create a clone of timeseries'''
