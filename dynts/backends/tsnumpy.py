@@ -14,6 +14,7 @@ from dynts.utils import laggeddates, asarray
 
 
 arraytype = np.ndarray
+nan = np.nan
 
 
 _functions = {'min':'min',
@@ -159,7 +160,7 @@ class TimeSeries(dynts.TimeSeries):
         return self.clone(self._date[i1:i2+1],
                           self._data[i1:i2+1])
     
-    def merge(self, tserie, fill = float("nan"), **kwargs):
+    def merge(self, tserie, fill = nan, **kwargs):
         if dynts.istimeseries(tserie):
             tserie = [tserie]
         alldates = set(self.dates())

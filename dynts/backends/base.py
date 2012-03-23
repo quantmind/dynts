@@ -164,8 +164,8 @@ which exposes hash-table like functionalities of ``self``.'''
     # OPERATIONS WHICH MODIFY TIMESERIES
     ######################################################################
     
-    def append(self, dte, value):
-        '''Append a new date-value pair at the end of the timeseries.'''
+    def insert(self, dte, value):
+        '''Insert a new date-value pair at the end of the timeseries.'''
         raise NotImplementedError
     
     
@@ -193,8 +193,8 @@ which exposes hash-table like functionalities of ``self``.'''
         return ts
     
     def reduce(self, size, method = 'simple', **kwargs):
-        '''Trim timeseries to a new *size* using the algorithm *method*.
-If *size* is greater or equal than len(self) it does nothing.'''
+        '''Trim :class:`Timeseries` to a new *size* using the algorithm
+*method*. If *size* is greater or equal than len(self) it does nothing.'''
         if size >= len(self):
             return self
         return self.getalgo('reduce',method)(self,size,**kwargs)

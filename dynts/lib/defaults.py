@@ -7,7 +7,7 @@ def simple_reduce(ts, size, align = 'right'):
     N = len(ts)
     n = int(N // size)
     while N/float(n) > size:
-        n+=1
+        n += 1
     if align == 'right':
         values = ts.values()[::-n][::-1]
         dates = ts.dates()[::-n][::-1]
