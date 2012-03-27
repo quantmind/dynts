@@ -1,2 +1,2 @@
 [run]
-source = dynts/backends,dynts/data,dynts/dsl,dynts/formatters,dynts/maths,dynts/utils
+source = dynts

@@ -5,10 +5,12 @@ _dep.py
 .project
 .pydevproject
 .coverage
-.settings/*
-dist/*
-build/*
-docs/build/*
+.Rhistory
+htmlcov/
+.settings/
+dist/
+build/
+docs/build/
 lib/src/*.c
 profile/*.prof
 parser.out
