@@ -163,6 +163,8 @@ class TimeSeries(dynts.TimeSeries):
     def merge(self, tserie, fill = nan, **kwargs):
         if dynts.istimeseries(tserie):
             tserie = [tserie]
+        else:
+            tserie = tuple(tserie)
         alldates = set(self.dates())
         hash = self.ashash()
         namespace = self.namespace
