@@ -15,7 +15,7 @@ dates inputs and the toolbar.
                data = {'height': h,
                        'line_height': h,
                        'float': 'left',
-                       'width':'100%',
+                       'width':'90%'
                        }
             )
     

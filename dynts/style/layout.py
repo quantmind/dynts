@@ -89,3 +89,4 @@ CssContext('ecoplot_plot_options_cells',
                 'text_align': 'center',
                 'vertical_align': 'middle'}
            )
+

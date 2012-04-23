@@ -123,7 +123,8 @@ plots, you can just fix the size of their placeholders.
                min_height: 200,
                defaultFade: 300,
                classname: 'ts-plot-module',
-               errorClass: 'dataErrorMessage'
+               errorClass: 'dataErrorMessage',
+               styling: 'jquery-ui'
            };
         
         
@@ -259,13 +260,16 @@ plots, you can just fix the size of their placeholders.
         }
 
 
-        // ///////////////////////////////////////////////////////////////
         // API FUNCTIONS AND PROPERTIES
         // ///////////////////////////////////////////////////////////////
         return {
             construct: _construct,
             removeEvent: function (id){delete events[id];},
             'defaults': defaults,
+            button: function(text, icon) {
+            	var el =  $('<button>'+text+'</button>').addClass('button');
+            	return el.button();
+            },
             debug: function (){return debug;},
             setdebug: function (v){debug = v;},
             count: function () {return instances.length;},
@@ -397,12 +401,14 @@ plots, you can just fix the size of their placeholders.
     			omenu = options.menu,
     			menu = this.data.menu,
     			container = this.container(),
-    			mc = $(omenu.container);
+    			mc = $(omenu.container),
+    			lower;
     		if(!mc.length) {
     			mc = $('<div></div>').appendTo(container);
     			menu.upper = $('<div class="menubar upper ui-widget-header"></div>').appendTo(mc).hide();
-        		menu.lower = $('<div class="menubar lower ui-widget-header"></div>').appendTo(mc);
-                menu.lower.append($('<div></div>').addClass(options.jsondata.loader_class));
+        		lower = $('<div class="lower ui-widget-header"></div>').appendTo(mc);
+        		menu.lower = $('<div class="menubar"></div>').appendTo(lower);
+        		lower.append($('<div></div>').addClass(options.jsondata.loader_class));
     		}
     		menu.container = mc.addClass(omenu.container_class);
     	}
@@ -435,6 +441,12 @@ plots, you can just fix the size of their placeholders.
                 var canvas = instance.get_canvas();
                 $.ecoplot.log.debug('resizing canvas');
                 instance._set_legend_position(canvas);
+            }).bind('redraw', function(e, dataplot) {
+            	var canvas = instance.get_canvas();
+            	$.each(canvas, function(){
+            		canvas.need_redraw = dataplot;
+            	});
+            	instance.get_canvas();
             });
         },
         layout: function() {
@@ -459,10 +471,11 @@ plots, you can just fix the size of their placeholders.
                 idx = canvases.current;
             }
             if(!$.isnothing(idx)) {
-                var c = canvases.all[idx];
-                if(c) {
-                    c.index = idx;
-                    return c;
+                var canvas = canvases.all[idx];
+                if(canvas) {
+                	canvas.index = idx;
+                	this.container().trigger('get_canvas', canvas);
+                    return canvas;
                 }
             }
         },
@@ -474,7 +487,7 @@ plots, you can just fix the size of their placeholders.
         },
         // Render a canvas. If idx is null or undefined it renders the current
 		// canvas
-        canvas_render: function (idx,opts) {
+        canvas_render: function (idx, opts) {
             var instance = this,
                 canvas = this.get_canvas(idx),
                 options = canvas.options,
@@ -551,7 +564,7 @@ plots, you can just fix the size of their placeholders.
                 .appendTo(outer);
             foptions.xaxis.mode = mtyp;
             data.options = foptions;
-            data.elem   = cv;
+            data.elem = cv;
             canvases.all.push(data);
             return data;
         },
@@ -711,86 +724,110 @@ plots, you can just fix the size of their placeholders.
                         classname: 'reload',
                         title: "Refresh data",
                         icon: "ui-icon-refresh",
-                        decorate: function (b,instance) {
+                        decorate: function (b, instance) {
                             b.click(function (e,o) {
                                 var inst = $.ecoplot.instance(this);
-                                if(inst) {
-                                    inst.ajaxload();
-                                }
+                                instance.container().trigger('load');
                             });
                         }
                     }
         },
         init: function () {
-            var options = this.settings().jsondata;
+            var self = this,
+            	options = self.settings().jsondata,
+            	container = self.container();
+            self.data.jsondata.dataplot = null;
+            container.bind('load', function() {
+            	self.ajaxload();
+            });
             if(options.autoload) {
-                this.container().bind('ecoplot-ready',function (e,instance) {
-                    instance.ajaxload();
+                container.bind('ecoplot-ready', function () {
+                	self.container().trigger('load');
                 });
             }
         },
         ajaxdata: function () {
-            var options = this.settings(),
-            	data = this.input_data(),
-                ticker = data.command;
-            if(!ticker) {return;}
+            var data = this.input_data();
+            if(!data.command) {return;}
             return data;
         },
         ajaxload: function () {
-            var options  = this.settings().jsondata,
+            var options = this.settings().jsondata,
                 log = $.ecoplot.log,
                 instance = this,
+                data = this.data.jsondata,
+                load = true,
                 dataplot;
             if(!options.url)  {return;}
             dataplot = this.ajaxdata();
             if(!dataplot) {return;}
-            log.info("Sending ajax request to " + options.url);
-            log.debug(dataplot.command + ' from ' + dataplot.start + ' end '+ dataplot.end);
-            var params   = {
-                timestamp: +new Date()
-            };
-            $.each(options.requestparams, function (key, param) {
-                params[key] = typeof param === "function" ? param() : param;
-            });
-            params = $.extend(true, params, dataplot);
-            if (options.data2body) {
-            	params = options.data2body(params);
+            if(data.dataplot !== null) {
+            	if(data.dataplot.command === dataplot.command) {
+            		// The ticker has been already loaded
+            		var start = new Date(data.dataplot.start),
+            			data_start = new Date(dataplot.start),
+            			end = new Date(data.dataplot.end),
+            			data_end = new Date(dataplot.end);
+            		if(start <= data_start && end >= data_end) {
+            			load = false;
+            			dataplot.start = data_start;
+            			dataplot.end = data_end;
+            		}
+            	}
             }
-            options.startLoading(this);
-            $.ajax({
-                url: options.url,
-                type: options.requestMethod,
-                data: params,
-                dataType: options.responsetype,
-                success: function (data) {
-                    log.info("Got the response from server");
-                    var pdata;
-                    try {
-                        pdata = options.parse(data,instance);
-                        if(!pdata) {
-                            log.error("Failed to parse.");
-                        }
-                    }
-                    catch(e) {
-                        log.error("Failed to parse. Error in line ",e);
-                    }
-                    options.stopLoading(instance);
-                    if(pdata)  {
-                        try {
-                            instance._ajaxdone(pdata);
-                        }
-                        catch(e2) {
-                            pdata = false;
-                            log.error("Failed after data has loaded",e2);
-                        }
-                    }
-                    if(!pdata) {
-                        $.each(options.errorcallbacks, function(i,f) {
-                            f(data,instance);
-                        });
-                    }
-                }
-            });
+            if(load) {
+            	data.dataplot = dataplot;
+	        	log.info("Sending ajax request to " + options.url);
+	        	log.debug(dataplot.command + ' from ' + dataplot.start + ' end '+ dataplot.end);
+	        	var params   = {
+	        		timestamp: +new Date()
+	        	};
+	            $.each(options.requestparams, function (key, param) {
+	                params[key] = typeof param === "function" ? param() : param;
+	            });
+	            params = $.extend(true, params, dataplot);
+	            if (options.data2body) {
+	            	params = options.data2body(params);
+	            }
+	            options.startLoading(this);
+	            $.ajax({
+	                url: options.url,
+	                type: options.requestMethod,
+	                data: params,
+	                dataType: options.responsetype,
+	                success: function (data) {
+	                    log.info("Got the response from server");
+	                    var pdata;
+	                    try {
+	                        pdata = options.parse(data, instance);
+	                        if(!pdata) {
+	                            log.error("Failed to parse.");
+	                        }
+	                    }
+	                    catch(e) {
+	                        log.error("Failed to parse. Error in line ",e);
+	                    }
+	                    options.stopLoading(instance);
+	                    if(pdata)  {
+	                        try {
+	                            instance._ajaxdone(pdata);
+	                        }
+	                        catch(e2) {
+	                            pdata = false;
+	                            log.error("Failed after data has loaded",e2);
+	                        }
+	                    }
+	                    if(!pdata) {
+	                        $.each(options.errorcallbacks, function(i,f) {
+	                            f(data,instance);
+	                        });
+	                    }
+	                }
+	            });
+            }
+            else {
+            	this.container().trigger('redraw', dataplot);
+            }
         },
         _ajaxdone: function (data) {
             this.replace_all_canvases(data);
@@ -846,7 +883,7 @@ plots, you can just fix the size of their placeholders.
                 opts.y2axis = checkax(ranges.y2axis);
             }
             // do the zooming
-            this.canvas_render(null,opts);
+            this.canvas_render(null, opts);
         }
     });
     
@@ -965,7 +1002,7 @@ plots, you can just fix the size of their placeholders.
 	 * 
 	 * To customize pass the edit dictionary in the ecoplot options
 	 * 
-	 * $(#myplot).ecomplot({..., edit: {popup: true, ...} });
+	 * $(#myplot).ecoplot({..., edit: {popup: true, ...} });
 	 * 
 	 * Options:
 	 * 
@@ -1493,6 +1530,10 @@ plots, you can just fix the size of their placeholders.
     });
     
 
+    /*
+     * Add start and end date inputs. These are useful when loading
+     * timeseries data
+     */
     $.ecoplot.plugin('dates',{
         isdefault: true,
     	defaults: {
@@ -1510,6 +1551,7 @@ plots, you can just fix the size of their placeholders.
         	var options = this.settings().dates,
         		dates = this.data.dates,
                 el = $('<div></div>').addClass(options.classname).appendTo(this.data.menu.lower);
+        	dates.container = el;
             dates.start = $('<input type="text" name="start">').addClass(options.cn).val(options.start),
             dates.end = $('<input type="text" name="end">').addClass(options.cn).val(options.end);
             if(options.label) {
@@ -1526,7 +1568,8 @@ plots, you can just fix the size of their placeholders.
             this.decorate_dates();
         },
         decorate_dates: function() {
-        	var options = this.settings().dates;
+        	var options = this.settings().dates,
+        		self = this;
             $('.'+options.cn,this.container()).datepicker({
                 defaultDate: +0,
                 showStatus: true,
@@ -1535,6 +1578,22 @@ plots, you can just fix the size of their placeholders.
                 firstDay: 1, 
                 changeFirstDay: false
             });
+            $('input', this.data.dates.container).change(function() {
+            	self.container().trigger('load');
+            });
+        },
+        _canvas_selection: function(e, canvas) {
+	        if(canvas.need_redraw === null || canvas.need_redraw === undefined) {
+	        	return;
+	        }
+        	var start = canvas.need_redraw.start.getTime(),
+        		end = canvas.need_redraw.end.getTime();
+        	canvas.need_redraw = null;
+        	if(canvas.type === 'timeseries') {
+        		var axis = canvas.flot.getAxes()
+        		canvas.flot.setSelection({xaxis: {from: start, to: end},
+        								  yaxis: {from: axis.yaxis.min, to: axis.yaxis.max}});
+        	}
         },
         init : function() {
         	var dates = this.settings().dates,
@@ -1555,6 +1614,7 @@ plots, you can just fix the size of their placeholders.
             v1 = $.datepicker.formatDate(dates.format, td);
             dates.start = v1;
             dates.end = v2;
+            this.container().bind('get_canvas', this._canvas_selection)
         },
         get_input_data: function() {
         	var dates = this.data.dates;
@@ -1675,6 +1735,49 @@ plots, you can just fix the size of their placeholders.
                 }
             }
         }
+    });
+    
+    
+    /*
+     * Add predifiend time-windows to the menubar
+     */
+    $.ecoplot.plugin('windows', {
+    	isdefault: true,
+    	defaults: {
+    		windows: null,
+    		className: 'windows',
+    	},
+    	layout: function() {
+    		var self = this,
+    			settings = this.settings(),
+    			options = settings.windows,
+    			inner;
+    		if(options.windows === null) {
+    			return;
+    		}
+    		inner = $('<div class="windows menu-item"></div>');
+    		$.each(options.windows, function(i, window) {
+    			$.ecoplot.button(window).appendTo(inner).data('window',window);
+    		});
+    		if(inner.children().length > 0) {
+    			inner.appendTo(this.data.menu.lower).show();
+                inner.children().click(function() {
+                	var dates = self.data.dates,
+                		window = $(this).data('window'),
+                		months, start, end;
+                	if(dates && window) {
+                		end = new Date(dates.end.val());
+                		start = new Date(dates.end.val());
+                		months = parseInt(window.substring(0,window.length-1));
+                		if(window.substring(window.length-1).toLowerCase() === 'y') {
+                			months *= 12;
+                		}
+                		start.setMonth(start.getMonth() - months);
+                		dates.start.val($.datepicker.formatDate(settings.dates.format, start)).trigger('change');
+                	}
+                });
+    		}
+    	}
     });
     
     // /////////////////////////////////////////////////

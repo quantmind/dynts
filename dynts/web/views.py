@@ -12,6 +12,9 @@ class EcoForm(forms.Form):
     service_url = forms.CharField(required = False)
     method = forms.ChoiceField(choices = (('get','get'),('post','post')),
                                default = 'get')
+    windows = forms.CharField(\
+            required = False,
+            help_text='Comma separated list of time windows (e.g. 3y,2y,1y,6m)')
     
     
 class PlotSettings(forms.Form):
@@ -39,14 +42,17 @@ for fetching data.'''
     flot_media = FLOT_MEDIA
     _methods = ('get',)
     
-    def get_widget(self, request, height = 400, service_url = None,
-                   method = 'get', start = None, **kwargs):
+    def get_widget(self, request, height=400, service_url = None,
+                   method = 'get', windows=None, start = None, **kwargs):
         service_url = service_url or self.path
         code = self.get_code_object(request)
         id = gen_unique_id()
+        if windows:
+            windows = [w.replace(' ','') for w in windows.split(',')]
         widget = html.Widget('div', id = id, cn = 'econometric-plot')\
                 .addData('height',height)\
                 .addData('start',start)\
+                .addData('windows',{'windows':windows})\
                 .addData('jsondata',{'url':service_url,
                                      'requestMethod':method})
         if code:

@@ -58,11 +58,15 @@
     background-position: center center;
     background-repeat: no-repeat;
     display: none;
-    float: right;
     height: 34px;
-    margin-right: 2%;
+    float: right;
     opacity: 0.5;
     width: 34px;
 }
+{{ tag }} .lower {
+    width: 100%;
+    float: left;
+}
+
 {% endblock %}
 
