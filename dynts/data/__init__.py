@@ -223,8 +223,8 @@ information about the data provider, the data provider ticker name
 and the data provider field.'''
         provider = provider or settings.default_provider
         if provider:
-            provider = providers.get(provider,None)
-        return self.symboldata(ticker,field,provider)
+            provider = providers.get(provider, None)
+        return self.symboldata(ticker, field, provider)
     
     #def getsymbol(self, ticker, field, provider):
 #        '''Convert *ticker*, *field* and *provider* to symbol code.
