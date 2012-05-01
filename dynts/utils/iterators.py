@@ -1,4 +1,4 @@
-from math import log,sqrt
+from math import log, sqrt
 
 def laggeddates(ts, step = 1):
     '''Lagged iterator over dates'''

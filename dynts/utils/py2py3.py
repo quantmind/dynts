@@ -26,13 +26,14 @@ if ispy3k(): # Python 3
     zip = zip
     map = map
     range = range
+    from itertools import zip_longest
     from io import StringIO as StreamIO
 else: # Python 2
     string_type = unicode
     itervalues = lambda d : d.itervalues()
     iteritems = lambda d : d.iteritems()
     is_string = lambda x : isinstance(x,basestring)
-    from itertools import izip as zip, imap as map
+    from itertools import izip as zip, imap as map, izip_longest as zip_longest
     range = xrange
     from io import BytesIO as StreamIO
 

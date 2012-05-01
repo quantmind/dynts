@@ -1,11 +1,11 @@
 '''Quantitative financial timeseries analysis'''
 
-VERSION = (0, 4, 2)
+VERSION = (0, 4, 2, 'alpha', 1)
+
+from dynts.exceptions import *
+from dynts.utils.version import get_version
  
-def get_version():
-    return '.'.join(map(str,VERSION))
- 
-__version__  = get_version()
+__version__  = version = get_version(VERSION)
 __license__  = "BSD"
 __author__   = "Luca Sbardella"
 __contact__  = "luca@quantmind.com"
@@ -28,13 +28,8 @@ CLASSIFIERS  = [
                 'Topic :: Office/Business :: Financial'
                 ]
 
-
-from functools import reduce
-
-from dynts.exceptions import *
 from .backends import *
 from .dsl import parse, evaluate, merge, dslresult, function_registry, functions
-from .maths import BasicStatistics, pivottable
 from .data import providers
 from dynts import formatters
 Formatters['flot'] = formatters.ToFlot()

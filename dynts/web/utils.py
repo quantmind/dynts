@@ -7,7 +7,8 @@ def data_table_header(splitter, base, *names, **params):
     code = splitter.join((n for n in names if n is not None)).lower()
     fullcode = splitter.join((base,code)).lower() if base else code
     name = params.pop('name',None) or nicename(code)
-    return table_header(code, name, attrname = fullcode, **params)
+    return table_header(code, name, function=fullcode,
+                        attrname=fullcode, **params)
 
 
 class RollingStatistic(object):

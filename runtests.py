@@ -4,61 +4,82 @@ import sys
 import argparse
 
 import dynts
+from dynts.conf import settings
 
-
-def makeoptions():
-    parser = argparse.ArgumentParser(description='______ DYNTS TEST SUITE',
-                                     epilog="Have fun!")
-    parser.add_argument('labels',nargs='*',
-                        help='Optional test labels to run. If not provided\
- all tests are run. To see available labels use the -l option.')
-    parser.add_argument("-v", "--verbosity",
-                      type = int,
-                      action="store",
-                      dest="verbosity",
-                      default=1,
-                      help="Tests verbosity level, one of 0, 1, 2 or 3")
-    parser.add_argument("-t", "--type",
-                      action="store",
-                      dest="test_type",
-                      default='regression',
-                      help="Test type, possible choices are: regression, bench and profile")
-    parser.add_argument("-l", "--list",
-                      action="store_true",
-                      dest="show_list",
-                      default=False,
-                      help="Show the list of available profiling tests")
-    parser.add_argument("-p", "--proxy",
-                      action="store",
-                      dest="proxy",
-                      default='',
-                      help="Set the HTTP_PROXY environment variable")
-    parser.add_argument("-d", "--docs",
-                      action="store_true",
-                      dest="docs",
-                      default=False,
-                      help="Dump function documentation.")
-    return parser
-
+try:
+    import pulsar
+    from pulsar.apps.test import TestOptionPlugin
     
-if __name__ == '__main__':
-    options = makeoptions().parse_args()
-    if options.proxy:
-        from dynts.conf import settings
-        settings.proxies['http'] = options.proxy
-    
-    if options.docs:
-        dynts.dump_docs()
-    else:
-        # add the tests directory to the Python Path
-        p = os.path
-        path = p.join(p.split(p.abspath(__file__))[0],'tests')
-        sys.path.insert(0, path)
-        from testsrunner import run
-            
-        run(options.labels,
-            options.test_type,
-            path,
-            verbosity=options.verbosity,
-            show_list=options.show_list)
+    class HttpProxy(TestOptionPlugin):
+        name = "http_proxy"
+        flags = ["--proxy"]
+        desc = 'Set the HTTP_PROXY environment variable.'
         
+        def configure(self, cfg):
+            settings.proxies['http'] = cfg.http_proxy
+            
+except ImportError:
+    pulsar = None
+    
+try:
+    import nose
+    from nose import plugins
+    
+    class NoseHttpProxy(plugins.Plugin):
+    
+        def options(self, parser, env=os.environ):
+            parser.add_option('--http_proxy',
+                          dest='http_proxy',
+                          default='',
+                          help="Set the HTTP_PROXY environment variable.")
+    
+        def configure(self, options, conf):
+            self.enabled = True
+            settings.proxies['http'] = options.http_proxy
+    
+    def noseoption(argv,*vals,**kwargs):
+        if vals:
+            for val in vals:
+                if val in argv:
+                    return
+            argv.append(vals[0])
+            value = kwargs.get('value')
+            if value is not None:
+                argv.append(value)
+                    
+except ImportError:
+    nose = None
+
+    
+def start():
+    global pulsar
+    argv = sys.argv
+    if len(argv) > 1 and argv[1] == 'nose':
+        pulsar = None
+        sys.argv.pop(1)
+    
+    if pulsar:
+        from pulsar.apps.test import TestSuite
+        from pulsar.apps.test.plugins import bench, profile
+        
+        os.environ['stdnet_test_suite'] = 'pulsar'
+        suite = TestSuite(
+                description = 'Dynts Asynchronous test suite',
+                    modules = ('tests',),
+                    plugins = (HttpProxy(),
+                               profile.Profile(),
+                               bench.BenchMark(),)
+                  )
+        suite.start()
+    elif nose:
+        os.environ['stdnet_test_suite'] = 'nose'
+        argv = list(sys.argv)
+        noseoption(argv, '-w', value = 'tests/regression')
+        noseoption(argv, '--all-modules')
+        nose.main(argv=argv, addplugins=[NoseHttpProxy()])
+    else:
+        print('To run tests you need either pulsar or nose.')
+        exit(0)
+
+if __name__ == '__main__':
+    start()
