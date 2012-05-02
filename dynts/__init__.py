@@ -27,11 +27,12 @@ CLASSIFIERS  = [
                 'Topic :: Scientific/Engineering :: Mathematics',
                 'Topic :: Office/Business :: Financial'
                 ]
+from functools import reduce
 
 from .backends import *
 from .dsl import parse, evaluate, merge, dslresult, function_registry, functions
 from .data import providers
-from dynts import formatters
+from . import formatters
 Formatters['flot'] = formatters.ToFlot()
 Formatters['jsonvba'] = formatters.ToJsonVba()
 Formatters['csv']  = formatters.ToCsv()
