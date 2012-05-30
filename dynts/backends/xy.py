@@ -94,7 +94,7 @@ length given by :class:`dynts.DynData.count`.'''
         elif not formatter:
             raise FormattingException('Formatter %s not available' % format)
         else:
-            return formatter(self,**kwargs)
+            return formatter(self, **kwargs)
 
 
 

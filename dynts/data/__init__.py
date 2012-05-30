@@ -57,7 +57,7 @@ It doesn't do anything special.
         self.provider = provider
     
     def __str__(self):
-        return self.ticker
+        return self.full()
     
     def full(self):
         c = settings.field_separator

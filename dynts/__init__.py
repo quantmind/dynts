@@ -1,6 +1,6 @@
 '''Quantitative financial timeseries analysis'''
 
-VERSION = (0, 4, 2, 'alpha', 2)
+VERSION = (0, 4, 2, 'alpha', 3)
 
 from dynts.exceptions import *
 from dynts.utils.version import get_version
