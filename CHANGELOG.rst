@@ -1,5 +1,6 @@
-Ver. 0.4.2 - Development
+Development
 ================================
+* Web stuff moved under the :mod:`web` module.
 * Improved documentation.
 * Several bug fixes.
 * Introduced :attr:`dynts.conf.Settings.desc` for specifying the order of dates in timeseries.
