@@ -1,5 +1,4 @@
-from djpcms import html
-from djpcms.utils import media
+from djpcms import html, media
 
 SPARKLINE_MEDIA = ['dynts/jquery.sparkline.js',
                    'dynts/decorator.js']

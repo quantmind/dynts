@@ -1,5 +1,5 @@
-from djpcms import views, forms, html
-from djpcms.utils import gen_unique_id, media
+from djpcms import views, forms, html, media
+from djpcms.utils.text import gen_unique_id
 
 import dynts
 from ccy import dateFromString
