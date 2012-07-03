@@ -402,13 +402,13 @@ plots, you can just fix the size of their placeholders.
     			menu = this.data.menu,
     			container = this.container(),
     			mc = $(omenu.container),
+    			menu_classes = 'menubar',
     			lower;
     		if(!mc.length) {
-    			mc = $('<div></div>').appendTo(container);
-    			menu.upper = $('<div class="menubar upper ui-widget-header"></div>').appendTo(mc).hide();
-        		lower = $('<div class="lower ui-widget-header"></div>').appendTo(mc);
-        		menu.lower = $('<div class="menubar"></div>').appendTo(lower);
-        		lower.append($('<div></div>').addClass(options.jsondata.loader_class));
+    			mc = $('<div></div>').addClass('ui-widget-header').appendTo(container);
+    			menu.upper = $('<div class="upper"></div>').addClass(menu_classes).appendTo(mc).hide();
+    			menu.lower = $('<div class="lower"></div>').addClass(menu_classes).appendTo(mc);
+        		menu.lower.append($('<div></div>').addClass(options.jsondata.loader_class));
     		}
     		menu.container = mc.addClass(omenu.container_class);
     	}
@@ -1507,10 +1507,13 @@ plots, you can just fix the size of their placeholders.
         		$.ecoplot.error('Could not find a suitable container for the command plugin');
         	}
         	else {
-        		var inp = $('input[type="text"]',container);
+        		var inp = $('input[type="text"]',container),
+        		    wrapper = $('<div></div>').addClass('commandline');
         		if(!inp.length) {
         			inp = $('<input type="text">').appendTo(container);
         		}
+        		inp.appendTo(wrapper);
+        		wrapper.appendTo(container);
         		inp.attr('name',"commandline");
         		if(command.symbol)  {
         			inp.val(command.symbol+"");

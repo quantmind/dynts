@@ -5,8 +5,7 @@ include MANIFEST.in
 include README.rst
 include requirements.txt
 include runtests.py
-recursive-include dynts/templates *
-recursive-include dynts/media *
+recursive-include dynts/tsweb/media *
 recursive-include lib *.py
 recursive-include lib/src *.pyx
 recursive-include tests *.py

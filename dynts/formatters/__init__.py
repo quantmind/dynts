@@ -66,7 +66,7 @@ class ToFlot(BaseFormatter):
     def __call__(self, ts, container = None, desc = False,
                  series_info = None, **kwargs):
         '''Dump timeseries as a JSON string compatible with ``flot``'''
-        from dynts.web import flot
+        from dynts.tsweb import flot
         from dynts.conf import settings
         
         pydate2flot = flot.pydate2flot
