@@ -65,6 +65,17 @@ plots, you can just fix the size of their placeholders.
             }
         }
         
+        var jquery_ui = {
+            name: 'jquery',
+            button: function(el, text, icons) {
+                var icon = {'primary': icons['jquery']};                
+                tel.button({
+                    text: menu.text || false,
+                    'icons': icon
+                });
+            }
+        };
+        
         var version = "0.4.2",
             authors = 'Luca Sbardella',
             home_page = 'https://github.com/quantmind/dynts',
@@ -85,7 +96,7 @@ plots, you can just fix the size of their placeholders.
                   'legend': {
                                classname: 'toggle-legend',
                                title: "Toggle legend",
-                               icon: "ui-icon-comment",
+                               icon: {'jquery': "ui-icon-comment"},
                                type: "checkbox",
                                decorate: function (b) {
                                    b.toggle(
@@ -108,6 +119,7 @@ plots, you can just fix the size of their placeholders.
             defaults = {
                showplot: function (i) {return true;},
                show_tooltip: true,
+               ui: jquery_ui,
                plugins: [],
                flot_options: {
                    xaxis: {},
@@ -405,7 +417,8 @@ plots, you can just fix the size of their placeholders.
     			menu_classes = 'menubar',
     			lower;
     		if(!mc.length) {
-    			mc = $('<div></div>').addClass('ui-widget-header').appendTo(container);
+    		    var ui = options.ui;
+    			mc = $('<div></div>').addClass(ui.widget_head).addClass(ui.corner_top).appendTo(container);
     			menu.upper = $('<div class="upper"></div>').addClass(menu_classes).appendTo(mc).hide();
     			menu.lower = $('<div class="lower"></div>').addClass(menu_classes).appendTo(mc);
         		menu.lower.append($('<div></div>').addClass(options.jsondata.loader_class));
@@ -454,7 +467,8 @@ plots, you can just fix the size of their placeholders.
         		canvases = options.canvases,
 				container = this.container(),
 				cdata = this.data.canvases;
-			cdata.body = $('<div class="ui-widget-content"></div>')
+			cdata.body = $('<div></div>').addClass(options.ui.widget_body)
+			            .addClass(options.ui.corner_bottom)
 			 			.addClass(canvases.outer_body_class)
 						.appendTo(container).height(options.height);
 			cdata.main = $('<div class="main"></div>').appendTo(cdata.body);
@@ -723,7 +737,8 @@ plots, you can just fix the size of their placeholders.
             'reload': {
                         classname: 'reload',
                         title: "Refresh data",
-                        icon: "ui-icon-refresh",
+                        icon: {'jquery': "ui-icon-refresh",
+                               'fontawesome': 'icon-repeat'},
                         decorate: function (b, instance) {
                             b.click(function (e,o) {
                                 var inst = $.ecoplot.instance(this);
@@ -834,14 +849,17 @@ plots, you can just fix the size of their placeholders.
         }
     });
     
-    
+    /**
+     * Add zoom and zoom out capabilities
+     */
     $.ecoplot.plugin('zoom',{
         isdefault: true,
         tools: {
                 'zoomout': {
                             classname: 'zoomout',
                             title: "Zoom Out",
-                            icon: "ui-icon-zoomout",
+                            icon: {'jquery': "ui-icon-zoomout",
+                                   'fontawesome': "icon-zoom-out"},
                             decorate: function (b) {
                                 b.click(function (e) {
                                     var instance = $.ecoplot.instance(this);
@@ -908,7 +926,7 @@ plots, you can just fix the size of their placeholders.
             'saveimage': {
                            classname: 'save-image',
                            title: "Save as image",
-                           icon: "ui-icon-image",
+                           icon: {'jquery': "ui-icon-image"},
                            decorate: function (b,el) {
                                b.click(function () {
                                    var instance = $.ecoplot.instance(this),
@@ -1040,7 +1058,8 @@ plots, you can just fix the size of their placeholders.
             edit: {
                 classname: 'options',
                 title: "Edit plotting options",
-                icon: "ui-icon-copy",
+                icon: {'jquery': "ui-icon-copy",
+                       'fontawesome': 'icon-magic'},
                 type: "checkbox",
                 decorate: function (b,instance) {
                 	var edit = instance.data.edit;
@@ -1488,6 +1507,11 @@ plots, you can just fix the size of their placeholders.
     });
 
 
+    /**
+     * Command line plugin.
+     * Add the command line to the container in options.command.container
+     * if supplied. Otherwise it add it to the upper menu container by default
+     */
     $.ecoplot.plugin('command',{
         isdefault: true,
     	defaults : {
@@ -1498,7 +1522,8 @@ plots, you can just fix the size of their placeholders.
     		symbol: null,
     	},
         layout: function () {
-        	var command = this.settings().command,
+        	var settings = this.settings(),
+        	    command = settings.command,
         		container = $(container);
         	if(!container.length) {
         		container = this.data.menu.upper;
@@ -1508,7 +1533,7 @@ plots, you can just fix the size of their placeholders.
         	}
         	else {
         		var inp = $('input[type="text"]',container),
-        		    wrapper = $('<div></div>').addClass('commandline');
+        		    wrapper = $('<div></div>').addClass('commandline').addClass(settings.ui.ui_input);
         		if(!inp.length) {
         			inp = $('<input type="text">').appendTo(container);
         		}
@@ -1551,20 +1576,23 @@ plots, you can just fix the size of their placeholders.
             classname: 'dateholder menu-item',
         },
         layout: function() {
-        	var options = this.settings().dates,
+        	var settings = this.settings()
+        	    options = settings.dates,
         		dates = this.data.dates,
-                el = $('<div></div>').addClass(options.classname).appendTo(this.data.menu.lower);
+                el = $('<div></div>').addClass(options.classname).appendTo(this.data.menu.lower),
+                wrap_start = $('<div></div>').addClass(settings.ui.ui_input),
+                wrap_end = $('<div></div>').addClass(settings.ui.ui_input);
         	dates.container = el;
             dates.start = $('<input type="text" name="start">').addClass(options.cn).val(options.start),
             dates.end = $('<input type="text" name="end">').addClass(options.cn).val(options.end);
             if(options.label) {
                 el.append($('<label>'+options.label+'</label>'));
             }
-            el.append(dates.start);
+            el.append(wrap_start.append(dates.start));
             if(options.middle) {
             	el.append($('<label class="middle">'+options.middle+'</label>'));
             }
-            el.append(dates.end);
+            el.append(wrap_end.append(dates.end));
             if(!options.show) {
                 el.hide();
             }
@@ -1653,9 +1681,11 @@ plots, you can just fix the size of their placeholders.
             }
             
             this.container().bind('ecoplot-ready', function(e,instance) {
-            	var options = instance.settings().toolbar,
+            	var settings = instance.settings(),
+            	    options = settings.toolbar,
             		toolbar = instance.data.toolbar,
             		container = toolbar.container,
+            		ui = settings.ui,
             		cid = instance.container().attr('id');
             	
             	$.each(options.display, function (i,name) {
@@ -1675,16 +1705,9 @@ plots, you can just fix the size of their placeholders.
 	                        if(eel) {
 	                            container.append(eel);
 	                        }
-	                        ico = {};
-	                        if(menu.icon) {
-	                            ico.primary = menu.icon;  
-	                        }
-	                        tel.button({
-	                            text: menu.text || false,
-	                            icons: ico
-	                        });
+	                        ui.button(tel, menu.text, menu.icon);
 	                        if(menu.decorate) {
-	                            menu.decorate(tel,instance);
+	                            menu.decorate(tel, instance);
 	                        }
 	                    }
 	                }
@@ -1717,7 +1740,7 @@ plots, you can just fix the size of their placeholders.
             about: {
                 classname: 'about',
                 title: 'About Economeric Plotting Plugin',
-                icon: "ui-icon-contact",
+                icon: {'jquery': "ui-icon-contact"},
                 decorate: function (b,el) {
                     b.click(function (e) {
                         var info = $.ecoplot.info(),

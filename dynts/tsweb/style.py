@@ -1,6 +1,8 @@
 from djpcms.media.style import *
+from djpcms.forms.layout import classes
 
-cssv.ecoplot.menu.height = px(36)
+cssv.ecoplot.padding = px(10)
+cssv.ecoplot.dateinput.width = px(90)
 
 
 class uppermenu(mixin):
@@ -9,12 +11,15 @@ dates inputs and the toolbar.
     '''
     def __call__(self, elem):
         height = cssv.ecoplot.menu.height
-        css('.menubar',
-            clearfix(),
+        css('.menu',
+            cssb('*',
+                 clearfix(),
+                 float='left',
+                 width=pc(100),
+                 padding_bottom=cssv.ecoplot.padding.bottom),
+            cssb('*:last-child', padding=0),
             parent=elem,
-            height=height,
-            width=pc(100),
-            float='left')
+            padding=cssv.ecoplot.padding)
         
         css('.commandline',
             css('input',
@@ -25,9 +30,21 @@ dates inputs and the toolbar.
             parent=elem)
     
         css('.menu-item',
+            cssb('*', float='left'),
+            cssa(':last-child', margin=0),
+            cssb('label',
+                 cssa(':first-child', margin=spacing(0, px(5), 0, 0)),
+                 margin=spacing(0, px(5))),
             parent=elem,
             float='left',
-            margin=spacing(0, 0, 0, pc(1)))
+            margin=spacing(0, px(10), 0, 0))
+        
+        css('.dateholder',
+            css('.%s'%classes.ui_input, width=cssv.ecoplot.dateinput.width))
+        
+        css('.loader',
+            display='none',
+            float='right')
     
 
 css('.econometric-plot',

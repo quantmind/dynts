@@ -39,7 +39,7 @@
             
         $.djpcms.decorator({
             id:"econometric_plot",
-            decorate: function(elem,config) {
+            decorate: function(elem, config) {
         		$.ecoplot.log = $.djpcms.logger;
                 var poptions = {
                         // colors: ["#205497","#2D8633","#B84000","#d18b2c"],
@@ -68,6 +68,8 @@
                     var start,
                         el = $(this),
                         options = el.data();
+                    options.ui = $.djpcms.ui;
+                    options.ui.name = 'djpcms';
                     options.jsondata.parse = parsedata;
                     options.jsondata.errorcallbacks = [errorback];
                     options.flot_options = poptions;
