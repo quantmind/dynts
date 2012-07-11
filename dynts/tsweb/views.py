@@ -49,15 +49,15 @@ for fetching data.'''
         id = gen_unique_id()
         if windows:
             windows = [w.replace(' ','') for w in windows.split(',')]
-        widget = html.Widget('div', id = id, cn = 'econometric-plot')\
-                .addData('height',height)\
-                .addData('start',start)\
-                .addData('windows',{'windows':windows})\
-                .addData('jsondata',{'url':service_url,
-                                     'requestMethod':method})
+        options = {'height': height,
+                   'start': start,
+                   'windows': {'windows': windows},
+                   'jsondata': {'url':service_url,
+                                'requestMethod':method}}
         if code:
-            widget.addData('command',{'show':False,'symbol':code})
-        return widget
+            options['command'] = {'show':False, 'symbol':code}
+        return html.Widget('div', id = id, cn = 'econometric-plot')\
+                   .addData('options',options)
             
     def render(self, request, **kwargs):
         return self.get_widget(request, **kwargs).render(request)

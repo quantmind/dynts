@@ -35,6 +35,7 @@ dates inputs and the toolbar.
             cssb('label',
                  cssa(':first-child', margin=spacing(0, px(5), 0, 0)),
                  margin=spacing(0, px(5))),
+            cssb('label.%s' % classes.button, margin=0),
             parent=elem,
             float='left',
             margin=spacing(0, px(10), 0, 0))
@@ -53,7 +54,6 @@ css('.econometric-plot',
         css('.panel',
             padding='10px'),
         overflow='auto'),
-    line_height='25px',
     overflow='hidden')
 
 #MakeUpperMenu(ecoplot,
