@@ -1,8 +1,19 @@
+'''Styling for ecoplot javascript plugin.
+Make sure "djpcms.apps.ui" is included before "dynts.tsweb"
+in the INSTALLED_APPS list.'''
 from djpcms.media.style import *
 from djpcms.forms.layout import classes
 
 cssv.ecoplot.padding = px(10)
 cssv.ecoplot.dateinput.width = px(90)
+
+cssv.ecoplot.legend.background = cssv.widget.body.background
+cssv.ecoplot.legend.color = cssv.widget.body.color
+cssv.ecoplot.legend.border.color = cssv.widget.border.color
+
+cssv.ecoplot.tooltip.background = cssv.ecoplot.legend.background
+cssv.ecoplot.tooltip.color = cssv.ecoplot.legend.color
+cssv.ecoplot.tooltip.border.color = cssv.ecoplot.legend.border.color
 
 
 class uppermenu(mixin):
@@ -50,22 +61,32 @@ dates inputs and the toolbar.
 
 css('.econometric-plot',
     uppermenu(),
+    css('.main',
+        width=pc(100),
+        height=pc(100),
+        float='left'),
     css('.secondary',
         css('.panel',
             padding='10px'),
-        overflow='auto'),
+        width=pc(100),
+        height=pc(100),
+        float='right'),
+    css('.with-panel',
+        css('.main,.secondary',
+            width=pc(50))),
     overflow='hidden')
 
-#MakeUpperMenu(ecoplot,
-#              height = 40,
-#              vertical_margin_input = 4)
-
-
 css('.econometric-plot-tooltip',
+    gradient(cssv.ecoplot.tooltip.background),
+    border(**cssv.ecoplot.tooltip.border.params()),
     padding='2px',
+    color=cssv.ecoplot.tooltip.color,
     font_size='90%')
 
-css('ecolegend',
+css('.ecolegend',
+    gradient(cssv.ecoplot.legend.background),
+    border(**cssv.ecoplot.legend.border.params()),
+    color=cssv.ecoplot.legend.color,
     font_size='90%')
 
 css('.ts-input-date',

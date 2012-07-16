@@ -47,13 +47,13 @@
         var jquery_ui = {
                 name: 'jquery',
                 classes: {},
-                input: function(input) {
+                input: function (input) {
                     return input;
                 },
                 button: function (elem, options) {
                     elem.button({
                         text: options.text || false,
-                        'icons': {'primary': options.icons['jquery']}
+                        'icons': {'primary': options.icons.jquery}
                     });
                 }
             },
@@ -69,9 +69,9 @@
             debug = false,
             default_logger = {
                 log: function (msg, level) {console_logger(msg); },
-                info : function (msg) {console_logger(msg); },
-                debug : function (msg) {console_logger(msg); },
-                error : function (msg) {console_logger(msg); }                
+                info: function (msg) {console_logger(msg); },
+                debug: function (msg) {console_logger(msg); },
+                error: function (msg) {console_logger(msg); }            
             },
             tools = {
                 'legend': {
@@ -81,102 +81,102 @@
                     type: "checkbox",
                     decorate: function (b) {
                         b.toggle(
-                                function () {
-                                    var legend = $.ecoplot.instance(this).legend();
-                                    if(legend) {
-                                        legend.hide();
-                                    }
-                                },
-                                function () {
-                                    var legend = $.ecoplot.instance(this).legend();
-                                    if(legend) {
-                                        legend.show();
-                                    }
+                            function () {
+                                var legend = $.ecoplot.instance(this).legend();
+                                if (legend) {
+                                    legend.hide();
                                 }
-                                );
+                            },
+                            function () {
+                                var legend = $.ecoplot.instance(this).legend();
+                                if (legend) {
+                                    legend.show();
+                                }
+                            }
+                       );
                     }
                 }
             },
             defaults = {
-               showplot: function (i) {return true; },
-               show_tooltip: true,
-               ui: jquery_ui,
-               plugins: [],
-               flot_options: {
-                   xaxis: {},
-                   legend: {
-                       show:true,
-                       position: "ne"
-                       },
-                   grid: {
-                       show: true
-                   }
-               },
-               infoPanel: 'ecoplot-info',
-               min_height: 200,
-               defaultFade: 300,
-               classname: 'ts-plot-module',
-               errorClass: 'dataErrorMessage',
-               styling: 'jquery-ui'
-           };
+                showplot: function (i) {return true; },
+                show_tooltip: true,
+                ui: jquery_ui,
+                plugins: [],
+                flot_options: {
+                    xaxis: {},
+                    legend: {
+                        show: true,
+                        position: "ne"
+                    },
+                    grid: {
+                        show: true
+                    }
+                },
+                infoPanel: 'ecoplot-info',
+                min_height: 200,
+                defaultFade: 300,
+                classname: 'ts-plot-module',
+                errorClass: 'dataErrorMessage',
+                styling: 'jquery-ui'
+            };
         // /////////////////////////////////////////////////////
         // DEFAULT PAGINATION
         //
         // To override create a plugin with paginate function.
         // /////////////////////////////////////////////////////
         function _set_dimensions(instance) {
-        	var options = instance.settings(),
-        		data = instance.data,
-                container = instance.container().show(),
+            var options = instance.settings(),
+        	    data = instance.data,
+        	    container = instance.container().show(),
                 height = container.height(),
                 h;
 
-            if(height < 10) {
+            if (height < 10) {
                 height = options.height || options.min_height;
             }
-            h = Math.max(height - data.menu.container.height(),30);
+            h = Math.max(height - data.menu.container.height(), 30);
             data.canvases.body.height(h);
-            instance.canvas_container().height(h-10).css({'margin':'5px 0'});
+            instance.canvas_container().height(h - 10).css({'margin': '5px 0'});
             container.height('auto');
         }
-           
-        function _addelement(el,holder) {
-            var id  = el.id.toLowerCase();
-            var p   = holder[id];
+        //
+        function _addelement(el, holder) {
+            var id = el.id.toLowerCase(),
+                p = holder[id];
             if(!p) {
                 el.id = id;
                 holder[id] = el;
             }
         }
-
+        //
         function _parseOptions(options_) {
             var options = {};
             $.extend(true, options, defaults, options_);
             return options;
         }
-        
+        //
         function make_instance(index_, container_, settings_) {
-        	var _layouts = [],
-        		_inputs = [],
-        		instance = {
+            var _layouts = [],
+        	    _inputs = [],
+        	    instance = {
 	                data: {},
-	                settings: function () { return settings_; },
-	                index: function () { return index_; },
-	                container: function () { return container_; },
+	                settings: function () {return settings_; },
+	                index: function () {return index_; },
+	                container: function () {return container_; },
 	                paginate: function () {
 	                	container_.hide().html("");
-	                	$.each(_layouts, function (i,layout) {
-	                		layout();
+	                	$.each(_layouts, function (i, layout) {
+	                	    layout();
 	                	});
 	                	_set_dimensions(this);
 	                	container_.trigger('ecoplot-ready',instance);
 	                },
 	                input_data: function () {
-	                	var d = {}
-	                	$.each(_inputs, function (i, inp) {
-	                		$.extend(d,inp());
-	                	});
-	                	return d;
+	                    var d = {}
+	                    $.each(_inputs, function (i, inp) {
+	                        $.extend(d,inp());
+	                    });
+	                    return d;
 	                },
 	                makeid: function (name) {
 	                    if(name === undefined) {
@@ -187,8 +187,8 @@
 	                    return name + '-' + index_;
 	                }
             	};
-        	
-        	function make_function (fname,func) {
+        	//
+        	function make_function(fname, func) {
                 if(fname.charAt(0) == '_') {
                     return func;
                 }
@@ -198,7 +198,7 @@
                             args = Array.prototype.slice.call(arguments),
                             res;
                         container.trigger('ecoplot-before-'+fname,args);
-                        res = func.apply(this,args);
+                        res = func.apply(this, args);
                         container.trigger('ecoplot-after-'+fname,res);
                         return res;
                     };
@@ -571,8 +571,8 @@
             }
 
             if(data) {
-                $.each(data, function (i,v) {
-                    instance.add_canvas(v,oldcanvas(i),outer);
+                $.each(data, function (i, v) {
+                    instance.add_canvas(v, oldcanvas(i), outer);
                 });
                 if(canvases.all.length === 1) {
                     $('ul',outer).remove();
@@ -676,9 +676,9 @@
     });
     
 
-    // /////////////////////////////////////////////////
-    // plugin for loading data via ajax
-    // /////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    // plugin for loading JSON data via AJAX
+    ///////////////////////////////////////////////////
     $.ecoplot.plugin('jsondata',{
         isdefault: true,
         defaults: {
@@ -704,19 +704,19 @@
             }
         },
         tools: {
-            'reload': {
-                        classname: 'reload',
-                        title: "Refresh data",
-                        icon: {'jquery': "ui-icon-refresh",
-                               'fontawesome': 'icon-repeat'},
-                        text: false,
-                        decorate: function (b, instance) {
-                            b.click(function (e,o) {
-                                var inst = $.ecoplot.instance(this);
-                                instance.container().trigger('load');
-                            });
-                        }
-                    }
+            'reload': {                
+                classname: 'reload',
+                title: "Refresh data",
+                icon: {'jquery': "ui-icon-refresh",
+                       'fontawesome': 'icon-repeat'},
+                text: false,
+                decorate: function (b, instance) {
+                    b.click(function (e,o) {
+                        var inst = $.ecoplot.instance(this);
+                        instance.container().trigger('load');
+                    });
+                }
+            }
         },
         init: function () {
             var self = this,
@@ -734,7 +734,7 @@
         },
         ajaxdata: function () {
             var data = this.input_data();
-            if(!data.command) {return;}
+            if (!data.command) {return; }
             return data;
         },
         ajaxload: function () {
@@ -744,11 +744,11 @@
                 data = this.data.jsondata,
                 load = true,
                 dataplot;
-            if(!options.url)  {return;}
+            if (!options.url)  {return;}
             dataplot = this.ajaxdata();
-            if(!dataplot) {return;}
-            if(data.dataplot !== null) {
-            	if(data.dataplot.command === dataplot.command) {
+            if (!dataplot) {return;}
+            if (data.dataplot !== null) {
+            	if (data.dataplot.command === dataplot.command) {
             		// The ticker has been already loaded
             		var start = new Date(data.dataplot.start),
             			data_start = new Date(dataplot.start),
@@ -825,24 +825,24 @@
     /**
      * Add zoom and zoom out capabilities
      */
-    $.ecoplot.plugin('zoom',{
+    $.ecoplot.plugin('zoom', {
         isdefault: true,
         tools: {
-                'zoomout': {
-                            classname: 'zoomout',
-                            title: "Zoom Out",
-                            icon: {'jquery': "ui-icon-zoomout",
-                                   'fontawesome': "icon-zoom-out"},
-                            text: false,
-                            decorate: function (b) {
-                                b.click(function (e) {
-                                    var instance = $.ecoplot.instance(this);
-                                    if(instance) {
-                                        instance.canvas_render(null,{});
-                                    }
-                                });
-                            }
+            'zoomout': {
+                classname: 'zoomout',
+                title: "Zoom Out",
+                icon: {'jquery': "ui-icon-zoomout",
+                       'fontawesome': "icon-zoom-out"},
+                text: false,
+                decorate: function (b) {
+                    b.click(function (e) {
+                        var instance = $.ecoplot.instance(this);
+                        if(instance) {
+                            instance.canvas_render(null,{});
+                        }
+                    });
                 }
+            }
         },
         init: function () {
             this.data.zoom.selecting = false;
@@ -883,7 +883,7 @@
      */
     $.ecoplot.plugin('dialog', {
         isdefault: true,
-        dialog: function (title,body,opts) {
+        dialog: function (title, body, opts) {
             var c = this.container(),
                 d = $("<div></div>").appendTo(c).attr('title',title).html(body);
             d.dialog(opts).bind('dialogclose', function () {
@@ -894,54 +894,55 @@
     /**
      * 
      */
-    $.ecoplot.plugin('image',{
+    $.ecoplot.plugin('image', {
         defaults: {
             title: 'Save as image',
             formats: ['png','jpeg','bmp']
         },
         tools: {
             'saveimage': {
-                           classname: 'save-image',
-                           title: "Save as image",
-                           icon: {'jquery': "ui-icon-image"},
-                           decorate: function (b,el) {
-                               b.click(function () {
-                                   var instance = $.ecoplot.instance(this),
-                                       body = instance.saveimagehtml(),
-                                       opts = {
-                                	   	   width: 'auto',
-                                	   	   height: 'auto',
-                                           buttons: {
-                                               'Preview': function () {
-                                                   var d = $(this),
-                                                       xdim = $('input[name="scalex"]').val(),
-                                                       ydim = $('input[name="scaley"]').val(),
-                                                       as = $('select[name="format"]').val(),
-                                                       preview = $('.preview',d),
-                                                       img;
-                                                   try {
-                                                       xdim = parseInt(xdim,10);
-                                                       ydim = parseInt(ydim,10);
-                                                   }
-                                                   catch(e) {
-                                                       xdim=0;ydim=0;
-                                                   }
-                                                   img = instance.saveimage(as,xdim,ydim);
-                                                   if(!preview.length) {
-                                                       preview = $('<div class="preview"></div>').css({'margin':'10px 0'}).insertAfter($('form',d));
-                                                   }
-                                                   preview.html(img);
-                                                },
-                                                'Cancel': function () {
-                                                    $( this ).dialog( "close" );
-                                                }
-                                           }
-                                       };
-                                   instance.dialog('Save as image',body,opts);
-                                   // plot.saveAsPng();
-                               });
-                           }
-                          }
+                classname: 'save-image',
+                title: "Save as image",
+                icon: {'jquery': "ui-icon-image"},
+                decorate: function (b, el) {
+                    b.click(function () {
+                        var instance = $.ecoplot.instance(this),
+                            body = instance.saveimagehtml(),
+                            opts = {
+                                width: 'auto',
+                                height: 'auto',
+                                buttons: {
+                                    'Preview': function () {
+                                        var d = $(this),
+                                            xdim = $('input[name="scalex"]').val(),
+                                            ydim = $('input[name="scaley"]').val(),
+                                            as = $('select[name="format"]').val(),
+                                            preview = $('.preview',d),
+                                            img;
+                                        try {
+                                            xdim = parseInt(xdim,10);
+                                            ydim = parseInt(ydim,10);
+                                        }
+                                        catch(e) {
+                                            xdim = 0;
+                                            ydim = 0;
+                                        }
+                                        img = instance.saveimage(as, xdim, ydim);
+                                        if (!preview.length) {
+                                            preview = $('<div class="preview"></div>').css({'margin':'10px 0'}).insertAfter($('form',d));
+                                        }
+                                        preview.html(img);
+                                    },
+                                    'Cancel': function () {
+                                        $( this ).dialog( "close" );
+                                    }
+                               }
+                            };
+                        instance.dialog('Save as image', body, opts);
+                        // plot.saveAsPng();
+                    });
+                }
+            }
         },
         init: function () {
             var fopts = this.settings().flot_options,
@@ -1096,9 +1097,8 @@
         		edit.show = function () {this.container.dialog("open");};
         		edit.hide = function () {this.container.dialog("close");};
         		edit.isactive = function () {return this.container.dialog('isOpen');};
-        	}
-        	else if(in_canvas) {
-        		edit.show = function () {
+        	} else if(in_canvas) {
+        	    edit.show = function () {
     				instance.data.canvases.body.addClass(options.editing_class);
     				this.container.show();
         		}
@@ -1116,14 +1116,15 @@
         		edit.isactive = function () {return true; };
         	}
         },
+        // Show the editing panel for the current canvas
         showPanel: function (idx) {
             var canvas = this.get_canvas(idx),
                 options = this.settings().edit,
                 edit = this.data.edit;
-            if(canvas) {
-            	this.edit_panel().hide();
-            	this.edit_panel(canvas.index).show();
-            	edit.show();
+            if (canvas) {
+                this.edit_panel().hide();
+                this.edit_panel(canvas.index).show();
+                edit.show();
             }
         },
         hidePanel: function () {
@@ -1136,7 +1137,7 @@
         	var edit = this.data.edit,
         		options = this.settings().edit;
         	if(!$.isnothing(idx)) {
-	        	var cn = options.panel_class + ' option-' + idx;
+	        	var cn = options.panel_class + ' option-' + idx,
 	        		se = $.selector_from_class(cn),
 	        		p = $(se,edit.container);
 	        	if(!p.length && create) {

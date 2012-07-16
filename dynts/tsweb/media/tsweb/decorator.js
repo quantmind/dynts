@@ -50,7 +50,7 @@
                 shadowSize: 0
             },
             jsondata: {
-                parsedata: function (data, instance) {
+                parse: function (data, instance) {
                     var res = data.result;
                     if (!res) {
                         res = data;
