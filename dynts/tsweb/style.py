@@ -4,6 +4,8 @@ in the INSTALLED_APPS list.'''
 from djpcms.media.style import *
 from djpcms.forms.layout import classes
 
+from .html import appname
+
 cssv.ecoplot.padding = px(10)
 cssv.ecoplot.dateinput.width = px(90)
 
@@ -111,6 +113,15 @@ css('.plot-options',
         padding='0 5px'),
     font_size='90%'
 )
+
+css('.econometric-plot',
+    css('.loader',
+        opacity(0.5),
+        image('%s/ecoplot/img/ajax-loader.gif' % appname),
+        display='none',
+        height=px(30),
+        float='right',
+        width=px(30)))
 
 css('.plot-options th, .plot-options td',
     padding='0 5px',
