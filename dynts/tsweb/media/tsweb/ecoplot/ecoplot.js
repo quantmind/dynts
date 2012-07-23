@@ -1257,7 +1257,7 @@
                 }
                 if (edit.render_as === 'table') {
                     series_container = $('<table class="plot-options"></table>');
-                    head = $('<tr></tr>').appendTo($('<thead class="ui-state-default"></thead>')
+                    head = $('<tr></tr>').appendTo($('<thead></thead>')
                                 .appendTo(series_container));
                     head_val = '';
                     $.each(options.edit.headers, function () {
@@ -1266,7 +1266,7 @@
                         head_val += '<th class="center">' + label + '</th>';
                     });
                     head.html(head_val);
-                    body = $('<tbody class="ui-widget-content"></tbody>').appendTo(series_container);
+                    body = $('<tbody></tbody>').appendTo(series_container);
                 }
                 series_container.appendTo(edit_panel).css({'margin': '0 auto 20px'});
             } else {
@@ -1274,7 +1274,7 @@
                 body = $('tbody', table).html('');
                 oseries = canvas.oseries;
             }
-            // Add a column element
+            // Add an input element to a column element
             function makeinp(i, type, name, value, checked, label) {
                 var id = cn + '-' + name + '-serie' + i,
                     inp = $('<input id="' + id + '" type="' + type + '" name="' + name + '" value="' + value + '">');
@@ -1282,7 +1282,13 @@
                     inp.prop({'checked': true});
                 }
                 if (label) {
-                    return $.merge(inp, $('<label for="' + id + '">' + label + '</label>'));
+                    type = inp.attr('type')
+                    if (type==='checkbox' || type==='radio') {
+                        inp = $('<label for="' + id + '"></label>')
+                            .addClass('inline').addClass(type).append(inp).append(label);
+                    } else {
+                        inp = $.merge(inp, $('<label for="' + id + '">' + label + '</label>'));
+                    }
                 }
                 return inp;
             }
@@ -1355,8 +1361,7 @@
                 // Axis radio button
                 $('<div></div>').appendTo($('<td></td>').appendTo(tr))
                         .append(makeinp(i + '1', 'radio', 'axis' + i, 'y-ax1', serie.yaxis ? serie.yaxis === 1 : i === 0, '1'))
-                        .append(makeinp(i + '2', 'radio', 'axis' + i, 'y-ax2', serie.yaxis ? serie.yaxis === 2 : i > 0, '2'))
-                        .buttonset();
+                        .append(makeinp(i + '2', 'radio', 'axis' + i, 'y-ax2', serie.yaxis ? serie.yaxis === 2 : i > 0, '2'));
             });
             return canvas;
         }
