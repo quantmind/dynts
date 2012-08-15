@@ -1,14 +1,14 @@
 '''Quantitative financial timeseries analysis'''
 
-VERSION = (0, 4, 8, 'alpha', 3)
+VERSION = (0, 5, 0, 'alpha', 1)
 
 from dynts.exceptions import *
 from dynts.utils.version import get_version
- 
-__version__  = version = get_version(VERSION)
-__license__  = "BSD"
-__author__   = "Luca Sbardella"
-__contact__  = "luca@quantmind.com"
+
+__version__ = version = get_version(VERSION)
+__license__ = "BSD"
+__author__ = "Luca Sbardella"
+__contact__ = "luca@quantmind.com"
 __homepage__ = "http://github.com/quantmind/dynts/"
 CLASSIFIERS  = [
                 'Development Status :: 4 - Beta',
@@ -51,7 +51,7 @@ def statistics(expression,
         return BasicStatistics(tseries, functions = functions)
     else:
         raise NotImplementedError
-    
+
 
 def tsname(*names):
     from dynts.conf import settings
@@ -66,7 +66,7 @@ def composename(name, *names, **kwargs):
     if kw:
         kw = ','+kw
     return sp.join(('{0}({1}{2})'.format(name,x,kw) for x in names))
-    
+
 
 def hasextensions():
     '''True if cython extensions are available'''
@@ -100,7 +100,7 @@ def function_doc(name):
 create the function ducumentation.'''
     return function_title_and_body(name)[1]
 
-        
+
 def functions_docs():
     names = sorted(function_registry)
     return '\n'.join((function_doc(name) for name in names))
@@ -112,4 +112,3 @@ def dump_docs(filename = 'dyntslist.rst'):
     f.write(docs)
     f.close()
     print(('Saved function documentations in {0}'.format(filename)))
-        
