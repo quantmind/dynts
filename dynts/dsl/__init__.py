@@ -67,21 +67,21 @@ Merge timeseries into a new :class:`dynts.TimeSeries` instance.
     ts = next(series)
     return ts.merge(series)
 
-    
+
 class dslresult(object):
     '''Class holding the results of an interpreted expression.
 Instances of this class are returned when invoking the :func:`dynts.evaluate`
 high level function.
-    
+
 .. attribute:: expression
 
     An instance of :class:`dynts.dsl.Expr` obtained when interpreting a
     timesries expression string via :func:`dynts.parse`.
-    
+
 .. attribute:: data
 
     data which is used to populate timeseries or scatters.
-    
+
 .. attribute:: backend
 
     backend used when populating timeseries.
@@ -90,28 +90,28 @@ high level function.
         self.expression = expression
         self.data = data
         self.backend = backend or settings.backend
-    
+
     def __repr__(self):
         return self.expression.__repr__()
-    
+
     def __str__(self):
         return self.__repr__()
-    
+
     def unwind(self):
         if not hasattr(self,'_ts'):
             self._unwind()
         return self
-    
+
     def ts(self):
         '''The associated timeseries, if available.'''
         self.unwind()
         return self._ts
-    
+
     def xy(self):
         '''The associated scatters, if available.'''
         self.unwind()
         return self._xy
-        
+
     def _unwind(self):
         res = self.expression.unwind(self.data, self.backend)
         self._ts = None
@@ -132,7 +132,7 @@ high level function.
                 self._xy = xys
         elif isxy(res):
             self._xy = res
-            
+
     def dump(self, format, **kwargs):
         ts = self.ts()
         xy = self.xy()
@@ -146,8 +146,8 @@ high level function.
             for el in xy:
                 ts = el.dump(format, container = ts, **kwargs)
         return ts
-            
-        
+
+
 def evaluate(expression, start = None, end = None,
              loader = None, logger = None, backend = None,
              **kwargs):
@@ -155,7 +155,7 @@ def evaluate(expression, start = None, end = None,
 an instance of an instance of :class:`dynts.dsl.dslresult` which can be used
 to obtain timeseries and/or scatters.
 This is probably the most used function of the library.
-    
+
 :parameter expression: A timeseries expression string or an instance
                        of :class:`dynts.dsl.Expr` obtained using
                        the :func:`dynts.parse` function.
@@ -163,14 +163,14 @@ This is probably the most used function of the library.
 :parameter end: End date or ``None``. If not provided today values is used.
 :parameter loader: Optional :class:`dynts.data.TimeSerieLoader`
                    class or instance to use.
-                   
+
                    Default ``None``.
-                   
+
 :parameter logger: Optional python logging instance, used if you required
                     logging.
-                    
+
                     Default ``None``.
-                    
+
 :parameter backend: :class:`dynts.TimeSeries` backend name or ``None``.
 
 The ``expression`` is parsed and the :class:`dynts.dsl.Symbol` are sent to the
@@ -193,6 +193,6 @@ Typical usage::
     symbols = expression.symbols()
     start = start if not start else todate(start)
     end = end if not end else todate(end)
-    data = providers.load(symbols, start, end, loader = loader,
-                          logger = logger, backend = backend, **kwargs)
-    return dslresult(expression, data, backend = backend)
+    data = providers.load(symbols, start, end, loader=loader,
+                          logger=logger, backend=backend, **kwargs)
+    return dslresult(expression, data, backend=backend)

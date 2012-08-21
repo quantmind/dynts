@@ -29,7 +29,7 @@ class PreProcessData(object):
     def __init__(self, intervals = None, result = None):
         self.intervals = intervals
         self.result    = result
-        
+
 
 class SymbolData(object):
     '''Class holding information an data symbol.
@@ -41,30 +41,30 @@ class SymbolData(object):
 .. attribute:: field
 
     String associated with the data provider field to load
-    
+
 .. attribute:: provider
 
     Instance of :class:`dynts.data.DataProvider`
-    
+
 This class provides a place-holder of information.
 It doesn't do anything special.
 '''
     __slots__ = ('ticker','field','provider')
-    
+
     def __init__(self, ticker, field, provider):
         self.ticker = ticker
         self.field = field
         self.provider = provider
-    
+
     def __str__(self):
         return self.full()
-    
+
     def full(self):
         c = settings.field_separator
         f = '' if not self.field else '%s%s' % (c,self.field)
         p = '' if not self.provider else '%s%s' % (c,self.provider.code)
         return '%s%s%s' % (self.ticker,f,p)
-    
+
 
 class TimeSerieLoader(object):
     '''Cordinates the loading of timeseries data
@@ -82,21 +82,21 @@ There are four different
     '''Class holding data returned by the
     :meth:`dynts.data.TimeSerieLoader.preprocess` method.
     It contains two attributes:
-    
+
     * ``intervals`` ``None`` or a tuple of two-elements tuples.
     * ``result`` ``None`` or any intermediate result.
-    
+
     If ``intervals`` is ``None`` or an empty container, the
     :func:`dynts.data.DataProvider.load` method won't be called,
     and the ``result`` attribute will be passed to the
     :meth:`dynts.data.TimeSerieLoader.onresult` method.
     '''
     symboldata = SymbolData
-    
-    
+
+
     def load(self, providers, symbols, start, end, logger, backend, **kwargs):
         '''Load symbols data.
-        
+
 :keyword providers: Dictionary of registered data providers.
 :keyword symbols: list of symbols to load.
 :keyword start: start date.
@@ -137,13 +137,13 @@ available.
             data[sym] = result
         # last hook
         return self.onfinishload(data, logger, backend, **kwargs)
-    
+
     def dates(self, start, end):
         '''Internal function which perform pre-conditioning on dates:
-   
+
 :keyword start: start date.
-:keyword end: end date.     
-    
+:keyword end: end date.
+
 This function makes sure the *start* and *end* date are consistent.
 It *never fails* and always return a two-element tuple
 containing *start*, *end* with *start* less or equal *end*
@@ -157,7 +157,7 @@ There should be no reason to override this function.'''
             start = end - timedelta(days=int(round(30.4*
                                                    settings.months_history)))
         return start,end
-    
+
     def parse_symbol(self, symbol, providers):
         '''Parse a symbol to obtain information regarding ticker,
 field and provider. Must return an instance of :attr:`symboldata`.
@@ -165,14 +165,14 @@ field and provider. Must return an instance of :attr:`symboldata`.
 :keyword symbol: string associated with market data to load.
 :keyword providers: dictionary of :class:`dynts.data.DataProvider`
                     instances available.
-    
+
 For example::
 
     intc
     intc:open
     intc:volume:google
     intc:google
-    
+
 are all valid inputs returning a :class:`SymbolData` instance with
 the following triplet of information::
 
@@ -180,7 +180,7 @@ the following triplet of information::
     intc,open,yahoo
     intc,volume,google
     intc,None,google
-    
+
 assuming ``yahoo`` is the provider in
 :attr:`dynts.conf.Settings.default_provider`.
 
@@ -214,9 +214,9 @@ This function is called before retrieving data.
                         'Could not parse %s. Unrecognized provider.' % symbol)
         elif len(bits) > 3:
             raise BadSymbol('Could not parse %s.' % symbol)
-        
+
         return self.symbol_for_ticker(ticker, field, provider, providers)
- 
+
     def symbol_for_ticker(self, ticker, field, provider, providers):
         '''Return an instance of *symboldata* containing
 information about the data provider, the data provider ticker name
@@ -225,7 +225,7 @@ and the data provider field.'''
         if provider:
             provider = providers.get(provider, None)
         return self.symboldata(ticker, field, provider)
-    
+
     #def getsymbol(self, ticker, field, provider):
 #        '''Convert *ticker*, *field* and *provider* to symbol code.
 #The inverse of :meth:`dynts.data.TimeSerieLoader.parse_symbol`.'''
@@ -234,7 +234,7 @@ and the data provider field.'''
 #        d = provider == self.default_provider_for_ticker(ticker, field)
 #        p = '' if d else '%s%s' % (c,provider)
 #        return '%s%s%s' % (ticker,f,p)
-    
+
     def preprocess(self, ticker, start, end, logger, backend, **kwargs):
         '''Preprocess **hook**. This is first loading hook and it is
 **called before requesting data** from a dataprovider.
@@ -242,7 +242,7 @@ It must return an instance of :attr:`TimeSerieLoader.preprocessdata`.
 By default it returns::
 
     self.preprocessdata(intervals = ((start,end),))
-    
+
 It could be overritten to modify the intervals.
 If the intervals is ``None`` or an empty container,
 the :func:`dynts.data.DataProvider.load` method won't be called,
@@ -250,18 +250,18 @@ otherwise it will be called as many times as the number of intervals
 in the return tuple (by default once).
 '''
         return self.preprocessdata(intervals = ((start, end),))
-    
+
     def onresult(self, ticker, result, logger, backend, **kwargs):
         '''Post-processing **hook** for results returned by
 calls to :func:`dynts.data.DataProvider.load`, or obtained
 from the :meth:`dynts.data.TimeSerieLoader.preprocess` method.
 By default return ``result``::
-    
+
     return result
-    
+
 It could be used to store data into a cache or database.'''
         return result
-    
+
     def onfinishload(self, data, logger, backend, **kwargs):
         '''Another post-processing **hook** invoked when the
 loading is finished. By default retun *data*.'''
@@ -270,22 +270,22 @@ loading is finished. By default retun *data*.'''
 
 class DataProviders(dict):
     proxies = {}
-        
-    def load(self, symbols, start = None, end = None, loader = None,
-             logger = None,  backend = None, **kwargs):
+
+    def load(self, symbols, start=None, end=None, loader=None,
+             logger=None,  backend=None, **kwargs):
         loader = loader or settings.default_loader or TimeSerieLoader
         backend = backend or settings.backend
         if isinstance(loader,type):
             loader = loader()
-        return loader.load(self,symbols,start,end,logger,backend,**kwargs)
-    
+        return loader.load(self, symbols, start, end, logger, backend, **kwargs)
+
     def register(self, provider):
         '''Register a new data provider. *provider* must be an instance of
     DataProvider. If provider name is already available, it will be replaced.'''
         if isinstance(provider,type):
             provider = provider()
         self[provider.code] = provider
-        
+
     def unregister(self, provider):
         '''Unregister an existing data provider. *provider* must be
 an instance of DataProvider.
@@ -295,7 +295,7 @@ If provider name is already available, it will be replaced.'''
         if isinstance(provider,DataProvider):
             provider = provider.code
         return self.pop(str(provider).upper(),None)
-        
+
     def get_logger(self, logger):
         if logger:
             return logger
