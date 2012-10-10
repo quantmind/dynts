@@ -15,7 +15,7 @@ istimeseries = lambda value : isinstance(value,TimeSeries)
 isxy = lambda value : isinstance(value,xydata)
 
 
-def timeseries(name = '', backend = None, date = None, data = None, **kwargs):
+def timeseries(name='', backend=None, date=None, data=None, **kwargs):
     '''Create a new :class:`dynts.TimeSeries` instance using a given *backend*
 and populating it with provided the data.
 

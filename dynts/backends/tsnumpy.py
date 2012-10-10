@@ -57,7 +57,7 @@ class TimeSeries(dynts.TimeSeries):
     '''A timeserie based on numpy'''
     type = 'numpy'
     
-    def make(self, date, data, raw = False, **params):
+    def make(self, date, data, raw=False, **params):
         if date is not None:
             if not raw:
                 c = self.dateinverse
@@ -160,7 +160,7 @@ class TimeSeries(dynts.TimeSeries):
         return self.clone(self._date[i1:i2+1],
                           self._data[i1:i2+1])
     
-    def merge(self, tserie, fill = nan, **kwargs):
+    def merge(self, tserie, fill=nan, **kwargs):
         if dynts.istimeseries(tserie):
             tserie = [tserie]
         else:
@@ -173,7 +173,7 @@ class TimeSeries(dynts.TimeSeries):
             if ts.namespace != namespace:
                 with_namespace = True
                 break
-        thashes  = [(hash,np.array([fill]*self.count()))]
+        thashes  = [(hash, np.array([fill]*self.count()))]
         names = self.names(with_namespace)
         for ts in tserie:
             alldates = alldates.union(ts.dates())

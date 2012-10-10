@@ -1,17 +1,8 @@
 import os
 import csv
+from io import StringIO
 
-try:
-    from urllib2 import urlopen, ProxyHandler, build_opener
-except ImportError:
-    from urllib.request import urlopen, ProxyHandler, build_opener
-    
-try:
-    import httplib2
-except:
-    httplib2 = None
-
-from dynts.conf import settings
+from dynts.utils.http import http_client
 
 from .base import DataProvider
 
@@ -20,42 +11,30 @@ short_month = ('Jan','Feb','Mar','Apr','May','Jun',
                'Jul','Aug','Sep','Oct','Nov','Dec')
 
 
-def line_decoder(res):
-    '''Simply convert to unicode'''
-    for line in res:
-        yield line.decode('ascii','ignore')
-
-
 class WebCsv(DataProvider):
 
-    def __init__(self):
-        if httplib2:
-            self.h = httplib2.Http()
-        else:
-            self.h = None
-        self.h = None
+    def __init__(self, http=None):
+        self._http = http
         
-    @property
     def http(self):
-        proxy = ProxyHandler(settings.proxies)
-        return build_opener(proxy)
-        
+        if self._http == None:
+            self._http = http_client()
+        return self._http
+    
     def string_to_date(self, sdte):
         from ccy import dateFromString
         return dateFromString(sdte)
     
     def request(self, url):
-        if self.h:
-            resp, content = self.h.request(url)
-            if resp.status == 200:
-                return resp
-        else:
-            return self.http.open(url)
+        response = self.http().get(url)
+        if response.status_code == 200:
+            return StringIO(response.content_string('ascii', 'ignore'))
     
     def rowdata(self, ticker, startdate, enddate):
         url = self.hystory_url(str(ticker), startdate, enddate)
         res = self.request(url)
-        return csv.DictReader(line_decoder(res))
+        if res:
+            return csv.DictReader(res)
         
     def hystory_url(self, ticker, startdate, enddate, field = None):
         raise NotImplementedError

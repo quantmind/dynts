@@ -2,7 +2,7 @@
 # NOT USED DIRECTLY
 # TEMPLATE TEST CASE FOR Difference Operators
 #
-from dynts import test
+from dynts.utils import test
 from dynts.utils.py2py3 import zip
 from dynts.utils.populate import randomts, polygen
 

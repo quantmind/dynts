@@ -18,7 +18,7 @@ __all__ = ['cross','asarray','ascolumn','assimple',
 def asarray(x, dtype = None):
     '''Convert ``x`` into a ``numpy.ndarray``.'''
     iterable = scalarasiter(x)
-    if isinstance(iterable,ndarray):
+    if isinstance(iterable, ndarray):
         return iterable
     else:
         if not hasattr(iterable,'__len__'):
@@ -29,7 +29,7 @@ def asarray(x, dtype = None):
                 a[i] = v
             return a
         else:
-            return array(iterable, dtype = dtype)
+            return array(iterable, dtype=dtype)
         
 
 

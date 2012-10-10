@@ -37,8 +37,8 @@ This class expose all the main functionalities of a timeseries
     default_align = 'right'
     _algorithms = {}
 
-    def __init__(self, name = '', date = None, data = None, info = None,
-                 dtype = np.double, **params):
+    def __init__(self, name='', date=None, data=None, info=None,
+                 dtype=np.double, **params):
         super(TimeSeries,self).__init__(name, info)
         self._dtype = np.dtype(dtype)
         self.make(date, data, **params)
@@ -89,11 +89,11 @@ This class expose all the main functionalities of a timeseries
         '''Number of series in timeseries.'''
         return self.shape[1]
 
-    def dates(self, desc = None):
+    def dates(self, desc=None):
         '''Returns an iterable over ``datetime.date`` instances
 in the timeseries.'''
         c = self.dateinverse
-        for key in self.keys(desc = desc):
+        for key in self.keys(desc=desc):
             yield c(key)
 
     def keys(self, desc = None):
@@ -189,12 +189,12 @@ which exposes hash-table like functionalities of ``self``.'''
     def window(self, start, end):
         raise NotImplementedError
 
-    def merge(self, ts, all = True):
+    def merge(self, ts, all=True):
         '''Merge this :class:`TimeSeries` with one or more :class:`TimeSeries`
 and return a new one.'''
         raise NotImplementedError()
 
-    def clone(self, date = None, data = None, name = None):
+    def clone(self, date=None, data=None, name=None):
         '''Create a clone of timeseries'''
         name = name or self.name
         data = data if data is not None else self.values()
@@ -202,7 +202,7 @@ and return a new one.'''
         ts._dtype = self._dtype
         if date is None:
             # dates not provided
-            ts.make(self.keys(), data, raw = True)
+            ts.make(self.keys(), data, raw=True)
         else:
             ts.make(date, data)
         return ts
@@ -213,6 +213,51 @@ and return a new one.'''
         if size >= len(self):
             return self
         return self.getalgo('reduce',method)(self,size,**kwargs)
+    
+    def clean(self, algorithm=None):
+        '''Create a new :class:`TimeSeries` with missing data removed or
+replaced by the algorithm provided'''
+        # perform the cleaning for each serie
+        dates = list(self.dates())
+        series = []
+        all_dates = set()
+        for serie in self.series():
+            d0, d1, v1 = None, None, None
+            missings = []
+            values = {}
+            for d, v in zip(dates, serie):
+                if v == v:
+                    if d0 is None:
+                        d0 = d
+                    if missings:
+                        for dx, vx in algorithm(d1, v1, d, v, missings):
+                            new_dates.append(dx)
+                            new_values.append(vx)
+                        missings = []
+                    d1 = d
+                    v1 = v
+                    values[d] = v
+                elif d0 is not None and algorithm:
+                    missings.append((dt, v))
+            series.append((d0, d1, values))
+            all_dates = all_dates.union(values)
+        cdate = []
+        cdata = []
+        for dt in sorted(all_dates):
+            cross = []
+            for start, end, values in series:
+                if start is None or (dt >= start and dt <= end):
+                    value = values.get(dt)
+                    if value is None:
+                        cross = None
+                        break
+                else:
+                    value = nan
+                cross.append(value)
+            if cross:
+                cdate.append(dt)
+                cdata.append(cross)
+        return self.clone(date=cdate, data=cdata)            
 
     ######################################################################
     # SCALAR STANDARD FUNCTIONS

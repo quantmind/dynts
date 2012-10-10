@@ -1,42 +1,14 @@
 #!/usr/bin/env python
 import os
 import sys
-import argparse
 
 import dynts
-from dynts.conf import settings
-
-try:
-    import pulsar
-    from pulsar.apps.test import TestOptionPlugin
-    
-    class HttpProxy(TestOptionPlugin):
-        name = "http_proxy"
-        flags = ["--proxy"]
-        desc = 'Set the HTTP_PROXY environment variable.'
-        
-        def configure(self, cfg):
-            settings.proxies['http'] = cfg.http_proxy
-            
-except ImportError:
-    pulsar = None
+from environment import pulsar
     
 try:
     import nose
     from nose import plugins
-    
-    class NoseHttpProxy(plugins.Plugin):
-    
-        def options(self, parser, env=os.environ):
-            parser.add_option('--http_proxy',
-                          dest='http_proxy',
-                          default='',
-                          help="Set the HTTP_PROXY environment variable.")
-    
-        def configure(self, options, conf):
-            self.enabled = True
-            settings.proxies['http'] = options.http_proxy
-    
+        
     def noseoption(argv,*vals,**kwargs):
         if vals:
             for val in vals:
@@ -66,8 +38,7 @@ def start():
         suite = TestSuite(
                 description = 'Dynts Asynchronous test suite',
                     modules = ('tests',),
-                    plugins = (HttpProxy(),
-                               profile.Profile(),
+                    plugins = (profile.Profile(),
                                bench.BenchMark(),)
                   )
         suite.start()

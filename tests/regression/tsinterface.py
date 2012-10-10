@@ -7,11 +7,9 @@
 __test__ = False
 from datetime import date
 
-from numpy import array
-
-from dynts import test, timeseries
+from dynts import timeseries, nan
+from dynts.utils import test, cross, asarray
 from dynts.utils.py2py3 import zip
-from dynts.utils import cross, asarray
 from dynts.exceptions import *
 
 
@@ -20,7 +18,7 @@ class TestDates(test.TestCase):
     def fill(self):
         dates = [1,2.1,3.5]
         values = [[1.0,5],[0.2,3],[-1.0,2.5]]
-        ts = self.timeseries(date = dates, data = values)
+        ts = self.timeseries(date=dates, data=values)
         self.assertEqual(len(ts),3)
         self.assertEqual(ts.shape,(3,2))
         self.assertTrue(ts.isconsistent())
@@ -42,11 +40,11 @@ class TestDates(test.TestCase):
         self.assertEqual(list(ts[3]),[-1.0,2.5])
 
 
-class TestFunctionTS(test.TestCase):
+class TestTS(test.TestCase):
     
     def _rollingTest(self, func):
         # A rolling function calculation
-        ts = self.getts(cols = 2)
+        ts = self.getts(cols=2)
         rollfun = 'roll%s' % func
         # Calculate the rolling function for two different windows
         mts30 = getattr(ts,rollfun)(window = 30, fallback = self.fallback)
@@ -109,9 +107,6 @@ class TestFunctionTS(test.TestCase):
         
     def testRollingSd(self):
         self._rollingTest('sd')
-                    
-
-class TestTS(TestFunctionTS):
     
     def testInit(self):
         ts,dates,data = self.getts(True)
@@ -216,9 +211,22 @@ class TestTS(TestFunctionTS):
             self.assertTrue(plot)
         
     def testDslNames(self):
-        res = self.evaluate('amzn:yahoo,min(amzn:yahoo)', backend = self.backend)
+        res = self.evaluate('amzn:yahoo,min(amzn:yahoo)', backend=self.backend)
         self.assertEqual(str(res.expression),'AMZN:YAHOO,min(AMZN:YAHOO)')
         self.assertEqual(len(res.data),1)
         ts = res.ts()
         self.assertEqual(ts.count(),2)
         self.assertEqual(ts.names(),['AMZN:YAHOO','min(AMZN:YAHOO,window=20)'])
+
+    def testClean(self):
+        ts1 = timeseries(date=[1,2,3,4,5,6],
+                         data=[nan,nan,5,6,nan,-1],
+                         backend=self.backend)
+        ts2 = timeseries(date=[1,2,3,4,5,6,7],
+                         data=[nan,-4,5,6,-1,nan,-5],
+                         backend=self.backend)
+        ts = ts1.merge(ts2)
+        self.assertEqual(ts.count(), 2)
+        self.assertEqual(len(ts), 7)
+        cts = ts.clean()
+        self.assertEqual(len(cts), 4)

@@ -1,13 +1,12 @@
 import random
 
-from dynts.utils.py2py3 import map,itervalues
-from dynts.conf import settings
-from dynts.test import TestCase
+from dynts.utils import test
+from dynts.utils.py2py3 import map, itervalues
 from dynts.backends import ops
 from dynts import exceptions 
 
 
-class TestOperators(TestCase):
+class TestOperators(test.TestCase):
 
     def testTSArithOperators(self):
         ts1, dates1, data1 = self.getts(returndata = True, cols = 2)
@@ -60,10 +59,8 @@ class TestOperators(TestCase):
         self._check_missing_dts(not_in_dates1, btree)
         
     def _check_missing_dts(self, dts, btree):
-        ismissing = settings.ismissing
-        
         for dt in  dts:
             vals = btree[dt]
             for val in vals:
-                self.assertTrue(ismissing(val))
+                self.assertNotEqual(val, val)
         

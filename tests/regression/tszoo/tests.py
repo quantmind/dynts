@@ -5,7 +5,7 @@ from io import BytesIO
 
 import dynts
 
-from regression import tsinterface, tsop, tsdelta, tsscalar, stat
+from . import tsinterface, tsop, tsdelta, tsscalar, stat
 
 def haszoo():
     try:
