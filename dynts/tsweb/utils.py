@@ -17,8 +17,8 @@ in a table.'''
     splitter = '__'
     
     def __init__(self, code, name, description, function,
-                 refresh, extraclass = 'color', base_code = None,
-                 splitter = None):
+                 refresh, extraclass='color', base_code=None,
+                 splitter=None, filter=None):
         self.base_code = base_code
         self.code = code
         self.name = name
@@ -27,18 +27,20 @@ in a table.'''
         self.refresh = refresh
         self.extraclass = extraclass
         self.splitter = splitter or self.splitter
+        self.filter = filter
         
     def __repr__(self):
         return self.code
     __str__ = __repr__
     
-    def make_header(self, field = None, window = None):
+    def make_header(self, field=None, window=None):
         name = self.name(window)
         if field:
             name = '{0} {1}'.format(field,name)
         description = '' if not self.description else self.description(window)
         return data_table_header(self.splitter, self.base_code,
                                  field, window, self.code,
-                                 name = name,
-                                 description = description,
-                                 extraclass = self.extraclass)
+                                 name=name,
+                                 description=description,
+                                 extraclass=self.extraclass,
+                                 filter=self.filter)

@@ -16,7 +16,7 @@ def nanvalue(value):
     for v in value:
         if v != v:
             return True
-        
+
 def full_clean(ts, dateconverter, desc):
     for dt, value in ts.items(desc=desc):
         dt = dateconverter(dt)
