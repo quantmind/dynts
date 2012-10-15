@@ -101,22 +101,51 @@ in the timeseries.'''
 from dates for same backend implementations.'''
         raise NotImplementedError
 
-    def values(self, desc = None):
+    def values(self, desc=None):
         '''Returns a ``numpy.ndarray`` containing the values of the timeseries.
 Implementations should try not to copy data if possible. This function
 can be used to access the timeseries as if it was a matrix.'''
         raise NotImplementedError
 
-    def items(self, desc=None):
+    def items(self, desc=None, start_value=None, shift_by=None):
         '''Returns a python ``generator`` which can be used to iterate over
 :func:`dynts.TimeSeries.dates` and :func:`dynts.TimeSeries.values`
 returning a two dimensional
 tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
-function. The additional input parameter *desc* can be used to iterate from
-the greatest to the smallest date in the timeseries by passing ''desc=True``'''
+function.
+
+:parameter desc: if ``True`` the iteratioon starts from the more recent data
+    and proceeds backwards.
+:parameter shift_by: optional parallel shift in values.
+:parameter start_value: optional start value of timeseries.
+'''
         if self:
-            for d,v in zip(self.dates(desc = desc),self.values(desc = desc)):
-                yield d,v
+            if shift_by is None and start_value is not None:
+                for cross in self.values():
+                    missings = 0
+                    if shift_by is None:
+                        shift_by = []
+                        for v in cross:
+                            shift_by.append(start_value - v)
+                            if v != v:
+                                missings += 1
+                    else:
+                        for j in range(len(shift_by)):
+                            s = shift_by[j]
+                            v = cross[j]
+                            if s != s:
+                                if v == v:
+                                    shift_by[j] = start_value - v
+                                else:
+                                    missings += 1
+                    if not missings:
+                        break
+            if shift_by:
+                for d, v in zip(self.dates(desc=desc),self.values(desc=desc)):
+                    yield d, v + shift_by
+            else:
+                for d, v in zip(self.dates(desc=desc),self.values(desc=desc)):
+                    yield d, v
 
     def series(self):
         '''Generator of single series data (no dates are included).'''
@@ -328,7 +357,7 @@ the median is then usually defined to be the mean of the two middle values'''
     def colnames(self):
         raise NotImplementedError
 
-    def delta(self, lag = 1, **kwargs):
+    def delta(self, lag=1, **kwargs):
         '''\
 First order derivative. Optimised.
 

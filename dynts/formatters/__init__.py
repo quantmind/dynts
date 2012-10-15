@@ -17,8 +17,8 @@ def nanvalue(value):
         if v != v:
             return True
 
-def full_clean(ts, dateconverter, desc):
-    for dt, value in ts.items(desc=desc):
+def full_clean(ts, dateconverter, desc, start_value):
+    for dt, value in ts.items(desc=desc, start_value=start_value):
         dt = dateconverter(dt)
         value = tuple(value)
         if nanvalue(value):
@@ -26,17 +26,17 @@ def full_clean(ts, dateconverter, desc):
         yield dt, value
 
 def tsiterator(ts, dateconverter=None, desc=None,
-               clean=False, **kwargs):
+               clean=False, start_value=None, **kwargs):
     '''An iterator of timeseries as tuples.'''
     dateconverter = dateconverter or default_converter
     yield ['Date'] + ts.names()
     if clean == 'full':
-        for dt, value in full_clean(ts, dateconverter, desc):
+        for dt, value in full_clean(ts, dateconverter, desc, start_value):
              yield (dt,) + tuple(value)
     else:
         if clean:
             ts = ts.clean()
-        for dt, value in ts.items(desc=desc):
+        for dt, value in ts.items(desc=desc, start_value=start_value):
             dt = dateconverter(dt)
             yield (dt,) + tuple(value)
         

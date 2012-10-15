@@ -230,3 +230,10 @@ class TestTS(test.TestCase):
         self.assertEqual(len(ts), 7)
         cts = ts.clean()
         self.assertEqual(len(cts), 4)
+        return ts
+        
+    def testItems(self):
+        ts = self.testClean()
+        v = list(ts.items(start_value=0))
+        self.assertTrue(v)
+        
