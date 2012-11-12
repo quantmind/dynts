@@ -148,29 +148,25 @@ high level function.
         return ts
 
 
-def evaluate(expression, start = None, end = None,
-             loader = None, logger = None, backend = None,
-             **kwargs):
-    '''Evaluate the timeseries ``expression`` into
-an instance of an instance of :class:`dynts.dsl.dslresult` which can be used
+def evaluate(expression, start=None, end=None, loader=None, logger=None,
+             backend=None, **kwargs):
+    '''Evaluate a timeseries ``expression`` into
+an instance of :class:`dynts.dsl.dslresult` which can be used
 to obtain timeseries and/or scatters.
 This is probably the most used function of the library.
 
 :parameter expression: A timeseries expression string or an instance
-                       of :class:`dynts.dsl.Expr` obtained using
-                       the :func:`dynts.parse` function.
+    of :class:`dynts.dsl.Expr` obtained using the :func:`dynts.parse` function.
 :parameter start: Start date or ``None``.
 :parameter end: End date or ``None``. If not provided today values is used.
 :parameter loader: Optional :class:`dynts.data.TimeSerieLoader`
-                   class or instance to use.
+    class or instance to use.
 
-                   Default ``None``.
-
+    Default ``None``.
 :parameter logger: Optional python logging instance, used if you required
-                    logging.
+    logging.
 
-                    Default ``None``.
-
+    Default ``None``.
 :parameter backend: :class:`dynts.TimeSeries` backend name or ``None``.
 
 The ``expression`` is parsed and the :class:`dynts.dsl.Symbol` are sent to the
