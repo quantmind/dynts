@@ -1,10 +1,9 @@
 import dynts
-from dynts.conf import settings
-from dynts.test import TestCase
+from dynts.utils import test
 from dynts.utils.populate import randomts
 
 
-class names(TestCase):
+class names(test.TestCase):
     
     def testtsname(self):
         name = dynts.tsname('test')

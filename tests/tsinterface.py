@@ -7,37 +7,10 @@
 __test__ = False
 from datetime import date
 
-from dynts import timeseries, nan
+from dynts import timeseries, nan, hasextensions
 from dynts.utils import test, cross, asarray
 from dynts.utils.py2py3 import zip
 from dynts.exceptions import *
-
-
-class TestDates(test.TestCase):
-    
-    def fill(self):
-        dates = [1,2.1,3.5]
-        values = [[1.0,5],[0.2,3],[-1.0,2.5]]
-        ts = self.timeseries(date=dates, data=values)
-        self.assertEqual(len(ts),3)
-        self.assertEqual(ts.shape,(3,2))
-        self.assertTrue(ts.isconsistent())
-        return ts
-    
-    def testSimple(self):
-        ts = self.fill()
-        ts.insert(4.5,[-4.5,67])
-        self.assertEqual(len(ts),4)
-        self.assertEqual(ts.shape,(4,2))
-        self.assertEqual(list(ts[3]),[-4.5,67])
-        
-    def testInsertMiddle(self):
-        ts = self.fill()
-        ts.insert(3,[-4.5,67])
-        self.assertEqual(len(ts),4)
-        self.assertEqual(ts.shape,(4,2))
-        self.assertEqual(list(ts[2]),[-4.5,67])
-        self.assertEqual(list(ts[3]),[-1.0,2.5])
 
 
 class TestTS(test.TestCase):
@@ -68,7 +41,31 @@ class TestTS(test.TestCase):
             c += 1
             for a,b in zip(v,tv):
                 self.assertAlmostEqual(a,b)
-                
+    
+    def fill(self):
+        dates = [1,2.1,3.5]
+        values = [[1.0,5],[0.2,3],[-1.0,2.5]]
+        ts = self.timeseries(date=dates, data=values)
+        self.assertEqual(len(ts),3)
+        self.assertEqual(ts.shape,(3,2))
+        self.assertTrue(ts.isconsistent())
+        return ts
+    
+    def testSimple(self):
+        ts = self.fill()
+        ts.insert(4.5,[-4.5,67])
+        self.assertEqual(len(ts),4)
+        self.assertEqual(ts.shape,(4,2))
+        self.assertEqual(list(ts[3]),[-4.5,67])
+        
+    def testInsertMiddle(self):
+        ts = self.fill()
+        ts.insert(3,[-4.5,67])
+        self.assertEqual(len(ts),4)
+        self.assertEqual(ts.shape,(4,2))
+        self.assertEqual(list(ts[2]),[-4.5,67])
+        self.assertEqual(list(ts[3]),[-1.0,2.5])
+        
     def testMax(self):
         ts  = self.getts()
         val = cross(ts.max(fallback = self.fallback))
@@ -236,4 +233,14 @@ class TestTS(test.TestCase):
         ts = self.testClean()
         v = list(ts.items(start_value=0))
         self.assertTrue(v)
+
+
+@test.skipUnless(hasextensions(), 'Requires C extensions')
+class TestFallBackNumpyTS(TestTS):
+    fallback = True
         
+        
+@test.skipUnless(test.haszoo(), 'Requires R zoo package')
+class TestTSZoo(TestTS):
+    backend = 'zoo'
+    

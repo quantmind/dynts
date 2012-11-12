@@ -36,10 +36,9 @@ def start():
         
         os.environ['stdnet_test_suite'] = 'pulsar'
         suite = TestSuite(
-                description = 'Dynts Asynchronous test suite',
-                    modules = ('tests',),
-                    plugins = (profile.Profile(),
-                               bench.BenchMark(),)
+                description='Dynts Asynchronous test suite',
+                    plugins=(profile.Profile(),
+                             bench.BenchMark(),)
                   )
         suite.start()
     elif nose:

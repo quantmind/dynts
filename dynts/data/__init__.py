@@ -275,7 +275,7 @@ class DataProviders(dict):
              logger=None,  backend=None, **kwargs):
         loader = loader or settings.default_loader or TimeSerieLoader
         backend = backend or settings.backend
-        if isinstance(loader,type):
+        if isinstance(loader, type):
             loader = loader()
         return loader.load(self, symbols, start, end, logger, backend, **kwargs)
 

@@ -1,8 +1,17 @@
 import os
-import unittest
+import sys
 from datetime import date
-
 import types
+
+if sys.version_info >= (2,7):
+    import unittest
+else:   # pragma nocover
+    try:
+        import unittest2 as unittest
+    except ImportError:
+        print('To run tests in python 2.6 you need to install '\
+              'the unittest2 package')
+        exit(0)
 
 import numpy as np
 
@@ -13,9 +22,24 @@ from .importlib import import_modules
 from .populate import populate, datepopulate, randomts
 from .py2py3 import zip_longest
 
+skipUnless = unittest.skipUnless
+
+def haszoo():
+    try:
+        from dynts.backends.zoo import TimeSeries
+    except ImportError:
+        return False
+    try:
+        st = sys.stdout
+        sys.stdout = BytesIO()
+        t = TimeSeries()
+        sys.stdout = st
+        return True
+    except dynts.MissingPackage:
+        return False
 
 class TestCase(unittest.TestCase):
-    backend = None
+    backend = 'numpy'
     fallback = False
     
     def __init__(self,*args,**kwargs):

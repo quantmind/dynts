@@ -1,9 +1,8 @@
-from dynts.test import TestCase
+from dynts.utils import test
 from dynts.utils.py2py3 import zip
-from dynts import BasicStatistics, pivottable
 
 
-class StatisticsTest(TestCase):
+class StatisticsTest(test.TestCase):
     
     def testSimpleStatistics(self):
         ts = self.getts(cols = 4)

@@ -245,30 +245,36 @@ and return a new one.'''
     
     def clean(self, algorithm=None):
         '''Create a new :class:`TimeSeries` with missing data removed or
-replaced by the algorithm provided'''
-        # perform the cleaning for each serie
-        dates = list(self.dates())
+replaced by the *algorithm* provided'''
+        # all dates
+        original_dates = list(self.dates())
         series = []
         all_dates = set()
         for serie in self.series():
-            d0, d1, v1 = None, None, None
+            dstart, dend, vend = None, None, None
+            new_dates = []
+            new_values = []
             missings = []
             values = {}
-            for d, v in zip(dates, serie):
+            for d, v in zip(original_dates, serie):
                 if v == v:
-                    if d0 is None:
-                        d0 = d
+                    if dstart is None:
+                        dstart = d
                     if missings:
-                        for dx, vx in algorithm(d1, v1, d, v, missings):
+                        for dx, vx in algorithm(dend, vend, d, v, missings):
                             new_dates.append(dx)
                             new_values.append(vx)
                         missings = []
-                    d1 = d
-                    v1 = v
+                    dend = d
+                    vend = v
                     values[d] = v
-                elif d0 is not None and algorithm:
+                elif dstart is not None and algorithm:
                     missings.append((dt, v))
-            series.append((d0, d1, values))
+            if missings:
+                for dx, vx in algorithm(d1, v1, None, None, missings):
+                    new_dates.append(dx)
+                    new_values.append(vx)
+            series.append((dstart, d1, values))
             all_dates = all_dates.union(values)
         cdate = []
         cdata = []

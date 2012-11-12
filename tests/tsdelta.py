@@ -1,16 +1,13 @@
-#
-# NOT USED DIRECTLY
-# TEMPLATE TEST CASE FOR Difference Operators
-#
 from dynts.utils import test
 from dynts.utils.py2py3 import zip
 from dynts.utils.populate import randomts, polygen
 
 
-class TestCase(test.TestCase):
+class TestDelta(test.TestCase):
     
     def getts(self, cols, *coefs):
-        return randomts(100, cols, backend = self.backend, generator = polygen(*coefs))
+        return randomts(100, cols, backend=self.backend,
+                        generator = polygen(*coefs))
     
     def testp0Delta(self):
         '''Test mean function with zero parameters'''
@@ -77,3 +74,7 @@ class TestCase(test.TestCase):
             for v,vv in zip(dv,ddv):
                 self.assertAlmostEqual(v,vv)
         
+        
+@test.skipUnless(test.haszoo(), 'Requires R zoo package')
+class TestDeltaZoo(TestDelta):
+    backend = 'zoo'

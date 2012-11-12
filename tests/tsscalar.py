@@ -1,7 +1,3 @@
-#
-# NOT USED DIRECTLY
-# TEMPLATE TEST CASE FOR Difference Operators
-#
 import numpy as np
 
 from dynts import tsname
@@ -10,7 +6,7 @@ from dynts.utils.py2py3 import zip
 from dynts.utils.populate import randomts
 
 
-class TestCase(test.TestCase):
+class TestScalar(test.TestCase):
     
     def getts(self, cols, **kwargs):
         return randomts(20, cols, backend = self.backend, **kwargs)
@@ -38,3 +34,7 @@ class TestCase(test.TestCase):
         self.assertEqual(rs.names(),['square(a)','square(b)'])
         self._testscalar(np.square, rs, ts)
 
+
+@test.skipUnless(test.haszoo(), 'Requires R zoo package')
+class TestScalarZoo(TestScalar):
+    backend = 'zoo'

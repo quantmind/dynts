@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from dynts.test import TestCase
+from dynts.utils import test
 from dynts.lib.fallback import jstimestamp
 
-class TestPythonDates(TestCase):
+class TestPythonDates(test.TestCase):
     
     def testTimeStamp(self):
         dt = datetime.now()

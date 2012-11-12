@@ -1,6 +1,6 @@
 
 import dynts
-from dynts.test import TestCase
+from dynts.utils import test
 from dynts.data import DataProvider, TimeSerieLoader
 from dynts.data import providers, register, unregister
 
@@ -18,7 +18,7 @@ class CustomLoader(TimeSerieLoader):
         
 
 
-class TestDataProvider(TestCase):
+class TestDataProvider(test.TestCase):
     backend = 'numpy'
     
     def testyahoo(self):

@@ -1,22 +1,17 @@
-import unittest
-
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
-
 import dynts
-from dynts.conf import settings
+from dynts.utils import test
+from dynts.utils.py2py3 import zip
 from dynts import dsl
 from dynts.dsl import ast
 
-class TestDsl(unittest.TestCase):
+
+class TestDsl(test.TestCase):
     names = ['eur','1eur','eu3r','eur4567']
     
     def testName(self):
         for name in self.names:
             res = dynts.parse(name)
-            self.assertTrue(isinstance(res,dsl.Symbol))
+            self.assertTrue(isinstance(res, dsl.Symbol))
             self.assertEqual(name.upper(),str(res))
         
     def testBinaryOperation(self):
@@ -31,11 +26,11 @@ class TestDsl(unittest.TestCase):
     def testOperationOrder(self):
         res = dynts.parse('2*GOOG+4*YHOO')
         self.assertEqual(len(res.children),2)
-        self.assertTrue(isinstance(res,dsl.PlusOp))
+        self.assertTrue(isinstance(res, dsl.PlusOp))
         res1 = res.children[0]
-        self.assertTrue(isinstance(res1,dsl.MultiplyOp))
+        self.assertTrue(isinstance(res1, dsl.MultiplyOp))
         res2 = res.children[1]
-        self.assertTrue(isinstance(res2,dsl.MultiplyOp))
+        self.assertTrue(isinstance(res2, dsl.MultiplyOp))
     
     def testAdditionOperation(self):
         res = dynts.parse('YHOO+GOOG')

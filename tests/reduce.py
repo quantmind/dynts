@@ -1,11 +1,9 @@
 import dynts
-from dynts import test
-from dynts.conf import settings
-from dynts.test import TestCase
+from dynts.utils import test
 from dynts.utils.populate import randomts
 
 
-class TestReduceAlgorithms(TestCase):
+class TestReduceAlgorithms(test.TestCase):
     
     def testsimple(self):
         ts = self.getts(size = 1000)

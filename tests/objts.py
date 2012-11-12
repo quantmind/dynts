@@ -1,7 +1,8 @@
 from datetime import date, timedelta
 import numpy as np
 
-from dynts import test, timeseries
+from dynts import timeseries
+from dynts.utils import test
 
 
 class TestFunctionTS(test.TestCase):

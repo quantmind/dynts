@@ -63,4 +63,9 @@ class TestOperators(test.TestCase):
             vals = btree[dt]
             for val in vals:
                 self.assertNotEqual(val, val)
+                
+                
+@test.skipUnless(test.haszoo(), 'Requires R zoo package')
+class TestOperatorsZoo(TestOperators):
+    backend = 'zoo'
         

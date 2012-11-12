@@ -18,10 +18,6 @@ class TestStat(test.TestCase):
                               backend=self.backend)
         self.assertAlmostEqual(ts.var()[0], 8.25, places)
         self.assertAlmostEqual(ts.var(ddof=1)[0], 9.166667, places)
-        
-        
-        
-class TestVariates(test.TestCase):
     
     def testVectorToSymmetric(self):
         self.assertRaises(ValueError, vector_to_symmetric, [1,2])
@@ -48,3 +44,7 @@ class TestVariates(test.TestCase):
         self.assertAlmostEqual(cov(data, ddof=0, rowvar=0),
                                v.cov(ddof=0), places)
         
+        
+@test.skipUnless(test.haszoo(), 'Requires R zoo package')
+class TestStatZoo(TestStat):
+    backend = 'zoo'
