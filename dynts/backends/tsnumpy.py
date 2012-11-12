@@ -115,25 +115,27 @@ class TimeSeries(dynts.TimeSeries):
             return self._date[-1]
         
     def insert(self, dte, values):
-        dte = self.dateconvert(dte)
-        if not self:
-            c = len(values)
-            if c:
+        '''insert *values* at date *dte*.'''
+        if len(values):
+            dte = self.dateconvert(dte)
+            if not self:
                 self._date = np.array([dte])
                 self._data = np.array([values])
-        else:
-            index = self.__skl.rank(dte)
-            if index < 0:
-                self.__skl.insert(dte)
-                index = 1-index
-                N = len(self._data)
-                self._date.resize((N+1,))
-                self._data.resize((N+1,self.count()))
-                if index < N:
-                    self._date[index+1:] = self._date[index:-1]
-                    self._data[index+1:] = self._data[index:-1]
-            self._date[index] = dte
-            self._data[index] = values
+            else:
+                # search for the date
+                index = self.__skl.rank(dte)
+                if index < 0:
+                    # date not available
+                    N = len(self._data)
+                    index = -1-index
+                    self._date.resize((N+1,))
+                    self._data.resize((N+1, self.count()))
+                    if index < N:
+                        self._date[index+1:] = self._date[index:-1]
+                        self._data[index+1:] = self._data[index:-1]
+                self._date[index] = dte
+                self._data[index] = values
+            self.__skl.insert(dte)
         
     def isregular(self):
         dates = self.dates().__iter__()

@@ -1,10 +1,3 @@
-# NOT USED DIRECTLY
-#==========================
-#
-# This module is imported in regression.tsnumpy and regression.tszoo
-# to perform tests across different backends
-#
-__test__ = False
 from datetime import date
 
 from dynts import timeseries, nan, hasextensions
@@ -51,6 +44,26 @@ class TestTS(test.TestCase):
         self.assertTrue(ts.isconsistent())
         return ts
     
+    def testInsertSmall(self):
+        ts = self.timeseries('test')
+        ts.insert(1, [4])
+        self.assertEqual(len(ts), 1)
+        ts.insert(3, [-1])
+        self.assertEqual(len(ts), 2)
+        dates = ts.dates()
+        self.assertEqual(dates[0], 1)
+        self.assertEqual(dates[1], 3)
+        ts = self.timeseries('test')
+        ts.insert(3, [4])
+        self.assertEqual(len(ts), 1)
+        ts.insert(2, [-1])
+        self.assertEqual(len(ts), 2)
+        dates = ts.dates()
+        self.assertEqual(dates[0], 2)
+        self.assertEqual(dates[1], 3)
+        self.assertEqual(list(ts[1]), [4])
+        self.assertEqual(list(ts[0]), [-1])
+    
     def testSimple(self):
         ts = self.fill()
         ts.insert(4.5,[-4.5,67])
@@ -60,11 +73,11 @@ class TestTS(test.TestCase):
         
     def testInsertMiddle(self):
         ts = self.fill()
-        ts.insert(3,[-4.5,67])
-        self.assertEqual(len(ts),4)
-        self.assertEqual(ts.shape,(4,2))
-        self.assertEqual(list(ts[2]),[-4.5,67])
-        self.assertEqual(list(ts[3]),[-1.0,2.5])
+        ts.insert(3, [-4.5, 67])
+        self.assertEqual(len(ts), 4)
+        self.assertEqual(ts.shape, (4, 2))
+        self.assertEqual(list(ts[2]), [-4.5, 67])
+        self.assertEqual(list(ts[3]), [-1.0, 2.5])
         
     def testMax(self):
         ts  = self.getts()
@@ -215,24 +228,6 @@ class TestTS(test.TestCase):
         self.assertEqual(ts.count(),2)
         self.assertEqual(ts.names(),['AMZN:YAHOO','min(AMZN:YAHOO,window=20)'])
 
-    def testClean(self):
-        ts1 = timeseries(date=[1,2,3,4,5,6],
-                         data=[nan,nan,5,6,nan,-1],
-                         backend=self.backend)
-        ts2 = timeseries(date=[1,2,3,4,5,6,7],
-                         data=[nan,-4,5,6,-1,nan,-5],
-                         backend=self.backend)
-        ts = ts1.merge(ts2)
-        self.assertEqual(ts.count(), 2)
-        self.assertEqual(len(ts), 7)
-        cts = ts.clean()
-        self.assertEqual(len(cts), 4)
-        return ts
-        
-    def testItems(self):
-        ts = self.testClean()
-        v = list(ts.items(start_value=0))
-        self.assertTrue(v)
 
 
 @test.skipUnless(hasextensions(), 'Requires C extensions')

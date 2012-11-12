@@ -26,7 +26,7 @@ def safetodate(dte):
 
 class PreProcessData(object):
     '''data preprocess holder'''
-    def __init__(self, intervals = None, result = None):
+    def __init__(self, intervals=None, result=None):
         self.intervals = intervals
         self.result    = result
 
@@ -121,7 +121,7 @@ available.
             pre = self.preprocess(symbol, start, end, logger, backend, **kwargs)
             if pre.intervals:
                 result = None
-                for st,en in pre.intervals:
+                for st, en in pre.intervals:
                     logger.info('Loading %s from %s. From %s to %s' %\
                                  (symbol.ticker,provider,st,en))
                     res = provider.load(symbol, st, en, logger, backend,

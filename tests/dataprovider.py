@@ -1,4 +1,3 @@
-
 import dynts
 from dynts.utils import test
 from dynts.data import DataProvider, TimeSerieLoader

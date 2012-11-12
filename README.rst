@@ -1,4 +1,3 @@
-
 A statistic package for python with enphasis on timeseries analysis.
 Built around numpy_, it provides several back-end timeseries classes including R-based objects via rpy2_.
 It is shipped with a domain specific language for timeseries analysis
@@ -19,7 +18,7 @@ It requires Python 2.6 and up, including Python 3 versions.
     :local:
 
 
-Timeserie Object
+Timeseries
 ========================
 
 To create a timeseries object directly::
@@ -27,19 +26,19 @@ To create a timeseries object directly::
 	>>> from dynts import timeseries
 	>>> ts = timeseries('test')
 	>>> ts.type
-	'zoo'
+	'numpy'
 	>>> ts.name
 	'test'
 	>>> ts
-	TimeSeries:zoo:test
+	TimeSeries:numpy:test
 	>>> str(ts)
 	'test'
 
 
 DSL
 =======
-At the core of the library there is a Domain-Specific-Language (DSL_) dedicated
-to timeserie analysis and manipulation. DynTS makes timeserie manipulation easy and fun.
+The package comes with a Domain-Specific-Language (DSL_) dedicated
+to timeserie analysis and manipulation.
 This is a simple multiplication::
 	
 	>>> import dynts
@@ -52,7 +51,7 @@ This is a simple multiplication::
 	[2.0, goog]
 	>>> ts = dynts.evaluate(e).unwind()
 	>>> ts
-	TimeSeries:zoo:2.0 * goog
+	TimeSeries:numpy:2.0 * goog
 	>>> len(ts)
 	251
 
@@ -61,7 +60,7 @@ Requirements
 =====================
 There are few requirements that must be met:
 
-* python_ 2.6 up to python 3.2.
+* python_ 2.6 up to python 3.3.
 * numpy_ version 1.5.1 or higher for arrays and matrices.
 * ply_ version 3.3 or higher, the building block of the DSL_.
 * ccy_ for date and currency manipulation.
@@ -137,11 +136,6 @@ To access coverage of tests you need to install the coverage_ package and run th
 and to check out the coverage report::
 
 	coverage report -m
-	
-
-Kudos
-===========
-* numpy_ developers.
 
 
 JavaScript

@@ -70,20 +70,19 @@ removal, and lookup by rank.'''
             i(v)
             
     def rank(self, value):
-        '''Return the 0-based index (rank) of *value*. If the value is not available
-it returns a negative integer which absolute value is the left most closest
-index with value less than *value*.'''
+        '''Return the 0-based index (rank) of *value*. If the value is not
+available it returns a negative integer which absolute value is the
+left most closest index with value less than *value*.'''
         node = self.__head
         rank = 0
-        for i in range(self.__level-1,-1,-1):
+        for i in range(self.__level-1, -1, -1):
             while node.next[i] and node.next[i].value <= value:
                 rank += node.width[i]
                 node = node.next[i]
-        rank -= 1
-        if node.value == value or rank == -1:
-            return rank
+        if node.value == value:
+            return rank - 1
         else:
-            return -rank
+            return -1 - rank
         
     def insert(self, value):
         # find first node on each level where node.next[levels].value > value

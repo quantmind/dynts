@@ -11,7 +11,7 @@ Development
     elem.prop({'checked':true});
     elem.is(':checked')
     
-* **118 Tests**, **70% test coverage**
+* **163 Tests**, **70% test coverage**
 
 Ver. 0.4.1 - 2011 May 19
 ================================

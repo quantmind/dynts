@@ -38,14 +38,13 @@ def haszoo():
     except dynts.MissingPackage:
         return False
 
+
 class TestCase(unittest.TestCase):
     backend = 'numpy'
     fallback = False
     
     def __init__(self,*args,**kwargs):
         super(TestCase,self).__init__(*args,**kwargs)
-        self.np = np
-        self.timeseries = timeseries
         self.evaluate = evaluate
         self.tsname = tsname
         self.datepopulate = datepopulate
@@ -63,23 +62,27 @@ class TestCase(unittest.TestCase):
     def randomts(self,**kwargs):
         return randomts(backend=self.backend, **kwargs)
         
-    def getdata(self, size = 100, cols = 1, delta = 1, start = None):
-        dates = self.datepopulate(size = size, delta = delta)
-        data = self.populate(size = size, cols = cols)
-        return dates,data
+    def getdata(self, size=100, cols=1, delta=1, start=None):
+        dates = self.datepopulate(size=size, delta=delta)
+        data = self.populate(size=size, cols=cols)
+        return dates, data
         
-    def getts(self, returndata=False, delta = 1, cols = 1, size = 100):
+    def getts(self, returndata=False, delta=1, cols=1, size=100):
         '''Return a timeseries filled with random data'''
-        dates,data = self.getdata(size,cols,delta)
-        ts   = self.timeseries(name='test', date=dates, data=data)
-        self.assertEqual(ts.shape,(size,cols))
-        self.assertEqual(len(ts),size)
-        self.assertEqual(ts.count(),cols)
+        dates, data = self.getdata(size, cols, delta)
+        ts = self.timeseries(name='test', date=dates, data=data)
+        self.assertEqual(ts.shape,(size, cols))
+        self.assertEqual(len(ts), size)
+        self.assertEqual(ts.count(), cols)
         if returndata:
-            return ts,list(dates),list(data)
+            return ts, list(dates),list(data)
         else:
             return ts
         
+    def timeseries(self, name='', date=None, data=None):
+        return timeseries(name=name, date=date, data=data,
+                          backend=self.backend)
+    
     def isiterable(self, a):
         return hasattr(a,'__iter__')
 

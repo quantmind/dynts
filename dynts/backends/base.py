@@ -271,10 +271,11 @@ replaced by the *algorithm* provided'''
                 elif dstart is not None and algorithm:
                     missings.append((dt, v))
             if missings:
-                for dx, vx in algorithm(d1, v1, None, None, missings):
+                for dx, vx in algorithm(dend, vend, None, None, missings):
                     new_dates.append(dx)
                     new_values.append(vx)
-            series.append((dstart, d1, values))
+                    dend = dx
+            series.append((dstart, dend, values))
             all_dates = all_dates.union(values)
         cdate = []
         cdata = []
