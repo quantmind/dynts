@@ -86,7 +86,7 @@ class ToFlot(BaseFormatter):
             res = flot.Flot(ts.name, type='timeseries', **series_info)
             dates  = asarray(ts.dates())
             missing = settings.ismissing
-            for name,serie in ts.named_series(ordering):
+            for name, serie in ts.named_series(ordering):
                 info = self.get_serie_info(series_info,name)
                 data = []
                 append = data.append

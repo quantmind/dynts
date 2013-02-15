@@ -11,11 +11,18 @@ from numpy import array, ndarray, double, dtype
 object_type = dtype(object)
 
 
-__all__ = ['cross','asarray','ascolumn','assimple',
-           'scalarasiter']
+__all__ = ['cross', 'asarray', 'ascolumn', 'assimple', 'scalarasiter']
 
 
-def asarray(x, dtype = None):
+def scalarasiter(x):
+    if x is None:
+        return []
+    elif hasattr(x, '__iter__'):
+        return x
+    else:
+        return [x] 
+
+def asarray(x, dtype=None):
     '''Convert ``x`` into a ``numpy.ndarray``.'''
     iterable = scalarasiter(x)
     if isinstance(iterable, ndarray):

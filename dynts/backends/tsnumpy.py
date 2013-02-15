@@ -91,17 +91,17 @@ class TimeSeries(dynts.TimeSeries):
     def __getitem__(self, i):
         return self._data[i]
     
-    def values(self, desc = None):
-        if desc == True:
-            return reversed(self._data)
+    def values(self, desc=None):
+        if self._data is not None:
+            return reversed(self._data) if desc else self._data
         else:
-            return self._data
+            return ()
     
-    def dates(self, desc = None):
-        if desc == True:
-            return reversed(self._date)
+    def dates(self, desc=None):
+        if self._date is not None:
+            return reversed(self._date) if desc else self._date
         else:
-            return self._date
+            return ()
     
     def keys(self, desc = None):
         return self.dates(desc = desc)

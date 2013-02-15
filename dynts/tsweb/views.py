@@ -50,7 +50,7 @@ for fetching data.'''
         if windows:
             windows = [w.replace(' ','') for w in windows.split(',')]
         options = {'height': height,
-                   'start': start,
+                   'dates': {'start': start},
                    'windows': {'windows': windows},
                    'jsondata': {'url':service_url,
                                 'requestMethod':method}}
