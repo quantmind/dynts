@@ -86,7 +86,7 @@ length given by :class:`dynts.DynData.count`.'''
         '''Nicely display self on the shell. Useful during prototyping and development.'''
         raise NotImplementedError
 
-    def dump(self, format = None, **kwargs):
+    def dump(self, format=None, **kwargs):
         '''Dump the timeseries using a specific :ref:`format <formatters>`.'''
         formatter = Formatters.get(format, None)
         if not format:

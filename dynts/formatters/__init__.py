@@ -129,7 +129,7 @@ VBA. For unserializing check http://code.google.com/p/vba-json/
 
 The unserializer is also included in the directory extras'''
     type = 'json'
-    def __call__(self, ts, container = None, **kwargs):
+    def __call__(self, ts, container=None, **kwargs):
         '''Dump timeseries as a JSON string VBA-Excel friendly'''
         from ccy import date2juldate
         from dynts.utils.anyjson import JSONdatainfo
