@@ -30,10 +30,10 @@ CLASSIFIERS  = [
 from functools import reduce
 
 from .backends import *
-from .dsl import parse, evaluate, merge, dslresult, function_registry, functions
+from .dsl import (parse, evaluate, merge, dslresult, function_registry,
+                  functions)
 from .data import providers
 from . import formatters
-Formatters['flot'] = formatters.ToFlot()
 Formatters['jsonvba'] = formatters.ToJsonVba()
 Formatters['csv']  = formatters.ToCsv()
 Formatters['excel']  = formatters.ToExcel()
@@ -88,7 +88,8 @@ create the function ducumentation.'''
         under = (2+len(title))*'='
         fdoc = func.__doc__
         if not fdoc:
-            raise FunctionError('Function {0} has no documentation.'.format(name))
+            raise FunctionError(
+                'Function {0} has no documentation.'.format(name))
         body = '\n'.join((link,'',title,under,'',fdoc,'\n'))
         return (title,body)
     else:
