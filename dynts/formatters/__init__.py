@@ -5,8 +5,9 @@ from dynts.utils.py2py3 import zip, StreamIO
 from dynts.exceptions import FormattingException
 from dynts.backends import istimeseries
 from dynts.utils import asarray
-from dynts.tsweb import flot
 from dynts.conf import settings
+
+from . import flot
 
 
 default_converter = lambda x : x.isoformat()
@@ -39,7 +40,7 @@ def tsiterator(ts, dateconverter=None, desc=None,
         for dt, value in ts.items(desc=desc, start_value=start_value):
             dt = dateconverter(dt)
             yield (dt,) + tuple(value)
-        
+
 
 class BaseFormatter(object):
     type = None
