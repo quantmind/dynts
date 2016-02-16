@@ -2,9 +2,14 @@
 *.pyd
 *.so
 _dep.py
+
+# IDE
+.idea
 .project
 .pydevproject
+
 .coverage
+.coveralls-repo-token
 .Rhistory
 htmlcov/
 .settings/

@@ -9,31 +9,31 @@ class CustomProvider(DataProvider):
 
 class CustomLoader(TimeSerieLoader):
     data = {}
-    
+
     def onresult(self, symbol, result, logger, backend, **kwargs):
         '''Store result in the class data dictionary'''
         self.data[symbol.full()] = result
         return result
-        
+
 
 
 class TestDataProvider(test.TestCase):
     backend = 'numpy'
-    
+
     def testyahoo(self):
         ts = dynts.evaluate('GOOG:yahoo')
         self.assertTrue(ts)
-        
+
     def testProviderRegistration(self):
         register(CustomProvider)
-        self.assertEqual(len(providers),3)
+        self.assertEqual(len(providers), 3)
         p = providers['CUSTOMPROVIDER']
-        self.assertTrue(isinstance(p,CustomProvider))
+        self.assertTrue(isinstance(p, CustomProvider))
         unregister('CUSTOMPROVIDER')
-        self.assertEqual(len(providers),2)
-        p = providers.get('CUSTOMPROVIDER',None)
-        self.assertEqual(p,None)
-        
+        self.assertEqual(len(providers), 2)
+        p = providers.get('CUSTOMPROVIDER', None)
+        self.assertEqual(p, None)
+
     def testCustomLoader(self):
         from dynts.conf import settings
         settings.default_loader = CustomLoader
@@ -41,6 +41,5 @@ class TestDataProvider(test.TestCase):
         data = CustomLoader.data
         self.assertTrue(data)
         self.assertTrue('BLT:GOOGLE' in data)
-        
-        
-        
+
+

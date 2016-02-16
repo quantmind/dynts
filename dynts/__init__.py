@@ -36,8 +36,8 @@ from . import formatters
 Formatters['flot'] = formatters.ToFlot()
 Formatters['jsonvba'] = formatters.ToJsonVba()
 Formatters['csv']  = formatters.ToCsv()
-Formatters['excel']  = formatters.ToExcel()
-Formatters['xls']  = formatters.ToXls()
+Formatters['excel'] = formatters.ToExcel()
+Formatters['xls'] = formatters.ToXls()
 Formatters['plot'] = formatters.ToPlot()
 
 
@@ -65,7 +65,7 @@ def composename(name, *names, **kwargs):
     kw = ','.join(('{0}={1}'.format(*v) for v in kwargs.items()))
     if kw:
         kw = ','+kw
-    return sp.join(('{0}({1}{2})'.format(name,x,kw) for x in names))
+    return sp.join(('{0}({1}{2})'.format(name, x, kw) for x in names))
 
 
 def hasextensions():
@@ -88,9 +88,9 @@ create the function ducumentation.'''
         under = (2+len(title))*'='
         fdoc = func.__doc__
         if not fdoc:
-            raise FunctionError('Function {0} has no documentation.'.format(name))
-        body = '\n'.join((link,'',title,under,'',fdoc,'\n'))
-        return (title,body)
+            raise FunctionError('Function %s has no documentation.' % name)
+        body = '\n'.join((link, '', title, under, '', fdoc,'\n'))
+        return title, body
     else:
         return title
 

@@ -1,5 +1,5 @@
-'''Rolling max function for a numpy backend'''
-from _base import *
+"""Rolling max function for a numpy backend
+"""
 
 ts = randomts(10000, 5, backend = 'zoo')
 

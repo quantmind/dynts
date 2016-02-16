@@ -3,7 +3,7 @@
 from dynts.backends import TimeSeries
 
 
-def simple_reduce(ts, size, align = 'right'):
+def simple_reduce(ts, size, align='right'):
     N = len(ts)
     n = int(N // size)
     while N/float(n) > size:
@@ -18,7 +18,7 @@ def simple_reduce(ts, size, align = 'right'):
         s = int(n // 2)
         values = ts.values()[s::n]
         dates = ts.dates()[s::n]
-    return ts.clone(dates,values)
+    return ts.clone(dates, values)
 
 
-TimeSeries.register_algorithm('reduce','simple',simple_reduce)
+TimeSeries.register_algorithm('reduce', 'simple', simple_reduce)

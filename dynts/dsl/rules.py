@@ -6,30 +6,30 @@ from .grammar import *
 
 
 class rules(object):
-    
+
     # Regular expression rules for simple tokens
-    t_PLUS    = r'\+'
-    t_MINUS   = r'-'
-    t_TIMES   = r'\*'
-    t_DIVIDE  = r'/'
-    t_LPAREN  = r'\('
-    t_RPAREN  = r'\)'
+    t_PLUS = r'\+'
+    t_MINUS = r'-'
+    t_TIMES = r'\*'
+    t_DIVIDE = r'/'
+    t_LPAREN = r'\('
+    t_RPAREN = r'\)'
     t_LSQUARE = r'\['
     t_RSQUARE = r'\]'
-    t_EQUAL   = r'\='
-    t_QUOTE   = r'\"'
-    t_CONCAT  = r'\%s' % settings.concat_operator
-    t_SPLIT   = r'\%s' % settings.separator_operator
+    t_EQUAL = r'\='
+    t_QUOTE = r'\"'
+    t_CONCAT = r'\%s' % settings.concat_operator
+    t_SPLIT = r'\%s' % settings.separator_operator
 
     def __init__(self, oper = None):
-        self.t_CONCAT  = r'\%s' % settings.concat_operator
-        self.t_SPLIT   = r'\%s' % settings.separator_operator
+        self.t_CONCAT = r'\%s' % settings.concat_operator
+        self.t_SPLIT = r'\%s' % settings.separator_operator
         self.lexer = None
-        self.oper  = oper or {}
-        
+        self.oper = oper or {}
+
     def reserved(self):
         return {}
-    
+
     def __get_tokens(self):
         re = self.reserved()
         tokens = [
@@ -48,10 +48,10 @@ class rules(object):
               'QUOTE',
               'ID',
               'FUNCTION'
-              ] + list(re.values()) 
+              ] + list(re.values())
         return tokens
     tokens = property(fget = __get_tokens)
-    
+
     def __get_precedence(self):
         return (('left','QUOTE'),
                 ('left','SPLIT'),
@@ -92,30 +92,30 @@ class rules(object):
             t.value = res
             t.type  = 'FUNCTION'
         return t
-    
+
     # Define a rule so we can track line numbers
     def t_newline(self, t):
         r'\n+'
         t.lexer.lineno += len(t.value)
-        
+
     # Error handling rule
     def t_error(self, t):
         print("Illegal character '%s'" % t.value[0])
         t.lexer.skip(1)
-    
+
     def build(self, **kwargs):
         self.lexer = lex.lex(object=self, **kwargs)
 
     def input(self, data):
         self.lexer.input(data)
-    
+
 
 def parsefunc(timeseries_expression, functions, method, debug):
     ru = rules(functions)
     ru.build()
     ru.input(timeseries_expression)
     # Important! needed by yacc
-    tokens     = ru.tokens
+    tokens = ru.tokens
     precedence = ru.precedence
-    p = yacc.yacc(method = method or 'SLR')
-    return p.parse(lexer = ru.lexer, debug = debug)
+    p = yacc.yacc(method=method or 'SLR')
+    return p.parse(lexer=ru.lexer, debug = debug)
