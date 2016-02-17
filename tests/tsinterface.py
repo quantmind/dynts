@@ -1,9 +1,9 @@
 from datetime import date
 
-from dynts import timeseries, nan, hasextensions
+from dynts import timeseries, hasextensions
 from dynts.utils import test, cross, asarray
 from dynts.utils.py2py3 import zip
-from dynts.exceptions import *
+from dynts.exceptions import *  # noqa
 
 
 class TestTS(test.TestCase):
@@ -22,7 +22,7 @@ class TestTS(test.TestCase):
         self.assertEqual(mts60.count(), 2)
         values = ts.values()
         v30 = mts30.values()
-        date   = asarray(ts.dates())
+        date = asarray(ts.dates())
         c = 0
         # Loop over the items of the shorter windows rolling function
         for dt, v in mts30.items():
@@ -80,7 +80,7 @@ class TestTS(test.TestCase):
         self.assertEqual(list(ts[3]), [-1.0, 2.5])
 
     def testMax(self):
-        ts  = self.getts()
+        ts = self.getts()
         val = cross(ts.max(fallback=self.fallback))
         for v in ts.values():
             self.assertTrue(val >= v)
@@ -153,9 +153,7 @@ class TestTS(test.TestCase):
     def testMultivariate(self):
         ts = self.getts(cols=2)
         va = ts[0]
-        self.assertEqual(len(va),2)
-        #names = ts.colnames()
-        #self.assertEqual(len(names), 1)
+        self.assertEqual(len(va), 2)
 
     def testBinaryTreeWrapper(self):
         '''Test included in documentation'''
@@ -171,7 +169,7 @@ class TestTS(test.TestCase):
         dts = ts.ashash()
         self.assertEqual(dts.shape, ts.shape)
         self.assertFalse(dts.modified)
-        dts[date(2009, 2, 1)]=[56.4, 78.6]
+        dts[date(2009, 2, 1)] = [56.4, 78.6]
         self.assertTrue(dts.modified)
         self.assertEqual(len(dts), len(ts)+1)
         dts = dts.getts()

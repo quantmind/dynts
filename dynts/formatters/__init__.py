@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import csv
 
 from dynts.utils.py2py3 import zip, StreamIO
@@ -10,13 +9,14 @@ from dynts.conf import settings
 from . import flot
 
 
-default_converter = lambda x : x.isoformat()
+default_converter = lambda x: x.isoformat()
 
 
 def nanvalue(value):
     for v in value:
         if v != v:
             return True
+
 
 def full_clean(ts, dateconverter, desc, start_value):
     for dt, value in ts.items(desc=desc, start_value=start_value):
@@ -25,6 +25,7 @@ def full_clean(ts, dateconverter, desc, start_value):
         if nanvalue(value):
             continue
         yield dt, value
+
 
 def tsiterator(ts, dateconverter=None, desc=None,
                clean=False, start_value=None, **kwargs):
@@ -60,6 +61,7 @@ class ToCsv(BaseFormatter):
 
         return stream.getvalue()
 
+
 class ToExcel(BaseFormatter):
     type = 'excel'
 
@@ -79,7 +81,8 @@ class ToFlot(BaseFormatter):
 
     def __call__(self, ts, container=None, desc=False, ordering=None,
                  series_info=None, **kwargs):
-        '''Dump timeseries as a JSON string compatible with ``flot``'''
+        '''Dump timeseries as a JSON string compatible with ``flot``
+        '''
         pydate2flot = flot.pydate2flot
         result = container or flot.MultiPlot()
         series_info = self.get_serie_info(series_info)
@@ -117,11 +120,11 @@ class ToFlot(BaseFormatter):
         result.add(res)
         return result
 
-    def get_serie_info(self, serie_info, name = None):
+    def get_serie_info(self, series_info, name=None):
         if not name:
             return series_info or {}
         else:
-            return series_info.get(name,{})
+            return series_info.get(name, {})
 
 
 class ToJsonVba(BaseFormatter):
@@ -130,10 +133,10 @@ VBA. For unserializing check http://code.google.com/p/vba-json/
 
 The unserializer is also included in the directory extras'''
     type = 'json'
+
     def __call__(self, ts, container=None, **kwargs):
         '''Dump timeseries as a JSON string VBA-Excel friendly'''
         from ccy import date2juldate
-        from dynts.utils.anyjson import JSONdatainfo
         if istimeseries(ts):
             return list(tsiterator(ts, dateconverter=date2juldate, **kwargs))
         else:
@@ -151,19 +154,19 @@ __ http://pypi.python.org/pypi/xlwt'''
         try:
             import xlwt
         except ImportError:
-            raise FormattingException('To save the timeseries as a spreadsheet, the xlwt python library is required.')
+            raise FormattingException(
+                    'To save the timeseries as a spreadsheet, the xlwt '
+                    'python library is required.')
 
-
-        if isinstance(filename,xlwt.Workbook):
+        if isinstance(filename, xlwt.Workbook):
             wb = filename
         else:
             wb = xlwt.Workbook()
         title = title or ts.name
-        stream = StreamIO()
         sheet = wb.add_sheet(title)
-        for i,row in enumerate(tsiterator(ts)):
-            for j,col in enumerate(row):
-                sheet.write(i,j,str(col))
+        for i, row in enumerate(tsiterator(ts)):
+            for j, col in enumerate(row):
+                sheet.write(i, j, str(col))
 
         if raw:
             return wb
@@ -181,7 +184,8 @@ class ToPlot(BaseFormatter):
             import tsplot
             return tsplot.toplot(ts, **kwargs)
         except ImportError:
-            raise FormattingException('To plot timeseries, matplotlib is required.')
+            raise FormattingException('To plot timeseries, '
+                                      'matplotlib is required.')
 
 
 

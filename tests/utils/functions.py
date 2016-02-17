@@ -20,7 +20,8 @@ class SimpleFunctionTest(unittest.TestCase):
 
     def testWindowParameter(self):
         '''Test mean function with one parameter'''
-        e = '%(f)s(GOOG, window=30), %(f)s(GOOG, window=60)' % {'f':self.function}
+        e = ('%(f)s(GOOG, window=30), %(f)s(GOOG, window=60)' %
+             {'f': self.function})
         result = dynts.evaluate(e)
         symbols = result.expression.symbols()
         self.assertEqual(len(symbols), 1)

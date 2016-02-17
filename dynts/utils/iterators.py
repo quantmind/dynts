@@ -1,7 +1,7 @@
 from math import log, sqrt
 
 
-def laggeddates(ts, step = 1):
+def laggeddates(ts, step=1):
     '''Lagged iterator over dates'''
     if step == 1:
         dates = ts.dates()
@@ -12,9 +12,8 @@ def laggeddates(ts, step = 1):
             yield dt1, dt0
             dt0 = dt1
     else:
-        q = deque()
         while done:
-            done+=1
+            done += 1
             lag.append(next(dates))
         for dt1 in dates:
             lag.append(dt1)
@@ -33,8 +32,8 @@ def laggeditems(ts, step = 1):
     else:
         ts.precondition(step > 1 and step < len(ts), dynts.DyntsOutOfBound)
         done = 0
-        items  = self.items()
-        lag    = deque()
+        items = self.items()
+        lag = deque()
         while done:
             done+=1
             lag.append(next(items))
@@ -43,7 +42,7 @@ def laggeditems(ts, step = 1):
             yield item1+lag.pop(0)
 
 
-def logdeltadt(ts, step = 1, dcf = None):
+def logdeltadt(ts, step=1, dcf=None):
     '''Iterator which returns a log delta'''
     dcf = dcf or settings.getdc()
     for d1, i1, d0, i0 in laggeditems(ts, step):
