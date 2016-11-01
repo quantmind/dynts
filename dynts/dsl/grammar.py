@@ -1,5 +1,5 @@
 from dynts.conf import settings
-from dynts.exceptions import ExpressionError
+from dynts.exc import ExpressionError
 
 from .ast import *
 
@@ -33,7 +33,7 @@ def p_expression_binop(p):
     elif v == settings.separator_operator:
         p[0] = SplittingOp(p[1],p[3])
     elif v == settings.field_operator:
-        p[0] = Symbol(p[1], field = p[3])
+        p[0] = Symbol(p[1], field=p[3])
 
 
 def p_expression_group(p):
@@ -101,4 +101,3 @@ def p_expression_bad_function3(p):
 def p_error(p):
     '''expression'''
     raise ExpressionError('Could not parse %s' % p)
-

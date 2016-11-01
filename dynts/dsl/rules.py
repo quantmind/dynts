@@ -1,7 +1,5 @@
 from ply import yacc, lex
 
-from dynts.conf import settings
-
 from .grammar import *
 
 
@@ -50,17 +48,18 @@ class rules(object):
               'FUNCTION'
               ] + list(re.values())
         return tokens
-    tokens = property(fget = __get_tokens)
+    tokens = property(fget=__get_tokens)
 
     def __get_precedence(self):
-        return (('left','QUOTE'),
-                ('left','SPLIT'),
-                ('left','CONCAT'),
-                ('left','EQUAL'),
-                ('left','PLUS','MINUS'),
-                ('left','TIMES','DIVIDE'),
-                )
-    precedence = property(fget = __get_precedence)
+        return (
+            ('left', 'QUOTE'),
+            ('left', 'SPLIT'),
+            ('left', 'CONCAT'),
+            ('left', 'EQUAL'),
+            ('left', 'PLUS', 'MINUS'),
+            ('left', 'TIMES', 'DIVIDE'),
+        )
+    precedence = property(fget=__get_precedence)
 
     # A regular expression rule with some action code
     def t_NUMBER(self, t):
@@ -69,7 +68,7 @@ class rules(object):
             sv = t.value
             v = float(sv)
             iv = int(v)
-            t.value = (iv if iv == v else v,sv)
+            t.value = (iv if iv == v else v, sv)
         except ValueError:
             print("Number %s is too large!" % t.value)
             t.value = 0
@@ -77,7 +76,7 @@ class rules(object):
 
     def t_ID(self, t):
         r'`[^`]*`|[a-zA-Z_][a-zA-Z_0-9:@]*'
-        res = self.oper.get(t.value, None) # Check for reserved words (operations)
+        res = self.oper.get(t.value, None)  # Check for reserved words
         if res == None:
             res = t.value.upper()
             if res == 'FALSE':

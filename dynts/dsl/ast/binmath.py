@@ -2,21 +2,18 @@ from dynts import ts_bin_op
 
 from .astbase import *
 
-__all__ = ['BinMathOp','PlusOp',
-           'MinusOp','MultiplyOp','DivideOp']
-
 
 class BinMathOp(BinOp):
-    
-    def __init__(self,left,right,op,op_name):
+
+    def __init__(self, left, right, op, op_name):
         self.op_name = op_name
-        super(BinMathOp,self).__init__(left,right,op)
-    
-    def _unwind(self, values, backend, full = False, **kwargs):
+        super().__init__(left, right, op)
+
+    def _unwind(self, values, backend, full=False, **kwargs):
         le = self.left.unwind(values, backend, **kwargs)
         ri = self.right.unwind(values, backend, **kwargs)
         return ts_bin_op(self.op_name, le, ri, name=str(self))
-    
+
     def lineardecomp(self):
         if isinstance(self.left,Number):
             if isinstance(self.right,Number):
@@ -27,13 +24,13 @@ class BinMathOp(BinOp):
             for k,v in d1.items():
                 dr[k] = nv*v
             return dr
-    
+
 
 class PlusOp(BinMathOp):
-    
-    def __init__(self,left,right):
-        BinMathOp.__init__(self,left,right,'+','add')
-    
+
+    def __init__(self, left, right):
+        BinMathOp.__init__(self, left, right, '+', 'add')
+
     def lineardecomp(self):
         ls = self.left.lineardecomp()
         rs = self.right.lineardecomp()
@@ -43,12 +40,13 @@ class PlusOp(BinMathOp):
             return lc
         else:
             return None
-    
-    
+
+
 class MinusOp(BinMathOp):
-    def __init__(self,left,right):
-        BinMathOp.__init__(self,left,right,'-','sub')
-    
+
+    def __init__(self, left, right):
+        super().__init__(left, right, '-', 'sub')
+
     def lineardecomp(self):
         ls = self.left.lineardecomp()
         rs = self.right.lineardecomp()
@@ -58,22 +56,21 @@ class MinusOp(BinMathOp):
             return lc
         else:
             return None
-        
-        
+
+
 class MultiplyOp(BinMathOp):
-    
-    def __init__(self,left,right):
-        BinMathOp.__init__(self,left,right,'*','mul')
-    
-    def lineardecomp(self):
-        return linearDecomp().append(self)
-    
-    
-class DivideOp(BinMathOp):
-    
-    def __init__(self,left,right):
-        BinMathOp.__init__(self,left,right,'/','div')
-    
+
+    def __init__(self, left, right):
+        super().__init__(left, right, '*', 'mul')
+
     def lineardecomp(self):
         return linearDecomp().append(self)
 
+
+class DivideOp(BinMathOp):
+
+    def __init__(self, left, right):
+        super().__init__(left, right, '/', 'div')
+
+    def lineardecomp(self):
+        return linearDecomp().append(self)

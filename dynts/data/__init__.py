@@ -1,6 +1,8 @@
 import logging
 from datetime import date, timedelta
 
+from ccy import todate
+
 from dynts.conf import settings
 from dynts.exceptions import *
 
@@ -11,13 +13,13 @@ class Silence(logging.Handler):
     def emit(self, record):
         pass
 
+
 class MissingDataProvider(Exception):
     '''Data provider is not available'''
     pass
 
 
 def safetodate(dte):
-    from ccy import todate
     try:
         return todate(dte)
     except:
@@ -34,21 +36,21 @@ class PreProcessData(object):
 class SymbolData(object):
     '''Class holding information an data symbol.
 
-.. attribute:: ticker
+    .. attribute:: ticker
 
-    String defining the data provider ticker
+        String defining the data provider ticker
 
-.. attribute:: field
+    .. attribute:: field
 
-    String associated with the data provider field to load
+        String associated with the data provider field to load
 
-.. attribute:: provider
+    .. attribute:: provider
 
-    Instance of :class:`dynts.data.DataProvider`
+        Instance of :class:`dynts.data.DataProvider`
 
-This class provides a place-holder of information.
-It doesn't do anything special.
-'''
+    This class provides a place-holder of information.
+    It doesn't do anything special.
+    '''
     __slots__ = ('ticker','field','provider')
 
     def __init__(self, ticker, field, provider):
@@ -68,16 +70,16 @@ It doesn't do anything special.
 
 class TimeSerieLoader(object):
     '''Cordinates the loading of timeseries data
-into :class:`dynts.dsl.Symbol`.
-This class can be overritten by a custom one if required.
-There are four different
-**hooks** which can be used to customised its behaviour:
+    into :class:`dynts.dsl.Symbol`.
+    This class can be overritten by a custom one if required.
+    There are four different
+    **hooks** which can be used to customised its behaviour:
 
-* :func:`dynts.data.TimeSerieLoader.parse_symbol`
-* :func:`dynts.data.TimeSerieLoader.preprocess`
-* :func:`dynts.data.TimeSerieLoader.onresult`
-* :func:`dynts.data.TimeSerieLoader.onfinishload`'''
-
+    * :func:`dynts.data.TimeSerieLoader.parse_symbol`
+    * :func:`dynts.data.TimeSerieLoader.preprocess`
+    * :func:`dynts.data.TimeSerieLoader.onresult`
+    * :func:`dynts.data.TimeSerieLoader.onfinishload`
+    '''
     preprocessdata = PreProcessData
     '''Class holding data returned by the
     :meth:`dynts.data.TimeSerieLoader.preprocess` method.
@@ -92,7 +94,6 @@ There are four different
     :meth:`dynts.data.TimeSerieLoader.onresult` method.
     '''
     symboldata = SymbolData
-
 
     def load(self, providers, symbols, start, end, logger, backend, **kwargs):
         '''Load symbols data.
@@ -160,34 +161,32 @@ There should be no reason to override this function.'''
 
     def parse_symbol(self, symbol, providers):
         '''Parse a symbol to obtain information regarding ticker,
-field and provider. Must return an instance of :attr:`symboldata`.
+        field and provider. Must return an instance of :attr:`symboldata`.
 
-:keyword symbol: string associated with market data to load.
-:keyword providers: dictionary of :class:`dynts.data.DataProvider`
-                    instances available.
+        :keyword symbol: string associated with market data to load.
+        :keyword providers: dictionary of :class:`dynts.data.DataProvider`
+                            instances available.
 
-For example::
+        For example::
 
-    intc
-    intc:open
-    intc:volume:google
-    intc:google
+            intc
+            intc:open
+            intc:volume:google
+            intc:google
 
-are all valid inputs returning a :class:`SymbolData` instance with
-the following triplet of information::
+        are all valid inputs returning a :class:`SymbolData` instance with
+        the following triplet of information::
 
-    intc,None,yahoo
-    intc,open,yahoo
-    intc,volume,google
-    intc,None,google
+            intc,None,yahoo
+            intc,open,yahoo
+            intc,volume,google
+            intc,None,google
 
-assuming ``yahoo`` is the provider in
-:attr:`dynts.conf.Settings.default_provider`.
+        assuming ``yahoo`` is the provider in
+        :attr:`dynts.conf.Settings.default_provider`.
 
-This function is called before retrieving data.
-'''
-        if not symbol:
-            raise BadSymbol("symbol not provided")
+        This function is called before retrieving data.
+        '''
         separator = settings.field_separator
         symbol = str(symbol)
         bits = symbol.split(separator)
@@ -310,4 +309,3 @@ unregister = providers.unregister
 
 register(google)
 register(yahoo)
-
