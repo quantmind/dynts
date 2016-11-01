@@ -1,6 +1,8 @@
 *.pyc
 *.pyd
 *.so
+.eggs
+*.egg-info
 _dep.py
 
 # IDE
@@ -15,7 +17,7 @@ htmlcov/
 dist/
 build/
 docs/build/
-lib/src/*.c
+extensions/lib/*.c
 profile/*.prof
 parser.out
 parsetab.py

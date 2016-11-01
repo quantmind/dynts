@@ -1,14 +1,13 @@
-from datetime import date
 
 from numpy import outer, cov, transpose, zeros
 
 import dynts
 from dynts.utils import test
 from dynts.utils.populate import datepopulate, populate
-from dynts.utils.py2py3 import range
 from dynts.stats import Variates, vector_to_symmetric
 
 places = 4
+
 
 class TestStat(test.TestCase):
 

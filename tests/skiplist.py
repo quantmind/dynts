@@ -1,8 +1,6 @@
 import unittest
-from functools import reduce
 
 import dynts
-from dynts.utils.py2py3 import zip
 from dynts import lib
 from dynts.stats import rollingOperation
 from dynts.utils.populate import populate
@@ -10,16 +8,16 @@ from dynts.utils.populate import populate
 
 class RollingFunctionSkipList(unittest.TestCase):
     fallback = False
-    
+
     def setUp(self):
         self.skiplist = lib.fallback.skiplist if self.fallback else lib.skiplist
-        
+
     def make(self):
         data  = populate(size = 500)[:,0]
         sl = lib.makeskiplist(data = data, use_fallback = self.fallback)
         self.assertEqual(len(sl),500)
         return sl
-        
+
     def testSkipList(self):
         ol = self.make()
         p = None
@@ -27,7 +25,7 @@ class RollingFunctionSkipList(unittest.TestCase):
             if p is not None:
                 self.assertTrue(v>=p)
             p = v
-            
+
     def testRank(self):
         sl = self.make()
         for i in range(len(sl)):
@@ -40,7 +38,7 @@ class RollingFunctionSkipList(unittest.TestCase):
         self.assertEqual(r,-99)
         self.assertEqual(sl.rank(sl[0]-1),-1)
         self.assertEqual(sl.rank(sl[N-1]+1),-N+1)
-        
+
     def testRollingOp(self):
         data  = populate(size = 500)[:,0]
         roll  = rollingOperation(data, 20, skiplist_class = self.skiplist)
@@ -50,9 +48,9 @@ class RollingFunctionSkipList(unittest.TestCase):
         for m0,m1,m2 in zip(rmin,rmed,rmax):
             self.assertTrue(m1>=m0)
             self.assertTrue(m2>=m1)
-        
-        
+
+
 if dynts.hasextensions():
-    
+
     class FallbackRollingFunctionSkipList(RollingFunctionSkipList):
         fallback = True

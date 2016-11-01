@@ -1,8 +1,6 @@
 import dynts
 from dynts.utils import test
-from dynts.utils.py2py3 import zip
 from dynts import dsl
-from dynts.dsl import ast
 
 
 class TestDsl(test.TestCase):

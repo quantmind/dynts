@@ -7,6 +7,7 @@ from dynts.data import providers, register, unregister
 class CustomProvider(DataProvider):
     pass
 
+
 class CustomLoader(TimeSerieLoader):
     data = {}
 
@@ -14,7 +15,6 @@ class CustomLoader(TimeSerieLoader):
         '''Store result in the class data dictionary'''
         self.data[symbol.full()] = result
         return result
-
 
 
 class TestDataProvider(test.TestCase):
@@ -41,5 +41,3 @@ class TestDataProvider(test.TestCase):
         data = CustomLoader.data
         self.assertTrue(data)
         self.assertTrue('BLT:GOOGLE' in data)
-
-

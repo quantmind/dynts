@@ -1,11 +1,25 @@
 import csv
 from io import StringIO
 
+from ccy import dateFromString
+
 from .base import DataProvider
 
 
-short_month = ('Jan','Feb','Mar','Apr','May','Jun',
-               'Jul','Aug','Sep','Oct','Nov','Dec')
+short_month = (
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+)
 
 
 class WebCsv(DataProvider):
@@ -17,7 +31,6 @@ class WebCsv(DataProvider):
         self.http = http
 
     def string_to_date(self, sdte):
-        from ccy import dateFromString
         return dateFromString(sdte)
 
     def request(self, url):
@@ -38,7 +51,6 @@ class WebCsv(DataProvider):
         return ['Close','Open','Low','High','Volume']
 
     def load(self, symbol, startdate, enddate, logger, backend, **kwargs):
-        from ccy import dateFromString
         ticker = symbol.ticker
         field  = symbol.field
         data = self.rowdata(ticker, startdate, enddate)
@@ -72,7 +84,7 @@ class WebCsv(DataProvider):
 
         field = field or 'CLOSE'
         return {'date': dates,
-                'value': fields.get(str(field).upper(),None)}
+                'value': fields.get(str(field).upper(), None)}
 
 
 class google(WebCsv):
@@ -80,32 +92,34 @@ class google(WebCsv):
 
     def getdate(self, st, dte):
         m = short_month[dte.month-1]
-        return '%s=%s+%s,+%s' % (st,m,dte.day,dte.year)
+        return '%s=%s+%s,+%s' % (st, m, dte.day, dte.year)
 
-    def hystory_url(self, ticker, startdate, enddate, field = None):
+    def hystory_url(self, ticker, startdate, enddate, field=None):
         b = self.baseurl
         st = self.getdate('startdate', startdate)
         et = self.getdate('enddate', enddate)
-        return '%s/historical?q=%s&%s&%s&output=csv' % (b,ticker,st,et)
+        return '%s/historical?q=%s&%s&%s&output=csv' % (b, ticker, st, et)
 
     def weblink(self, ticker):
-        return '%s?q=%s' % (self.baseurl,ticker)
+        return '%s?q=%s' % (self.baseurl, ticker)
 
 
 class yahoo(WebCsv):
     baseurl = 'http://ichart.yahoo.com'
 
     def getdate(self, st, dte):
-        return '%s=%s&%s=%s&%s=%s' % (st[0],dte.month-1,st[1],
-                                      dte.day,st[2],dte.year)
+        return '%s=%s&%s=%s&%s=%s' % (
+            st[0], dte.month-1, st[1],
+            dte.day, st[2], dte.year
+        )
 
     def hystory_url(self, ticker, startdate, enddate):
         b = self.baseurl
         st = self.getdate(('a','b','c'), startdate)
         et = self.getdate(('d','e','f'), enddate)
-        return '%s/table.csv?s=%s&%s&%s&g=d&ignore=.csv' % (b,ticker,st,et)
+        return '%s/table.csv?s=%s&%s&%s&g=d&ignore=.csv' % (
+            b, ticker, st, et
+        )
 
     def weblink(self, ticker):
         return 'http://finance.yahoo.com/q?s=%s' % ticker
-
-

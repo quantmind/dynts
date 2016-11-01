@@ -1,9 +1,8 @@
 import random
 
 from dynts.utils import test
-from dynts.utils.py2py3 import map, itervalues
 from dynts.backends import ops
-from dynts import exceptions
+from dynts.exc import ExpressionError
 
 
 class TestOperators(test.TestCase):
@@ -36,10 +35,10 @@ class TestOperators(test.TestCase):
         ts1 = self.getts(cols=2)
         ts2 = self.getts(cols=1)
 
-        op = list(itervalues(ops))[0]
+        op = list(ops.values())[0]
 
         curry_fn = lambda: op(ts1, ts2)
-        self.assertRaises(exceptions.ExpressionError, curry_fn)
+        self.assertRaises(ExpressionError, curry_fn)
 
     def testArithOpWithMissingDates(self):
         ts1, dates1, data1 = self.getts(returndata=True, cols=2)
@@ -47,7 +46,7 @@ class TestOperators(test.TestCase):
 
         all_dates = list(set(dates1).union(set(dates2)))
         all_dates.sort()
-        op = list(itervalues(ops))[0]
+        op = list(ops.values())[0]
         ts3 = op(ts1, ts2)
         # Check that all the dates are in the return series by default
         self.check_dates(ts3, all_dates)

@@ -1,7 +1,7 @@
 import unittest
+import json
 
 import dynts
-from dynts.utils.anyjson import json
 
 
 class TestFlot(unittest.TestCase):

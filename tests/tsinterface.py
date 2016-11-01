@@ -227,7 +227,6 @@ class TestTS(test.TestCase):
                          ['AMZN:YAHOO', 'min(AMZN:YAHOO, window=20)'])
 
 
-
 @test.skipUnless(hasextensions(), 'Requires C extensions')
 class TestFallBackNumpyTS(TestTS):
     fallback = True

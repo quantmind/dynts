@@ -3,66 +3,55 @@
 Created using ply (http://www.dabeaz.com/ply/) a pure Python implementation
 of the popular compiler construction tools lex and yacc.
 '''
+from ccy import todate
+
 from dynts.conf import settings
-from dynts.exceptions import DyntsException, ExpressionError, CouldNotParse
+from dynts.exc import ExpressionError, CouldNotParse
 from dynts.backends import istimeseries, isxy
-from dynts.utils.py2py3 import to_string
 from dynts.data import providers
 
 from .ast import *
 from .registry import FunctionBase, ComposeFunction, function_registry
 
 try:
-    from ccy import todate
-except ImportError:
-    todate = lambda x : x
-
-try:
     from .rules import parsefunc
 except ImportError:
     parsefunc = None
 
-try:
-    strtype = basestring
-except NameError:
-    strtype = str
 
-
-def parse(timeseries_expression, method = None,
-          functions = None, debug = False):
+def parse(timeseries_expression, method=None, functions=None, debug=False):
     '''Function for parsing :ref:`timeseries expressions <dsl-script>`.
-If succesful, it returns an instance of :class:`dynts.dsl.Expr` which
-can be used to to populate timeseries or scatters once data is available.
+    If succesful, it returns an instance of :class:`dynts.dsl.Expr` which
+    can be used to to populate timeseries or scatters once data is available.
 
-Parsing is implemented using the ply_ module,
-an implementation of lex and yacc parsing tools for Python.
+    Parsing is implemented using the ply_ module,
+    an implementation of lex and yacc parsing tools for Python.
 
-:parameter expression: A :ref:`timeseries expressions <dsl-script>` string.
-:parameter method: Not yet used.
-:parameter functions: dictionary of functions to use when parsing.
-    If not provided the :data:`dynts.function_registry`
-    will be used.
+    :parameter expression: A :ref:`timeseries expressions <dsl-script>` string.
+    :parameter method: Not yet used.
+    :parameter functions: dictionary of functions to use when parsing.
+        If not provided the :data:`dynts.function_registry`
+        will be used.
 
-    Default ``None``.
-:parameter debug: debug flag for ply_.  Default ``False``.
+        Default ``None``.
+    :parameter debug: debug flag for ply_.  Default ``False``.
 
-For examples and usage check the :ref:`dsl documentation <dsl>`.
+    For examples and usage check the :ref:`dsl documentation <dsl>`.
 
-.. _ply: http://www.dabeaz.com/ply/
-'''
+    .. _ply: http://www.dabeaz.com/ply/
+    '''
     if not parsefunc:
         raise ExpressionError('Could not parse. No parser installed.')
     functions = functions if functions is not None else function_registry
-    expr_str = to_string(timeseries_expression).lower()
+    expr_str = str(timeseries_expression).lower()
     return parsefunc(expr_str, functions, method, debug)
 
 
 def merge(series):
-    '''\
-Merge timeseries into a new :class:`dynts.TimeSeries` instance.
+    '''Merge timeseries into a new :class:`dynts.TimeSeries` instance.
 
-:parameter series: an iterable over :class:`dynts.TimeSeries`.
-'''
+    :parameter series: an iterable over :class:`dynts.TimeSeries`.
+    '''
     series = iter(series)
     ts = next(series)
     return ts.merge(series)
@@ -70,22 +59,22 @@ Merge timeseries into a new :class:`dynts.TimeSeries` instance.
 
 class dslresult(object):
     '''Class holding the results of an interpreted expression.
-Instances of this class are returned when invoking the :func:`dynts.evaluate`
-high level function.
+    Instances of this class are returned when invoking the
+    :func:`dynts.evaluate` high level function.
 
-.. attribute:: expression
+    .. attribute:: expression
 
-    An instance of :class:`dynts.dsl.Expr` obtained when interpreting a
-    timesries expression string via :func:`dynts.parse`.
+        An instance of :class:`dynts.dsl.Expr` obtained when interpreting a
+        timesries expression string via :func:`dynts.parse`.
 
-.. attribute:: data
+    .. attribute:: data
 
-    data which is used to populate timeseries or scatters.
+        data which is used to populate timeseries or scatters.
 
-.. attribute:: backend
+    .. attribute:: backend
 
-    backend used when populating timeseries.
-'''
+        backend used when populating timeseries.
+    '''
     def __init__(self, expression, data, backend = None):
         self.expression = expression
         self.data = data

@@ -6,17 +6,17 @@ from dynts.utils import test
 
 
 class TestFunctionTS(test.TestCase):
-    
+
     def get(self):
         ts = timeseries(dtype = object)
         self.assertTrue(ts.is_object)
         self.assertEqual(ts.dtype, np.dtype(object))
-        
+
     def testSimple(self):
         self.get()
-    
+
     def testHashEmpty(self):
-        ts = timeseries(dtype = object)
+        ts = timeseries(dtype=object)
         h = ts.ashash()
         self.assertFalse(h)
         dt1 = date.today()
@@ -27,4 +27,4 @@ class TestFunctionTS(test.TestCase):
         ts = h.getts()
         self.assertEqual(len(ts),2)
         self.assertEqual(ts[0][0], 'this is a string')
-        self.assertEqual(ts[1][0], [56,48])
+        self.assertEqual(ts[1][0], [56, 48])

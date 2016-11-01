@@ -1,8 +1,8 @@
 from numpy import array, ndarray, sqrt, outer
 
-from dynts.utils.py2py3 import range
 
-__all__ = ['vector_to_symmetric', 'Variates'] 
+__all__ = ['vector_to_symmetric', 'Variates']
+
 
 def vector_to_symmetric(v):
     '''Convert an iterable into a symmetric matrix.'''
@@ -16,27 +16,28 @@ def vector_to_symmetric(v):
         for c in range(r+1):
             sym[r,c] = sym[c,r] = iterable.next()
     return sym
-  
+
+
 def ttest(r, n):
     return r*sqrt((n-2)/(1 - r*r))
-  
-  
+
+
 class Variates(object):
     '''Perform statistics on already aggregated samples.
-    
-.. attribute: n
-    
-    The sample size
 
-.. attribute: sx
+    .. attribute: n
 
-    An array obtained from sum_{n=1}^N x_n
-    
-.. attribute: sxx
+        The sample size
 
-    A symmetric matrix obtained obtained from sum_{n=1}^N x_n \times x_n^T
- 
-''' 
+    .. attribute: sx
+
+        An array obtained from sum_{n=1}^N x_n
+
+    .. attribute: sxx
+
+        A symmetric matrix obtained obtained from sum_{n=1}^N x_n \times x_n^T
+
+    '''
     def __init__(self, n, sx, sxx):
         self.n = n
         if n < 2:
@@ -51,23 +52,24 @@ class Variates(object):
         if self.length != sxx.shape[0] or self.length != sxx.shape[1]:
             raise ValueError('Inconsistent dimensions')
         self.sxx = sxx
-    
+
     @property
     def length(self):
         return self.sx.shape[0]
-    
+
     def cov(self, ddof=None, bias=0):
         '''The covariance matrix from the aggregate sample. It accepts an
-optional parameter for the degree of freedoms.
+        optional parameter for the degree of freedoms.
 
-:parameter ddof: If not ``None`` normalization is by (N - ddof), where N is
-    the number of observations; this overrides the value implied by bias.
-    The default value is None.'''
+        :parameter ddof: If not ``None`` normalization is by (N - ddof), where N is
+            the number of observations; this overrides the value implied by bias.
+            The default value is None.
+        '''
         N = self.n
         M = N if bias else N-1
-        M = M if ddof is None else N-ddof 
+        M = M if ddof is None else N-ddof
         return (self.sxx - outer(self.sx,self.sx)/N)/M
-    
+
     def corr(self):
         '''The correlation matrix'''
         cov = self.cov()
@@ -78,9 +80,10 @@ optional parameter for the degree of freedoms.
                 corr[r,c] = corr[c,r] = cov[r,c]/sqrt(cov[r,r]*cov[c,c])
             corr[r,r] = 1.
         return corr
-        
+
     def ttest(self, r, n=None):
         '''t-test of a correlation coefficient. Used to investigate whether
-the difference between the sample correlation coefficient and zero is
-statistically significant'''
+        the difference between the sample correlation coefficient and zero is
+        statistically significant
+        '''
         return ttest(r, n or self.n)

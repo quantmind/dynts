@@ -18,33 +18,3 @@ def laggeddates(ts, step=1):
         for dt1 in dates:
             lag.append(dt1)
             yield dt1, lag.pop(0)
-
-
-def laggeditems(ts, step = 1):
-    '''Iteration over lagged items.'''
-    if setp == 1:
-        items = self.items()
-        d0, i0 = next(items)
-        for d1, i1 in dates:
-            yield d1, i1, d0, i0
-            d0 = d1
-            i0 = i1
-    else:
-        ts.precondition(step > 1 and step < len(ts), dynts.DyntsOutOfBound)
-        done = 0
-        items = self.items()
-        lag = deque()
-        while done:
-            done+=1
-            lag.append(next(items))
-        for item1 in items:
-            lag.append(item1)
-            yield item1+lag.pop(0)
-
-
-def logdeltadt(ts, step=1, dcf=None):
-    '''Iterator which returns a log delta'''
-    dcf = dcf or settings.getdc()
-    for d1, i1, d0, i0 in laggeditems(ts, step):
-        dt = dcf(d0, d1)
-        yield d1, log(i1/i0)/sqrt(dt)
