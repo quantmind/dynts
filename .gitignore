@@ -5,8 +5,7 @@ _dep.py
 
 # IDE
 .idea
-.project
-.pydevproject
+.DS_Store
 
 .coverage
 .coveralls-repo-token

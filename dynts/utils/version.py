@@ -2,33 +2,43 @@ import datetime
 import os
 import subprocess
 
-def get_version(version):
+symbol = {'alpha': 'a', 'beta': 'b'}
+
+
+def get_version(version, filename=None):
     assert len(version) == 5
     assert version[3] in ('alpha', 'beta', 'rc', 'final')
-    parts = 2 if version[2] == 0 else 3
-    main = '.'.join(map(str,version[:parts]))
+    main = '.'.join(map(str, version[:3]))
     sub = ''
     if version[3] == 'alpha' and version[4] == 0:
-        git_changeset = get_git_changeset()
+        git_changeset = get_git_changeset(filename)
         if git_changeset:
             sub = '.dev%s' % git_changeset
-    elif version[3] != 'final':
-        mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'c'}
-        sub = mapping[version[3]] + str(version[4])
+    if version[3] != 'final' and not sub:
+        sub = '%s%s' % (symbol.get(version[3], version[3]), version[4])
     return main + sub
 
-def get_git_changeset():
+
+def sh(command, cwd=None):
+    return subprocess.Popen(command,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            shell=True,
+                            cwd=cwd,
+                            universal_newlines=True).communicate()[0]
+
+
+def get_git_changeset(filename=None):
     """Returns a numeric identifier of the latest git changeset.
 
     The result is the UTC timestamp of the changeset in YYYYMMDDHHMMSS format.
     This value isn't guaranteed to be unique, but collisions are very unlikely,
     so it's sufficient for generating the development version numbers.
     """
-    repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    git_show = subprocess.Popen('git show --pretty=format:%ct --quiet HEAD',
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            shell=True, cwd=repo_dir, universal_newlines=True)
-    timestamp = git_show.communicate()[0].partition('\n')[0]
+    dirname = os.path.dirname(filename or __file__)
+    git_show = sh('git show --pretty=format:%ct --quiet HEAD',
+                  cwd=dirname)
+    timestamp = git_show.partition('\n')[0]
     try:
         timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))
     except ValueError:

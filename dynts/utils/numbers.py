@@ -1,6 +1,10 @@
 
 
-__all__ = ['isnumeric','significant','significant_format']
+__all__ = [
+    'isnumeric',
+    'significant',
+    'significant_format'
+]
 
 
 def isnumeric(obj):
@@ -16,7 +20,7 @@ def isnumeric(obj):
         except:
             return False
         return True
-    
+
 
 def significant(number, n = 3):
     '''Round a number up to a given number ``n`` of significant figures.
@@ -27,17 +31,17 @@ of different scales in a uniform way.'''
     return r % number
 
 
-def significant_format(number, decimal_sep = '.', thousand_sep=',', n = 3):
+def significant_format(number, decimal_sep='.', thousand_sep=',', n=3):
     """Format a number according to a given number of significant figures.
-"""
+    """
     str_number = significant(number, n)
-    
+
     # sign
     if float(number) < 0:
         sign = '-'
     else:
         sign = ''
-    
+
     if str_number[0] == '-':
         str_number = str_number[1:]
     if '.' in str_number:
@@ -54,4 +58,3 @@ def significant_format(number, decimal_sep = '.', thousand_sep=',', n = 3):
             int_part_gd += digit
         int_part = int_part_gd[::-1]
     return sign + int_part + dec_part
-

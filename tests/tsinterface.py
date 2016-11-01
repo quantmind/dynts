@@ -2,8 +2,6 @@ from datetime import date
 
 from dynts import timeseries, hasextensions
 from dynts.utils import test, cross, asarray
-from dynts.utils.py2py3 import zip
-from dynts.exceptions import *  # noqa
 
 
 class TestTS(test.TestCase):

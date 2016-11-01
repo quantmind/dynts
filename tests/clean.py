@@ -1,4 +1,4 @@
-from dynts import timeseries, nan
+from dynts import nan
 from dynts.utils import test
 
 

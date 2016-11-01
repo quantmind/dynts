@@ -5,11 +5,6 @@ import sys
 from random import random
 from math import log
 
-ispy3k = int(sys.version[0]) >= 3
-
-if not ispy3k:
-    range = xrange
-
 
 __all__ = ['skiplist']
 
@@ -35,7 +30,7 @@ removal, and lookup by rank.'''
         self.clear()
         if data is not None:
             self.extend(data)
-    
+
     def clear(self):
         self.__size = 0
         self.__level = 1
@@ -45,10 +40,10 @@ removal, and lookup by rank.'''
 
     def __repr__(self):
         return list(self).__repr__()
-    
+
     def __str__(self):
         return self.__repr__()
-    
+
     def __len__(self):
         return self.__size
 
@@ -63,12 +58,12 @@ removal, and lookup by rank.'''
             if traversed == index:
                 return node.value
         raise IndexError('skiplist index out of range')
-    
+
     def extend(self, iterable):
         i = self.insert
         for v in iterable:
             i(v)
-            
+
     def rank(self, value):
         '''Return the 0-based index (rank) of *value*. If the value is not
 available it returns a negative integer which absolute value is the
@@ -83,7 +78,7 @@ left most closest index with value less than *value*.'''
             return rank - 1
         else:
             return -1 - rank
-        
+
     def insert(self, value):
         # find first node on each level where node.next[levels].value > value
         if value != value:
@@ -109,7 +104,7 @@ left most closest index with value less than *value*.'''
                 chain[i] = self.__head
                 chain[i].width[i] = self.__size
             self.__level = level
-        
+
         # create the new node
         node = Node(value, [None]*level, [None]*level)
         for i in range(level):
@@ -123,7 +118,7 @@ left most closest index with value less than *value*.'''
         # increment width for untouched levels
         for i in range(level,self.__level):
             chain[i].width[i] += 1
-            
+
         self.__size += 1
         return node
 
@@ -135,7 +130,7 @@ left most closest index with value less than *value*.'''
             while node.next[i] and node.next[i].value < value:
                 node = node.next[i]
             chain[i] = node
-            
+
         node = node.next[0]
         if value != node.value:
             raise KeyError('Not Found')
@@ -146,7 +141,7 @@ left most closest index with value less than *value*.'''
                 chain[i].next[i] = node.next[i]
             else:
                 chain[i].width[i] -= 1
-        
+
         self.__size -= 1
 
     def __iter__(self):

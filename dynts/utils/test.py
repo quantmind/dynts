@@ -1,5 +1,7 @@
 import sys
 import unittest
+from io import BytesIO
+from itertools import zip_longest
 
 import numpy as np
 
@@ -7,7 +9,6 @@ from dynts.conf import settings
 from dynts import timeseries, evaluate, tsname
 
 from .populate import populate, datepopulate, randomts
-from .py2py3 import zip_longest
 
 skipUnless = unittest.skipUnless
 

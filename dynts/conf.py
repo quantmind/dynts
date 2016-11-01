@@ -1,5 +1,7 @@
 from math import isnan
+
 toupper = lambda x : str(x).upper()
+
 
 class Settings(object):
     '''\
@@ -8,53 +10,53 @@ The setting class contains configuration parameters used in dynts.
 .. attribute:: backend
 
     Default :class:`dynts.TimeSeries` backend class.
-    
+
     Default ``"numpy"``.
 
 .. attribute:: desc
 
-    Default sorting order for dates. If ``False`` timeseries are ordered in 
+    Default sorting order for dates. If ``False`` timeseries are ordered in
     ascending date order, if ``True`` in a descending order.
-    
+
     Default ``False``.
-    
+
 .. attribute:: concat_operator
 
     Operator for concatenating expressions.
-    
+
     Default ``,``.
 
 .. attribute:: default_loader
 
     Default :class:`dynts.data.TimeSerieLoader` class.
     If this is ``None`` the :class:`dynts.data.TimeSerieLoader` class will be used as loder.
-    
+
     Default ``None``.
-    
+
 .. attribute:: default_provider
 
     Default :class:`dynts.data.DataProvider` code. Default ``"YAHOO"``.
-    
+
 .. attribute:: field_separator
 
     Character used to separate tickers from fields and providers. Default ``:``.
-    
+
 .. attribute:: months_history
 
     the default number of months of history. Default: ``12``.
-    
+
 .. attribute:: proxies
 
     dictionary of proxy servers. Default ``{}``.
     If you need to use a proxy server to access the web::
-    
+
         from dynts.conf import settings
         settings.proxies['http'] = 'http://yourproxy.com:80'
-                
+
 To change settings::
-    
+
     from dynts.conf import settings
-    
+
     settings.default_provider = 'GOOGLE'
     '''
     def __init__(self):
@@ -72,18 +74,17 @@ To change settings::
         self.symboltransform = toupper
         self.default_daycounter = 'ACT/365'
         self.missing_value      = float('nan')
-        
+
     @property
     def special_operators(self):
         return [self.concat_operator,self.separator_operator]
-    
+
     def getdc(self):
         import ccy
         return ccy.getdc(self.default_daycounter)
-    
+
     def ismissing(self, value):
         return isnan(value)
-    
-        
-        
+
+
 settings = Settings()

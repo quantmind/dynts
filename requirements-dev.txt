@@ -1,0 +1,3 @@
+pulsar
+xlwt
+rpy2
