@@ -42,7 +42,10 @@ class Expr:
 
     def unwind(self, values, backend, **kwargs):
         '''Unwind expression by applying *values* to the abstract nodes.
-the ``kwargs`` dictionary can contain data which can be used to override values'''
+
+        The ``kwargs`` dictionary can contain data which can be used
+        to override values
+        '''
         if not hasattr(self, "_unwind_value"):
             self._unwind_value = self._unwind(values, backend, **kwargs)
         return self._unwind_value
@@ -111,8 +114,7 @@ class String(BaseExpression):
 class Parameter(BaseExpression):
 
     def __init__(self, value):
-        value = str(value).lower()
-        super(Parameter,self).__init__(value)
+        super().__init__(str(value).lower())
 
 
 class Symbol(BaseExpression):
@@ -138,7 +140,7 @@ class Symbol(BaseExpression):
 
     def _unwind(self, values, backend, **kwargs):
         sdata = values[self.value]
-        if istimeseries(sdata):
+        if is_timeseries(sdata):
             return sdata
         else:
             ts = timeseries(name=str(self),
@@ -209,7 +211,7 @@ class MultiExpression(Expr):
         Loop over children a remove duplicate entries.
         @return - a list of removed entries
         '''
-        removed      = []
+        removed = []
         if entries == None:
             entries = {}
         new_children = []
@@ -245,7 +247,11 @@ class ConcatenationOp(ConcatOp):
     def __init__(self, left, right):
         super().__init__(left, right, settings.concat_operator)
 
-    def _unwind(self, values, backend, sametype = True, **kwargs):
+    def info(self):
+        c = self.concat_operator
+        return reduce(lambda x, y: '%s%s %s' % (x, c, y), self.children)
+
+    def _unwind(self, values, backend, sametype=True, **kwargs):
         result = []
         for child in self:
             result.append(child.unwind(values, backend, **kwargs))
@@ -270,16 +276,16 @@ class BinOp(ConcatOp):
     def __init__(self, left, right, op):
         if op in settings.special_operators:
             raise ValueError('not a valid binary operator: %s' % op)
-        super().__init__(left, right, op, concatenate = False)
+        super().__init__(left, right, op, concatenate=False)
         self.append = None
 
-    def __get_left(self):
+    @property
+    def left(self):
         return self[0]
-    left = property(fget = __get_left)
 
-    def __get_right(self):
+    @property
+    def right(self):
         return self[1]
-    right = property(fget = __get_right)
 
 
 class EqualOp(BinOp):
@@ -295,28 +301,33 @@ class EqualOp(BinOp):
     def __init__(self,left,right):
         if not isinstance(left,Parameter):
             if not isinstance(left,Symbol):
-                raise ValueError('Left-hand-side of %s should be a string' % self)
+                raise ValueError('Left-hand-side of %s should be a string'
+                                 % self)
             left = Parameter(left.value)
-        super(EqualOp,self).__init__(left,right,"=")
+        super().__init__(left, right, "=")
 
     def _unwind(self, values, backend, **kwargs):
         name = str(self.left)
         if name in kwargs:
-            return {name:kwargs[name]}
+            return {name: kwargs[name]}
         else:
-            return {name:self.right.unwind(values, backend, **kwargs)}
+            return {name: self.right.unwind(values, backend, **kwargs)}
 
 
 class Bracket(Expression):
-    '''A :class:`dynts.dsl.Expr` class for enclosing group of :class:`dynts.dsl.Expr`.
-It forms the building block of :class:`dynts.dsl.Function` and other operators.'''
-    def __init__(self,value,pl,pr):
+    '''A :class:`dynts.dsl.Expr` class for enclosing group of
+    :class:`dynts.dsl.Expr`.
+
+    It forms the building block of :class:`dynts.dsl.Function`
+    and other operators.
+    '''
+    def __init__(self, value, pl, pr):
         self.__pl = pl
         self.__pr = pr
-        super(Bracket,self).__init__(value)
+        super().__init__(value)
 
     def info(self):
-        return '%s%s%s' % (self.__pl,self.value,self.__pr)
+        return '%s%s%s' % (self.__pl, self.value, self.__pr)
 
     def _unwind(self, *args, **kwargs):
         data = self.value.unwind(*args, **kwargs)

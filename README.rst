@@ -6,7 +6,7 @@ and manipulation built on to of ply_.
 |
 
 :Badges: |license|  |pyversions| |status| |pypiversion|
-:Master CI: |master-build|_ |coverage-master|
+:Master CI: |master-build| |coverage-master|
 :Documentation: http://quantmind.github.io/dynts/
 :Dowloads: http://pypi.python.org/pypi/dynts/
 :Source: http://github.com/quantmind/dynts
@@ -42,15 +42,15 @@ The package comes with a Domain-Specific-Language (DSL_) dedicated
 to timeserie analysis and manipulation.
 This is a simple multiplication::
 
-	>>> import dynts
-	>>> e = dynts.parse('2*GOOG')
+	>>> from dynts import api
+	>>> e = api.parse('2*GOOG')
 	>>> e
 	2.0 * goog
 	>>> len(e)
 	2
 	>>> list(e)
 	[2.0, goog]
-	>>> ts = dynts.evaluate(e).unwind()
+	>>> ts = api.evaluate(e).unwind()
 	>>> ts
 	TimeSeries:numpy:2.0 * goog
 	>>> len(ts)
@@ -102,7 +102,7 @@ There are three types of tests available:
 
 From the distribution directory type::
 
-	python runtests.py
+	python setup.py test
 
 This will run by default the regression tests. To run a profile test
 type::
@@ -112,9 +112,9 @@ type::
 where ``<test-name>`` is the name of a profile test.
 To obtain a list of available tests for each test type, run::
 
-	python runtests.py --list
+	python setup.py test -l
 
-for regression, or::
+for unit tests, or::
 
 	python runtests.py -t profile --list
 
@@ -123,10 +123,6 @@ for profile, or::
 	python runtests.py -t bench --list
 
 from benchmarks.
-
-If you access the internet behind a proxy server, pass the ``-p`` option, for example::
-
-	python runtests.py -p http://myproxy.com:80
 
 It is needed since during tests some data is fetched from google finance.
 
@@ -138,22 +134,6 @@ and to check out the coverage report::
 
 	coverage report -m
 
-
-JavaScript
-------------
-* jQuery flot_ plugin for web graphs.
-* jQuery Sparklines_ plugin for inline plotting.
-
-
-
-Community
-=================
-Trying to use an IRC channel **#dynts** on ``irc.freenode.net``
-(you can use the webchat at http://webchat.freenode.net/).
-
-If you find a bug or would like to request a feature, please `submit an issue`__.
-
-__ http://github.com/quantmind/dynts/issues
 
 
 .. |pypiversion| image:: https://badge.fury.io/py/dynts.svg

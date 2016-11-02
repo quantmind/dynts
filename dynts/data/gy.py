@@ -34,9 +34,9 @@ class WebCsv(DataProvider):
         return dateFromString(sdte)
 
     def request(self, url):
-        response = self.http().get(url)
+        response = self.http.get(url)
         if response.status_code == 200:
-            return StringIO(response.content_string('ascii', 'ignore'))
+            return StringIO(response.text)
 
     def rowdata(self, ticker, startdate, enddate):
         url = self.hystory_url(str(ticker), startdate, enddate)

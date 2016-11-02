@@ -11,8 +11,7 @@ from ..api.timeseries import is_timeseries, ts_merge
 from ..api.scatter import is_scatter
 from ..data import providers
 
-from .ast import *
-from .functions import FunctionBase, composeFunction, function_registry
+from .functions import function_registry
 from .rules import parsefunc
 
 
@@ -121,7 +120,7 @@ class DSLResult:
         return self.__repr__()
 
     def unwind(self):
-        if not hasattr(self,'_ts'):
+        if not hasattr(self, '_ts'):
             self._unwind()
         return self
 

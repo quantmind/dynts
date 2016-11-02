@@ -1,5 +1,6 @@
 from ply import yacc, lex
 
+from .grammar import *  # noqa
 from ..conf import settings
 
 
