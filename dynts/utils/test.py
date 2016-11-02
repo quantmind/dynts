@@ -5,10 +5,10 @@ from itertools import zip_longest
 
 import numpy as np
 
-from dynts.conf import settings
-from dynts import timeseries, evaluate, tsname
+from ..conf import settings
+from ..api import timeseries, randomts, evaluate, tsname
 
-from .populate import populate, datepopulate, randomts
+from .populate import populate, datepopulate
 
 skipUnless = unittest.skipUnless
 

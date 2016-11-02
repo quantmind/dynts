@@ -7,11 +7,12 @@ from ccy import todate
 
 from ..conf import settings
 from ..exc import ExpressionError, CouldNotParse
-from ..api import is_timeseries, is_scatter
+from ..api.timeseries import is_timeseries, ts_merge
+from ..api.scatter import is_scatter
 from ..data import providers
 
 from .ast import *
-from .registry import FunctionBase, ComposeFunction, function_registry
+from .functions import FunctionBase, composeFunction, function_registry
 from .rules import parsefunc
 
 
@@ -43,17 +44,54 @@ def parse(timeseries_expression, method=None, functions=None, debug=False):
     return parsefunc(expr_str, functions, method, debug)
 
 
-def merge(series):
-    '''Merge timeseries into a new :class:`dynts.TimeSeries` instance.
+def evaluate(expression, start=None, end=None, loader=None, logger=None,
+             backend=None, **kwargs):
+    '''Evaluate a timeseries ``expression`` into
+    an instance of :class:`dynts.dsl.dslresult` which can be used
+    to obtain timeseries and/or scatters.
+    This is probably the most used function of the library.
 
-    :parameter series: an iterable over :class:`dynts.TimeSeries`.
+    :parameter expression: A timeseries expression string or an instance
+        of :class:`dynts.dsl.Expr` obtained using the :func:`~.parse`
+        function.
+    :parameter start: Start date or ``None``.
+    :parameter end: End date or ``None``. If not provided today values is used.
+    :parameter loader: Optional :class:`dynts.data.TimeSerieLoader`
+        class or instance to use.
+
+        Default ``None``.
+    :parameter logger: Optional python logging instance, used if you required
+        logging.
+
+        Default ``None``.
+    :parameter backend: :class:`dynts.TimeSeries` backend name or ``None``.
+
+    The ``expression`` is parsed and the :class:`~.Symbol` are sent to the
+    :class:`dynts.data.TimeSerieLoader` instance for retrieving
+    actual timeseries data.
+    It returns an instance of :class:`~.DSLResult`.
+
+    Typical usage::
+
+        >>> from dynts import api
+        >>> r = api.evaluate('min(GS,window=30)')
+        >>> r
+        min(GS,window=30)
+        >>> ts = r.ts()
     '''
-    series = iter(series)
-    ts = next(series)
-    return ts.merge(series)
+    if isinstance(expression, str):
+        expression = parse(expression)
+    if not expression or expression.malformed():
+        raise CouldNotParse(expression)
+    symbols = expression.symbols()
+    start = start if not start else todate(start)
+    end = end if not end else todate(end)
+    data = providers.load(symbols, start, end, loader=loader,
+                          logger=logger, backend=backend, **kwargs)
+    return DSLResult(expression, data, backend=backend)
 
 
-class dslresult(object):
+class DSLResult:
     '''Class holding the results of an interpreted expression.
     Instances of this class are returned when invoking the
     :func:`dynts.evaluate` high level function.
@@ -101,79 +139,33 @@ class dslresult(object):
         res = self.expression.unwind(self.data, self.backend)
         self._ts = None
         self._xy = None
-        if istimeseries(res):
+        if is_timeseries(res):
             self._ts = res
         elif res and isinstance(res,list):
             tss = []
             xys = []
             for v in res:
-                if istimeseries(v):
+                if is_timeseries(v):
                     tss.append(v)
-                elif isxy(v):
+                elif is_scatter(v):
                     xys.append(v)
             if tss:
-                self._ts = merge(tss)
+                self._ts = ts_merge(tss)
             if xys:
                 self._xy = xys
-        elif isxy(res):
+        elif is_scatter(res):
             self._xy = res
 
     def dump(self, format, **kwargs):
         ts = self.ts()
         xy = self.xy()
-        if istimeseries(ts):
+        if is_timeseries(ts):
             ts = ts.dump(format, **kwargs)
         else:
             ts = None
         if xy:
-            if isxy(xy):
+            if is_scatter(xy):
                 xy = [xy]
             for el in xy:
-                ts = el.dump(format, container = ts, **kwargs)
+                ts = el.dump(format, container=ts, **kwargs)
         return ts
-
-
-def evaluate(expression, start=None, end=None, loader=None, logger=None,
-             backend=None, **kwargs):
-    '''Evaluate a timeseries ``expression`` into
-an instance of :class:`dynts.dsl.dslresult` which can be used
-to obtain timeseries and/or scatters.
-This is probably the most used function of the library.
-
-:parameter expression: A timeseries expression string or an instance
-    of :class:`dynts.dsl.Expr` obtained using the :func:`dynts.parse` function.
-:parameter start: Start date or ``None``.
-:parameter end: End date or ``None``. If not provided today values is used.
-:parameter loader: Optional :class:`dynts.data.TimeSerieLoader`
-    class or instance to use.
-
-    Default ``None``.
-:parameter logger: Optional python logging instance, used if you required
-    logging.
-
-    Default ``None``.
-:parameter backend: :class:`dynts.TimeSeries` backend name or ``None``.
-
-The ``expression`` is parsed and the :class:`dynts.dsl.Symbol` are sent to the
-:class:`dynts.data.TimeSerieLoader` instance for retrieving
-actual timeseries data.
-It returns an instance of :class:`dynts.dsl.dslresult`.
-
-Typical usage::
-
-    >>> import dynts
-    >>> r = dynts.evaluate('min(GS,window=30)')
-    >>> r
-    min(GS,window=30)
-    >>> ts = r.ts()
-    '''
-    if isinstance(expression, str):
-        expression = parse(expression)
-    if not expression or expression.malformed():
-        raise CouldNotParse(expression)
-    symbols = expression.symbols()
-    start = start if not start else todate(start)
-    end = end if not end else todate(end)
-    data = providers.load(symbols, start, end, loader=loader,
-                          logger=logger, backend=backend, **kwargs)
-    return dslresult(expression, data, backend=backend)

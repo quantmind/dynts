@@ -26,8 +26,8 @@ class Rules:
     def reserved(self):
         return {}
 
-    def __get_tokens(self):
-        re = self.reserved()
+    @property
+    def tokens(self):
         tokens = [
               'NUMBER',
               'PLUS',
@@ -44,11 +44,12 @@ class Rules:
               'QUOTE',
               'ID',
               'FUNCTION'
-              ] + list(re.values())
+              ]
+        tokens.extend(self.reserved().values())
         return tokens
-    tokens = property(fget=__get_tokens)
 
-    def __get_precedence(self):
+    @property
+    def precedence(self):
         return (
             ('left', 'QUOTE'),
             ('left', 'SPLIT'),
@@ -57,7 +58,6 @@ class Rules:
             ('left', 'PLUS', 'MINUS'),
             ('left', 'TIMES', 'DIVIDE'),
         )
-    precedence = property(fget=__get_precedence)
 
     # A regular expression rule with some action code
     def t_NUMBER(self, t):
@@ -75,19 +75,19 @@ class Rules:
     def t_ID(self, t):
         r'`[^`]*`|[a-zA-Z_][a-zA-Z_0-9:@]*'
         res = self.oper.get(t.value, None)  # Check for reserved words
-        if res == None:
+        if res is None:
             res = t.value.upper()
             if res == 'FALSE':
-                r.type = 'BOOL'
-                r.value = False
+                t.type = 'BOOL'
+                t.value = False
             elif res == 'TRUE':
-                r.type = 'BOOL'
-                r.value = True
+                t.type = 'BOOL'
+                t.value = True
             else:
                 t.type = 'ID'
         else:
             t.value = res
-            t.type  = 'FUNCTION'
+            t.type = 'FUNCTION'
         return t
 
     # Define a rule so we can track line numbers
@@ -112,7 +112,7 @@ def parsefunc(timeseries_expression, functions, method, debug):
     ru.build()
     ru.input(timeseries_expression)
     # Important! needed by yacc
-    tokens = ru.tokens
-    precedence = ru.precedence
+    tokens = ru.tokens              # noqa
+    precedence = ru.precedence      # noqa
     p = yacc.yacc(method=method or 'SLR')
-    return p.parse(lexer=ru.lexer, debug = debug)
+    return p.parse(lexer=ru.lexer, debug=debug)

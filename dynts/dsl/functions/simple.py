@@ -1,4 +1,4 @@
-from dynts.dsl import FunctionBase
+from .registry import FunctionBase
 
 
 class ScalarFunction(FunctionBase):
@@ -25,8 +25,7 @@ class ScalarWindowFunction(ScalarFunction):
 
 
 class Log(ScalarFunction):
-    """\
-    Calculate the natural logarithm of a timeseries. It applies to each
+    """Calculate the natural logarithm of a timeseries. It applies to each
     value and return a timeseries with exactly the same dimensions.
     """
     def apply(self, ts, **kwargs):
@@ -34,10 +33,9 @@ class Log(ScalarFunction):
 
 
 class Sqrt(ScalarFunction):
-    """\
-Calculate the square root of a timeseries. It applies to each
-value and return a timeseries with exactly the same dimensions.
-"""
+    """Calculate the square root of a timeseries. It applies to each
+    value and return a timeseries with exactly the same dimensions.
+    """
     def apply(self, ts, **kwargs):
         return ts.sqrt(**kwargs)
 
@@ -76,46 +74,46 @@ Or for calculating standard deviation on changes::
 
 class Delta2(ScalarFunction):
     """\
-Second order difference evaluated as
+    Second order difference evaluated as
 
-.. math::
+    .. math::
 
-    \\Delta_{\\tt lag}^2 y_t &= \\Delta_{\\tt lag} \\left( \\Delta_{\\tt lag} y_t \\right)\\\\
-                             &= y_t - 2 y_{t-{\\tt lag}} + y_{t-2{\\tt lag}}
+        \\Delta_{\\tt lag}^2 y_t &= \\Delta_{\\tt lag} \\left( \\Delta_{\\tt lag} y_t \\right)\\\\
+                                 &= y_t - 2 y_{t-{\\tt lag}} + y_{t-2{\\tt lag}}
 
-Typical usage::
+    Typical usage::
 
-    delta2(tiker)
-    delta2(tiker,lag=5)
+        delta2(tiker)
+        delta2(tiker,lag=5)
 
-It is an optimised shortcut function equivalent to::
+    It is an optimised shortcut function equivalent to::
 
-    delta(delta(tiker))
-    delta(delta(tiker,lag=5),lag=5)
+        delta(delta(tiker))
+        delta(delta(tiker,lag=5),lag=5)
 
-:parameter lag: backward lag. Default ``1``.
-"""
+    :parameter lag: backward lag. Default ``1``.
+    """
     def apply(self, ts, **kwargs):
         return ts.delta2(**kwargs)
 
 
 class LDelta(ScalarFunction):
     """\
-Calculate the logarithmic difference of a timeseries.
-This is the first order difference
-in log-space useful for evaluating percentage moments:
+    Calculate the logarithmic difference of a timeseries.
+    This is the first order difference
+    in log-space useful for evaluating percentage moments:
 
-.. math::
+    .. math::
 
-    {\\tt ldelta} (y_t, {\\tt lag}) = \\log{\\frac{y_t}{y_{t-{\\tt lag}}}}
+        {\\tt ldelta} (y_t, {\\tt lag}) = \\log{\\frac{y_t}{y_{t-{\\tt lag}}}}
 
-Typical usage::
+    Typical usage::
 
-    ldelta(tiker)
-    ldelta(tiker,lag=5)
+        ldelta(tiker)
+        ldelta(tiker,lag=5)
 
-:parameter lag: backward lag. Default ``1``.
-"""
+    :parameter lag: backward lag. Default ``1``.
+    """
     description = "log delta"
     def apply(self, ts, **kwargs):
         return ts.logdelta(**kwargs)
@@ -123,14 +121,14 @@ Typical usage::
 
 class Ma(ScalarWindowFunction):
     """\
-Arithmetic moving average function simply defined by
+    Arithmetic moving average function simply defined by
 
-.. math::
+    .. math::
 
-    {\\tt ma}(y_t,w) = \\frac{1}{w}\\sum_{i=0}^{w-1} y_{t-i}
+        {\\tt ma}(y_t,w) = \\frac{1}{w}\\sum_{i=0}^{w-1} y_{t-i}
 
-:parameter window ``w``: the rolling window in units. Default ``20``
-"""
+    :parameter window ``w``: the rolling window in units. Default ``20``
+    """
     description = 'arithmetic moving average'
     def apply(self, ts, **kwargs):
         return ts.rollmean(**kwargs)

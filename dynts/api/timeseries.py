@@ -1,14 +1,12 @@
 import numpy as np
 
-from dynts.utils import laggeddates, ashash, asbtree, asarray
 from .data import Data
-from . import operators
+from ..conf import settings
 from ..exc import DyntsException, NotAvailable
+from ..utils.wrappers import ashash, asbtree, asarray
+from .operators import op_get, op_ts_ts, op_ts_scalar, op_scalar_ts
 
 nan = np.nan
-
-ops = operators._ops
-ts_bin_op = operators._handle_ts_or_scalar
 object_type = np.dtype(object)
 
 
@@ -16,10 +14,7 @@ def is_timeseries(value):
     return isinstance(value, TimeSeries)
 
 
-BACKENDS = {
-    'zoo': 'zoo',
-    'numpy': 'tsnumpy',
-}
+BACKENDS = {}
 
 
 class TSmeta(type):
@@ -31,6 +26,56 @@ class TSmeta(type):
         if not abstract:
             BACKENDS[klass.type] = klass
         return klass
+
+
+def ts_merge(series):
+    '''Merge timeseries into a new :class:`~.TimeSeries` instance.
+
+    :parameter series: an iterable over :class:`~.TimeSeries`.
+    '''
+    series = iter(series)
+    ts = next(series)
+    return ts.merge(series)
+
+
+def ts_bin_op(op_name, ts1, ts2, all=True, fill=None, name=None):
+    '''Entry point for any arithmetic type function performed on a timeseries
+    and/or a scalar.
+    op_name - name of the function to be performed
+    ts1, ts2 - timeseries or scalars that the function is to performed over
+    all - whether all dates should be included in the result
+    fill - the value that should be used to represent "missing values"
+    name - the name of the resulting time series
+    '''
+    op = op_get(op_name)
+    fill = fill if fill is not None else settings.missing_value
+    if hasattr(fill,'__call__'):
+        fill_fn = fill
+    else:
+        fill_fn = lambda: fill
+
+    name = name or '%s(%s,%s)' % (op_name, ts1, ts2)
+    if is_timeseries(ts1):
+        ts = ts1
+        if is_timeseries(ts2):
+            dts, data = op_ts_ts(op_name, op, ts1, ts2, all, fill_fn)
+
+        else:
+            dts, data = op_ts_scalar(op_name, op, ts1, ts2, fill_fn)
+    else:
+        if is_timeseries(ts2):
+            ts = ts2
+            dts, data = op_scalar_ts(op_name, op, ts1, ts2, fill_fn)
+        else:
+            return op(ts1, ts2)
+
+    return ts.clone(date=dts, data=data, name=name)
+
+
+def ts_fn(op_name):
+    def fn(*args,  **kwargs):
+        return ts_bin_op(op_name, *args, **kwargs)
+    return fn
 
 
 class TimeSeries(Data, metaclass=TSmeta):
@@ -50,17 +95,17 @@ class TimeSeries(Data, metaclass=TSmeta):
     default_align = 'right'
     _algorithms = {}
 
-    def __init__(self, name='', date=None, data=None, info=None,
+    def __init__(self, name=None, date=None, data=None, info=None,
                  dtype=np.double, **params):
-        super(TimeSeries,self).__init__(name, info)
+        super().__init__(name, info)
         self._dtype = np.dtype(dtype)
         self.make(date, data, **params)
 
-    __add__ = operators.add
-    __sub__ = operators.sub
-    __mul__ = operators.mul
-    __div__ = operators.div
-    __truediv__ = operators.div # Python 3
+    __add__ = ts_fn('add')
+    __sub__ = ts_fn('sub')
+    __mul__ = ts_fn('mul')
+    __div__ = ts_fn('div')
+    __truediv__ = ts_fn('div')
 
     @property
     def dtype(self):
@@ -109,9 +154,11 @@ in the timeseries.'''
         for key in self.keys(desc=desc):
             yield c(key)
 
-    def keys(self, desc = None):
-        '''Returns an iterable over ``raw`` keys. The keys may be different
-from dates for same backend implementations.'''
+    def keys(self, desc=None):
+        '''Returns an iterable over ``raw`` keys.
+
+        Keys may be different from dates for same backend implementations.
+        '''
         raise NotImplementedError
 
     def values(self, desc=None):

@@ -2,14 +2,12 @@ from bisect import bisect_left, bisect_right
 
 from numpy import ndarray
 
-from dynts.conf import settings
-from dynts.utils.section import asarray
-from dynts.exceptions import *
-
-__all__ = ['TimeSerieWrap', 'asbtree', 'ashash']
+from ..conf import settings
+from ..exc import DateNotFound, OutOfBound, RightOutOfBound
+from .section import asarray
 
 
-class TimeSerieWrap(object):
+class TimeSerieWrap:
 
     def __init__(self, ts, **kwargs):
         self.ts = ts
@@ -36,7 +34,7 @@ but catches exceptions and return *default*.'''
 
     @property
     def shape(self):
-        return (len(self), self.ts.count())
+        return len(self), self.ts.count()
 
 
 class asbtree(TimeSerieWrap):
@@ -65,7 +63,7 @@ has a shortcut method which construct a ``asbtree``. Here is an example::
 an :class:`dynts.exceptions.DateNotFound`.'''
         try:
             index = self.find_ge(dt)
-        except DyntsOutOfBound:
+        except OutOfBound:
             raise DateNotFound
         if self.dates[index] == dt:
             return self.values[index]
@@ -156,6 +154,7 @@ an :class:`dynts.exceptions.DateNotFound`.'''
 
 class pair(object):
     __slots__ = ('time', 'value')
+
     def __init__(self, time, value):
         self.time, self.value = time, value
 

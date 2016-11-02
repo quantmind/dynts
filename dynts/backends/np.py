@@ -6,8 +6,7 @@ import numpy as np
 
 from ..api.timeseries import TimeSeries, is_timeseries
 from ..lib import skiplist
-from ..conf import settings
-from ..utils import laggeddates, asarray
+from ..utils.section import asarray
 
 
 arraytype = np.ndarray

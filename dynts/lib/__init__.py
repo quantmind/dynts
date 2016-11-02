@@ -1,17 +1,9 @@
-from dynts.utils.py2py3 import zip
+from .cts import *      # noqa
+from . import defaults  # noqa
+from . import fallback
 
-try:
-    from .cts import *
-    hasextensions = True
-except ImportError as e:
-    hasextensions = False
-    from .fallback import *
-else:
-    import fallback
 
-from .defaults import *
-
-def makeskiplist(data = None, use_fallback = False):
+def make_skiplist(data=None, use_fallback=False):
     '''Create a new skiplist'''
     sl = fallback.skiplist if use_fallback else skiplist
     return sl(data)

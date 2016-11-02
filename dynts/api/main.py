@@ -1,7 +1,7 @@
-from importlib import import_module
-
 from ..conf import settings
 from ..exc import InvalidBackEnd
+from ..utils.populate import datepopulate, populate
+from .timeseries import BACKENDS
 
 
 def timeseries(name='', backend=None, date=None, data=None, **kwargs):
@@ -17,16 +17,16 @@ def timeseries(name='', backend=None, date=None, data=None, **kwargs):
     :parameter data: optional iterable over data.
     '''
     backend = backend or settings.backend
-    bname = BACKENDS.get(backend, None)
-    if bname:
-        bmodule = 'dynts.backends.%s' % bname
-    else:
-        bmodule = backend
-    module = import_module(bmodule)
-    name = name or bmodule
-    try:
-        factory = getattr(module, 'TimeSeries')
-    except AttributeError:
+    TS = BACKENDS.get(backend)
+    if not TS:
         raise InvalidBackEnd(
-                'Could not find a TimeSeries class in module %s' % bmodule)
-    return factory(name = name, date = date, data = data, **kwargs)
+            'Could not find a TimeSeries class %s' % backend
+        )
+    return TS(name=name, date=date, data=data, **kwargs)
+
+
+def randomts(size=100, cols=1, start=None, delta=1,
+             generator=None, backend=None, name='randomts'):
+    dates = datepopulate(size, start=start, delta=delta)
+    data  = populate(size, cols=cols, generator=generator)
+    return timeseries(name=name, backend=backend, date=dates, data=data)

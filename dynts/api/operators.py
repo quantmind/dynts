@@ -1,6 +1,5 @@
 import numpy as np
 
-from ..conf import settings
 from ..exc import ExpressionError
 
 
@@ -12,7 +11,7 @@ _ops = {
 }
 
 
-def _get_op(op_name):
+def op_get(op_name):
     global _ops
     op = _ops.get(op_name, None)
     if op is None:
@@ -49,7 +48,7 @@ def applyfn(op, v1, v2, fill_vec):
     def op_or_missing(a,b):
         try:
             result = op(a,b)
-        except Exception as e:
+        except Exception:
             result = None
         if result is None:
                 result = fill_vec
@@ -78,7 +77,7 @@ def _create_fill_vec(ts, fill_fn):
     return fill
 
 
-def _handle_scalar_ts(op_name, op, scalar, ts, fill_fn):
+def op_scalar_ts(op_name, op, scalar, ts, fill_fn):
     fill_vec = _create_fill_vec(ts, fill_fn)
     values = ts.values()
     shape = values.shape
@@ -89,7 +88,7 @@ def _handle_scalar_ts(op_name, op, scalar, ts, fill_fn):
     return dts, result
 
 
-def _handle_ts_scalar(op_name, op, ts, scalar, fill_fn):
+def op_ts_scalar(op_name, op, ts, scalar, fill_fn):
     values = ts.values()
     if values is not None:
         fill_vec = _create_fill_vec(ts, fill_fn)
@@ -102,9 +101,12 @@ def _handle_ts_scalar(op_name, op, ts, scalar, fill_fn):
         return None, None
 
 
-def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
+def op_ts_ts(op_name, op, ts, ts2, all, fill_fn):
     if ts.count() != ts2.count():
-        raise ExpressionError("Cannot %s two timeseries with different number of series." % op_name)
+        raise ExpressionError(
+            "Cannot %s two timeseries with different number of series."
+            % op_name
+        )
     dts1 = set(ts.dates())
     if all:
         indx = dts1.union(ts2.dates())
@@ -126,51 +128,3 @@ def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
     new_ts = hash.getts()
     rt = zip(*new_ts.items())
     return rt
-
-
-def _handle_ts_or_scalar(op_name, ts1, ts2, all=True, fill=None, name=None):
-    '''Entry point for any arithmetic type function performed on a timeseries
-    and/or a scalar.
-    op_name - name of the function to be performed
-    ts1, ts2 - timeseries or scalars that the function is to performed over
-    all - whether all dates should be included in the result
-    fill - the value that should be used to represent "missing values"
-    name - the name of the resulting time series
-    '''
-    from dynts import istimeseries
-    op = _get_op(op_name)
-    fill = fill if fill is not None else settings.missing_value
-    if hasattr(fill,'__call__'):
-        fill_fn = fill
-    else:
-        fill_fn = lambda : fill
-
-    name = name or '%s(%s,%s)' % (op_name,ts1,ts2)
-    ts = None
-    if istimeseries(ts1):
-        ts = ts1
-        if istimeseries(ts2):
-            dts, data =  _handle_ts_ts(op_name, op, ts1, ts2, all, fill_fn)
-
-        else:
-            dts, data = _handle_ts_scalar(op_name, op, ts1, ts2, fill_fn)
-    else:
-        if istimeseries(ts2):
-            ts = ts2
-            dts, data = _handle_scalar_ts(op_name, op, ts1, ts2, fill_fn)
-        else:
-            return op(ts1,ts2)
-
-    return ts.clone(date = dts, data = data, name = name)
-
-
-def ts_fn(op_name):
-    def fn(*args,  **kwargs):
-        return _handle_ts_or_scalar(op_name, *args, **kwargs)
-    return fn
-
-
-add = ts_fn('add')
-sub = ts_fn('sub')
-mul = ts_fn('mul')
-div = ts_fn('div')

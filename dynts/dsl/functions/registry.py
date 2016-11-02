@@ -24,7 +24,8 @@ class FunctionRegistry(dict):
 
 class ASTFunctionMeta(type):
     '''Meta class for dsl functions. This type ensure
-function registration to the global registry.'''
+    function registration to the global registry.
+    '''
     def __new__(cls, name, bases, attrs):
         global function_registry
         super_new = super(ASTFunctionMeta, cls).__new__
@@ -97,7 +98,7 @@ The only member function to implement is the ``__call__`` method.
             raise ValueError
 
 
-def ComposeFunction(name, comp, description='', docs=''):
+def composeFunction(name, comp, description='', docs=''):
     attrs = {
         'composite': comp,
         '__doc__': docs,

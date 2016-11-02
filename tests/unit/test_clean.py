@@ -1,4 +1,5 @@
-from dynts import nan
+from numpy import nan
+
 from dynts.utils import test
 
 

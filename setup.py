@@ -43,7 +43,7 @@ meta = dict(
     license="BSD",
     long_description=read('README.rst'),
     include_package_data=True,
-    setup_requires=['wheel'],
+    setup_requires=['numpy', 'pulsar', 'wheel'],
     packages=find_packages(include=['dynts', 'dynts.*']),
     classifiers=[
         'Development Status :: 4 - Beta',

@@ -2,6 +2,7 @@ cdef int _EPOCH_ORD = 719163
 
 from datetime import date as pydate
 
+
 cdef inline int64_t gmtime(object date):
     cdef int y, m, d, h, mn, s, ms, days
 
@@ -16,11 +17,14 @@ cdef inline int64_t gmtime(object date):
     days = pydate(y, m, 1).toordinal() - _EPOCH_ORD + d - 1
     return ((<int64_t> (((days * 24 + h) * 60 + mn))) * 60 + s) * 1000
 
+
 cpdef object to_datetime(int64_t timestamp):
     return pydatetime.utcfromtimestamp(timestamp / 1000.0)
 
+
 cpdef object to_timestamp(object dt):
     return gmtime(dt)
+
 
 def array_to_timestamp(ndarray[object, ndim=1] arr):
     cdef int i, n
@@ -33,6 +37,7 @@ def array_to_timestamp(ndarray[object, ndim=1] arr):
         result[i] = gmtime(arr[i])
 
     return result
+
 
 def array_to_datetime(ndarray[int64_t, ndim=1] arr):
     cdef int i, n

@@ -2,6 +2,7 @@
 *.pyd
 *.so
 .eggs
+*.log
 *.egg-info
 _dep.py
 

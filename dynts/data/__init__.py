@@ -3,20 +3,12 @@ from datetime import date, timedelta
 
 from ccy import todate
 
-from dynts.conf import settings
-from dynts.exceptions import *
-
+from ..conf import settings
 from .gy import DataProvider, google, yahoo
+from ..exc import MissingDataProvider
 
 
-class Silence(logging.Handler):
-    def emit(self, record):
-        pass
-
-
-class MissingDataProvider(Exception):
-    '''Data provider is not available'''
-    pass
+LOGGER = logging.getLogger('dynts.data')
 
 
 def safetodate(dte):
@@ -26,14 +18,14 @@ def safetodate(dte):
         return None
 
 
-class PreProcessData(object):
+class PreProcessData:
     '''data preprocess holder'''
     def __init__(self, intervals=None, result=None):
         self.intervals = intervals
-        self.result    = result
+        self.result = result
 
 
-class SymbolData(object):
+class SymbolData:
     '''Class holding information an data symbol.
 
     .. attribute:: ticker
@@ -51,7 +43,7 @@ class SymbolData(object):
     This class provides a place-holder of information.
     It doesn't do anything special.
     '''
-    __slots__ = ('ticker','field','provider')
+    __slots__ = ('ticker', 'field', 'provider')
 
     def __init__(self, ticker, field, provider):
         self.ticker = ticker
@@ -68,7 +60,7 @@ class SymbolData(object):
         return '%s%s%s' % (self.ticker,f,p)
 
 
-class TimeSerieLoader(object):
+class TimeSerieLoader:
     '''Cordinates the loading of timeseries data
     into :class:`dynts.dsl.Symbol`.
     This class can be overritten by a custom one if required.
@@ -98,16 +90,16 @@ class TimeSerieLoader(object):
     def load(self, providers, symbols, start, end, logger, backend, **kwargs):
         '''Load symbols data.
 
-:keyword providers: Dictionary of registered data providers.
-:keyword symbols: list of symbols to load.
-:keyword start: start date.
-:keyword end: end date.
-:keyword logger: instance of :class:`logging.Logger` or ``None``.
-:keyword backend: :class:`dynts.TimeSeries` backend name.
+        :keyword providers: Dictionary of registered data providers.
+        :keyword symbols: list of symbols to load.
+        :keyword start: start date.
+        :keyword end: end date.
+        :keyword logger: instance of :class:`logging.Logger` or ``None``.
+        :keyword backend: :class:`dynts.TimeSeries` backend name.
 
-There is no need to override this function, just use one the three hooks
-available.
-'''
+        There is no need to override this function, just use one
+        the three hooks available.
+        '''
         # Preconditioning on dates
         logger = logger or logging.getLogger(self.__class__.__name__)
         start, end = self.dates(start, end)
@@ -117,14 +109,15 @@ available.
             symbol = self.parse_symbol(sym, providers)
             provider = symbol.provider
             if not provider:
-                raise MissingDataProvider('data provider for %s not\
- available' % sym)
+                raise MissingDataProvider(
+                    'data provider for %s not available' % sym
+                )
             pre = self.preprocess(symbol, start, end, logger, backend, **kwargs)
             if pre.intervals:
                 result = None
                 for st, en in pre.intervals:
-                    logger.info('Loading %s from %s. From %s to %s' %\
-                                 (symbol.ticker,provider,st,en))
+                    logger.info('Loading %s from %s. From %s to %s',
+                                symbol.ticker, provider, st, en)
                     res = provider.load(symbol, st, en, logger, backend,
                                         **kwargs)
                     if result is None:
@@ -286,22 +279,20 @@ class DataProviders(dict):
         self[provider.code] = provider
 
     def unregister(self, provider):
-        '''Unregister an existing data provider. *provider* must be
-an instance of DataProvider.
-If provider name is already available, it will be replaced.'''
-        if isinstance(provider,type):
+        '''Unregister an existing data provider.
+
+        *provider* must be an instance of DataProvider.
+        If provider name is already available, it will be replaced.
+        '''
+        if isinstance(provider, type):
             provider = provider()
-        if isinstance(provider,DataProvider):
+        if isinstance(provider, DataProvider):
             provider = provider.code
-        return self.pop(str(provider).upper(),None)
+        return self.pop(str(provider).upper(), None)
 
     def get_logger(self, logger):
-        if logger:
-            return logger
-        logger = logging.getLogger('dynts.data')
-        if not logger.handlers:
-            logger.addHandler(Silence())
-        return logger
+        return logger or LOGGER
+
 
 providers = DataProviders()
 register = providers.register

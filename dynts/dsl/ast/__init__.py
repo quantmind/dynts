@@ -2,7 +2,7 @@
 Abstract Syntax Tree
 '''
 from .base import (
-    String
+    Number, String
 )
 from .binmath import (
     BinMathOp, PlusOp, MinusOp, MultiplyOp, DivideOp
@@ -15,6 +15,7 @@ __all__ = [
     'MinusOp',
     'MultiplyOp',
     'DivideOp',
+    'Number',
     'String',
     'Function'
 ]

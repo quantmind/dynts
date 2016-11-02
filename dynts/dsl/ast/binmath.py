@@ -1,6 +1,5 @@
-from dynts import ts_bin_op
-
-from .astbase import *
+from ...api.timeseries import ts_bin_op
+from .base import BinOp, Number
 
 
 class BinMathOp(BinOp):
@@ -15,13 +14,13 @@ class BinMathOp(BinOp):
         return ts_bin_op(self.op_name, le, ri, name=str(self))
 
     def lineardecomp(self):
-        if isinstance(self.left,Number):
-            if isinstance(self.right,Number):
+        if isinstance(self.left, Number):
+            if isinstance(self.right, Number):
                 raise ValueError
             nv = self.left.value
             d1 = self.right.lineardecomp()
             dr = {}
-            for k,v in d1.items():
+            for k, v in d1.items():
                 dr[k] = nv*v
             return dr
 

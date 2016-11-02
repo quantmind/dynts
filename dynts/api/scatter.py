@@ -12,6 +12,10 @@ class xyserie:
         self.data = data
 
 
+def is_scatter(value):
+    return isinstance(value, Scatter)
+
+
 class Scatter(Data):
     '''A :class:`dynts.DynData` class for 2-dimensional series of data
     with an extra dimension which contain further information for

@@ -1,8 +1,8 @@
-from dynts.dsl import ComposeFunction
+from .registry import composeFunction
 from .simple import ScalarWindowFunction
 
 
-ComposeFunction(
+composeFunction(
     'sdd',
     'sd(delta(x1),window=20)',
     docs='''\
@@ -17,7 +17,7 @@ of changes. Therefore:
 )
 
 
-ComposeFunction(
+composeFunction(
     'vol',
     '15.874*sd(delta(x1),window=20)',
     docs='''\
@@ -26,7 +26,7 @@ ComposeFunction(
 )
 
 
-ComposeFunction(
+composeFunction(
     'psdd',
     'sd(ldelta(x1),window=20)',
     docs='''\
@@ -41,7 +41,7 @@ of log-changes. Therefore:
 )
 
 
-ComposeFunction(
+composeFunction(
     'avol',
     '15.874*sd(ldelta(x1),window=20)',
     description='annualised volatility',
@@ -55,7 +55,7 @@ This function is equivalent to::
 )
 
 # Annualized sharpe on changes
-ComposeFunction(
+composeFunction(
     'asharpe',
     '15.874*sharpe(delta(x1),window=20)',
     docs='''\
@@ -64,7 +64,7 @@ a''',
 )
 
 # Annualized sharpe on log-changes
-ComposeFunction(
+composeFunction(
     'alsharpe',
     '15.874*sharpe(ldelta(x1),window=20)',
     docs='''\

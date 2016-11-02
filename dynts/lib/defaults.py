@@ -1,6 +1,6 @@
 #
 # Defaults
-from dynts.backends import TimeSeries
+from ..api.timeseries import TimeSeries
 
 
 def simple_reduce(ts, size, align='right'):

@@ -43,20 +43,20 @@ class DateNotFound(DyntsException):
     pass
 
 
-class DyntsOutOfBound(DyntsException):
+class OutOfBound(DyntsException):
     '''A :class:`DyntsException` exception raised when
     trying to access :class:`dynts.TimeSeries` outside its dates range.
     '''
     pass
 
 
-class RightOutOfBound(DyntsOutOfBound):
+class RightOutOfBound(OutOfBound):
     '''A :class:`DyntsOutOfBound` exception raised when
     trying to access :class:`dynts.TimeSeries` after the end date.'''
     pass
 
 
-class LeftOutOfBound(DyntsOutOfBound):
+class LeftOutOfBound(OutOfBound):
     '''A :class:`DyntsOutOfBound` exception raised when
     trying to access :class:`dynts.TimeSeries` before the start date.'''
     pass
@@ -107,3 +107,8 @@ class BadConcatenation(ExpressionError):
     def __init__(self, type1, type2):
         msg = 'Failed to concatenate %s with %s' % (type1,type2)
         super(BadConcatenation,self).__init__(msg)
+
+
+class MissingDataProvider(DyntsException):
+    '''Data provider is not available'''
+    pass
