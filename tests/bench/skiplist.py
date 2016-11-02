@@ -1,5 +1,5 @@
-from dynts import test
-from dynts.lib import makeskiplist
+from dynts.utils import test
+from dynts.lib import make_skiplist
 from dynts.utils.populate import populate
 
 
@@ -15,14 +15,14 @@ class CythonSkiplistInsert(test.BenchMark):
             self.__class__.__name__, self.size, self.number)
 
     def run(self):
-        makeskiplist(data=self.data)
+        make_skiplist(self.data)
 
 
 class CythonSkiplistIteration(CythonSkiplistInsert):
     data = None
 
     def setUp(self):
-        self.data = makeskiplist(data=populate(size=self.size))
+        self.data = make_skiplist(populate(size=self.size))
 
     def run(self):
         pass
@@ -31,12 +31,10 @@ class CythonSkiplistIteration(CythonSkiplistInsert):
 class SkiplistInsert(CythonSkiplistInsert):
 
     def run(self):
-        makeskiplist(data=self.data, use_fallback=True)
+        make_skiplist(self.data, use_fallback=True)
 
 
 class SkiplistIteration(CythonSkiplistIteration):
 
     def setUp(self):
-        self.data = makeskiplist(data=populate(size=self.size),
-                                 use_fallback=True)
-
+        self.data = make_skiplist(populate(size=self.size), use_fallback=True)

@@ -2,40 +2,39 @@
 #-------------------------------------------------------------------------------
 # Rolling median, min, max
 
-# Pointer to a function operating on a skiplist
-ctypedef double_t (* skiplist_f)(skiplist sl, int n)
+# Pointer to a function operating on a Skiplist
+ctypedef double_t (* skiplist_f)(Skiplist sl, int n)
 
 @cython.boundscheck(False)
 cdef _roll_skiplist_op(ndarray arg, int window, skiplist_f op):
     '''Apply a rolling median/min/max function to an array'''
     cdef ndarray[double_t, ndim=1] input = arg
     cdef double val, prev, midpoint
-    cdef skiplist sl
+    cdef Skiplist sl
     cdef int nobs = 0
     cdef int i = 0
     cdef int j = 0
     cdef int N = len(input)
-    
+
     if window > N:
         raise ValueError('Rolling operation not possible.')
-    
-    sl = skiplist(window)
-    cdef ndarray[double_t, ndim=1] output = np.empty(N-window+1,
-                                                     dtype=float)
 
-    for i in xrange(window):
+    sl = Skiplist()
+    cdef ndarray[double_t, ndim=1] output = np.empty(N-window+1, dtype=float)
+
+    for i in range(window):
         val = input[i]
         # Not NaN
         if val == val:
             nobs += 1
             sl.insert(val)
-    
+
     output[j] = op(sl, nobs)
-    
-    for i in xrange(window,N):
+
+    for i in range(window, N):
         val = input[i]
         prev = input[i - window]
-        
+
         # Not NaN
         if prev == prev:
             sl.remove(prev)
@@ -44,7 +43,7 @@ cdef _roll_skiplist_op(ndarray arg, int window, skiplist_f op):
         if val == val:
             nobs += 1
             sl.insert(val)
-        
+
         j += 1
         output[j] = op(sl, nobs)
 
@@ -60,7 +59,7 @@ def roll_min(ndarray input, int window):
     return _roll_skiplist_op(input, window, _get_min)
 
 
-cdef double_t _get_median(skiplist sl, int nobs):
+cdef double_t _get_median(Skiplist sl, int nobs):
     cdef int midpoint
     if nobs:
         midpoint = nobs / 2
@@ -73,14 +72,14 @@ cdef double_t _get_median(skiplist sl, int nobs):
         return NaN
 
 
-cdef double_t _get_max(skiplist sl, int nobs):
+cdef double_t _get_max(Skiplist sl, int nobs):
     if nobs:
         return sl.get(nobs - 1)
     else:
         return NaN
 
 
-cdef double_t _get_min(skiplist sl, int nobs):
+cdef double_t _get_min(Skiplist sl, int nobs):
     if nobs:
         return sl.get(0)
     else:
@@ -108,7 +107,7 @@ def roll_mean(ndarray[double_t, ndim=1] input, int window):
         if val == val:
             nobs += 1
             sum_x += val
-    
+
     output[j] = NaN if not nobs else sum_x / nobs
 
     for i in xrange(window,N):

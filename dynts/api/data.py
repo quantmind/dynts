@@ -38,7 +38,7 @@ class Data:
 
     def __repr__(self):
         d = self.description()
-        b = '%s:%s' % (self.__class__.__name__ ,self.__class__.type)
+        b = '%s:%s' % (self.__class__.__name__, self.__class__.type)
         return '%s:%s' % (b, d) if d else b
 
     def __str__(self):

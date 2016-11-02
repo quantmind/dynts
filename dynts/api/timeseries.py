@@ -2,7 +2,7 @@ import numpy as np
 
 from .data import Data
 from ..conf import settings
-from ..exc import DyntsException, NotAvailable
+from ..exc import DyntsException, NotAvailable, OutOfBound
 from ..utils.wrappers import ashash, asbtree, asarray
 from .operators import op_get, op_ts_ts, op_ts_scalar, op_scalar_ts
 
@@ -49,7 +49,7 @@ def ts_bin_op(op_name, ts1, ts2, all=True, fill=None, name=None):
     '''
     op = op_get(op_name)
     fill = fill if fill is not None else settings.missing_value
-    if hasattr(fill,'__call__'):
+    if hasattr(fill, '__call__'):
         fill_fn = fill
     else:
         fill_fn = lambda: fill
@@ -124,12 +124,12 @@ class TimeSeries(Data, metaclass=TSmeta):
         try:
             return oper[name]
         except KeyError:
-            raise NotAvailable('{0} algorithm {1} not registered.'\
-                               .format(operation,name))
+            raise NotAvailable('{0} algorithm {1} not registered.'
+                               .format(operation, name))
 
     @classmethod
     def register_algorithm(cls, operation, name, callable):
-        if hasattr(callable,'__call__'):
+        if hasattr(callable, '__call__'):
             algorithms = cls._algorithms
             if operation not in algorithms:
                 algorithms[operation] = {}
@@ -169,16 +169,17 @@ can be used to access the timeseries as if it was a matrix.'''
 
     def items(self, desc=None, start_value=None, shift_by=None):
         '''Returns a python ``generator`` which can be used to iterate over
-:func:`dynts.TimeSeries.dates` and :func:`dynts.TimeSeries.values`
-returning a two dimensional
-tuple ``(date,value)`` in each iteration. Similar to the python dictionary items
-function.
+        :func:`dynts.TimeSeries.dates` and :func:`dynts.TimeSeries.values`
+        returning a two dimensional
+        tuple ``(date,value)`` in each iteration.
+        Similar to the python dictionary items
+        function.
 
-:parameter desc: if ``True`` the iteratioon starts from the more recent data
-    and proceeds backwards.
-:parameter shift_by: optional parallel shift in values.
-:parameter start_value: optional start value of timeseries.
-'''
+        :parameter desc: if ``True`` the iteratioon starts from the more
+            recent data and proceeds backwards.
+        :parameter shift_by: optional parallel shift in values.
+        :parameter start_value: optional start value of timeseries.
+        '''
         if self:
             if shift_by is None and start_value is not None:
                 for cross in self.values():
@@ -201,10 +202,10 @@ function.
                     if not missings:
                         break
             if shift_by:
-                for d, v in zip(self.dates(desc=desc),self.values(desc=desc)):
+                for d, v in zip(self.dates(desc=desc), self.values(desc=desc)):
                     yield d, v + shift_by
             else:
-                for d, v in zip(self.dates(desc=desc),self.values(desc=desc)):
+                for d, v in zip(self.dates(desc=desc), self.values(desc=desc)):
                     yield d, v
 
     def series(self):
@@ -212,7 +213,7 @@ function.
         data = self.values()
         if len(data):
             for c in range(self.count()):
-                yield data[:,c]
+                yield data[:, c]
         else:
             raise StopIteration
 
@@ -234,11 +235,11 @@ function.
                 yield name_serie
 
     def serie(self, index):
-        return self.values()[:,index]
+        return self.values()[:, index]
 
     def display(self):
-        for d,v in self.items():
-            print('%s: %s' % (d,v))
+        for d, v in self.items():
+            print('%s: %s' % (d, v))
 
     ######################################################################
     # OTHER REPRESENTATIONS of TIMESERIE
@@ -270,7 +271,6 @@ which exposes hash-table like functionalities of ``self``.'''
         '''Insert a new date-value pair at the end of the timeseries.'''
         raise NotImplementedError
 
-
     ######################################################################
     # OPERATIONS RETURNING NEW SERIES
     ######################################################################
@@ -296,12 +296,12 @@ and return a new one.'''
             ts.make(date, data)
         return ts
 
-    def reduce(self, size, method = 'simple', **kwargs):
+    def reduce(self, size, method='simple', **kwargs):
         '''Trim :class:`Timeseries` to a new *size* using the algorithm
 *method*. If *size* is greater or equal than len(self) it does nothing.'''
         if size >= len(self):
             return self
-        return self.getalgo('reduce',method)(self,size,**kwargs)
+        return self.getalgo('reduce', method)(self, size, **kwargs)
 
     def clean(self, algorithm=None):
         '''Create a new :class:`TimeSeries` with missing data removed or
@@ -359,37 +359,41 @@ replaced by the *algorithm* provided'''
     # SCALAR STANDARD FUNCTIONS
     ######################################################################
 
-    def max(self, fallback = False):
+    def max(self, fallback=False):
         '''Max values by series'''
-        return asarray(self.apply('max', fallback = fallback)[0])
+        return asarray(self.apply('max', fallback=fallback)[0])
 
-    def min(self, fallback = False):
+    def min(self, fallback=False):
         '''Max values by series'''
-        return asarray(self.apply('min', fallback = fallback)[0])
+        return asarray(self.apply('min', fallback=fallback)[0])
 
-    def mean(self, fallback = False):
+    def mean(self, fallback=False):
         '''Mean values by series'''
-        return asarray(self.apply('mean', fallback = fallback)[0])
+        return asarray(self.apply('mean', fallback=fallback)[0])
 
-    def median(self, fallback = False):
+    def median(self, fallback=False):
         '''Median values by series. A median value of a serie
-is defined as the the numeric value separating the higher half,
-from the lower half. It is therefore differnt from the :meth:`TimeSeries.mean` value.
+        is defined as the the numeric value separating the higher half,
+        from the lower half. It is therefore differnt from the
+        :meth:`~.TimeSeries.mean` value.
 
-The median of a finite list of numbers can be found by arranging all the
-observations from lowest value to highest value and picking the middle one.
+        The median of a finite list of numbers can be found by arranging
+        all the observations from lowest value to highest value and
+        picking the middle one.
 
-If there is an even number of observations, then there is no single middle value;
-the median is then usually defined to be the mean of the two middle values'''
-        return asarray(self.apply('median', fallback = fallback)[0])
+        If there is an even number of observations, then there is no
+        single middle value; the median is then usually defined to be the
+        mean of the two middle values
+        '''
+        return asarray(self.apply('median', fallback=fallback)[0])
 
-    def returns(self, fallback = False):
+    def returns(self, fallback=False):
         '''Calculate returns as delta(log(self)) by series'''
-        return self.logdelta(fallback = fallback)
+        return self.logdelta(fallback=fallback)
 
     def isconsistent(self):
         '''Check if the timeseries is consistent'''
-        for dt1,dt0 in laggeddates(self):
+        for dt1, dt0 in laggeddates(self):
             if dt1 <= dt0:
                 return False
         return True
@@ -425,22 +429,20 @@ the median is then usually defined to be the mean of the two middle values'''
         raise NotImplementedError
 
     def delta(self, lag=1, **kwargs):
-        '''\
-First order derivative. Optimised.
+        '''First order derivative. Optimised.
 
-:parameter lag: backward lag
-'''
+        :parameter lag: backward lag
+        '''
         raise NotImplementedError
 
-    def delta2(self, lag = 2, **kwargs):
-        '''\
-Second order derivative. Optimised.
+    def delta2(self, lag=2, **kwargs):
+        '''Second order derivative. Optimised.
 
-:parameter lag: backward lag
-'''
+        :parameter lag: backward lag
+        '''
         raise NotImplementedError
 
-    def lag(self, lag = 1):
+    def lag(self, lag=1):
         raise NotImplementedError
 
     def log(self):
@@ -452,11 +454,11 @@ Second order derivative. Optimised.
     def square(self):
         raise NotImplementedError
 
-    def logdelta(self, lag = 1, **kwargs):
+    def logdelta(self, lag=1, **kwargs):
         '''Delta in log-space. Used for percentage changes.'''
         raise NotImplementedError
 
-    def var(self, ddof = 0):
+    def var(self, ddof=0):
         '''Calculate variance of timeseries. Return a vector containing
 the variances of each series in the timeseries.
 
@@ -484,70 +486,77 @@ the variances of each series in the timeseries.
         else:
             return None
 
-    def apply(self, func,
-              window = None,
-              bycolumn = True,
-              align = None,
-              **kwargs):
+    def apply(self, func, window=None, bycolumn=True, align=None, **kwargs):
         '''Apply function ``func`` to the timeseries.
 
-    :keyword func: string indicating function to apply
-    :keyword window: Rolling window, If not defined ``func`` is applied on
-                     the whole dataset. Default ``None``.
-    :keyword bycolumn: If ``True``, function ``func`` is applied on
-                       each column separately. Default ``True``.
-    :keyword align: string specifying whether the index of the result should be ``left`` or
-                    ``right`` (default) or ``centered`` aligned compared to the
-                    rolling window of observations.
-    :keyword kwargs: dictionary of auxiliary parameters used by function ``func``.'''
+        :keyword func: string indicating function to apply
+        :keyword window: Rolling window, If not defined ``func`` is applied on
+            the whole dataset. Default ``None``.
+        :keyword bycolumn: If ``True``, function ``func`` is applied on
+            each column separately. Default ``True``.
+        :keyword align: string specifying whether the index of the result
+            should be ``left`` or ``right`` (default) or ``centered``
+            aligned compared to the rolling window of observations.
+        :keyword kwargs: dictionary of auxiliary parameters used by
+            function ``func``.
+        '''
         N = len(self)
         window = window or N
-        self.precondition(window<=N and window > 0,DyntsOutOfBound)
+        self.precondition(window <= N and window > 0, OutOfBound)
         return self._rollapply(func,
-                               window = window,
-                               align = align or self.default_align,
-                               bycolumn = bycolumn,
+                               window=window,
+                               align=align or self.default_align,
+                               bycolumn=bycolumn,
                                **kwargs)
 
-    def rollapply(self, func, window = 20, **kwargs):
-        '''A generic :ref:`rolling function <rolling-function>` for function *func*.
-Same construct as :meth:`dynts.TimeSeries.apply` but with default ``window`` set to ``20``.'''
+    def rollapply(self, func, window=20, **kwargs):
+        '''A generic :ref:`rolling function <rolling-function>`
+        for function *func*.
+        Same construct as :meth:`dynts.TimeSeries.apply` but with default
+        ``window`` set to ``20``.
+        '''
         return self.apply(func, window=window, **kwargs)
 
     def rollmax(self, **kwargs):
         '''A :ref:`rolling function <rolling-function>` for max values.
-Same as::
+        Same as::
 
-    self.rollapply('max',**kwargs)'''
-        return self.rollapply('max',**kwargs)
+            self.rollapply('max',**kwargs)
+        '''
+        return self.rollapply('max', **kwargs)
 
     def rollmin(self, **kwargs):
         '''A :ref:`rolling function <rolling-function>` for min values.
-Same as::
+        Same as::
 
-    self.rollapply('min',**kwargs)'''
-        return self.rollapply('min',**kwargs)
+            self.rollapply('min',**kwargs)
+        '''
+        return self.rollapply('min', **kwargs)
 
     def rollmedian(self, **kwargs):
         '''A :ref:`rolling function <rolling-function>` for median values.
-Same as::
+        Same as::
 
-    self.rollapply('median',**kwargs)'''
-        return self.rollapply('median',**kwargs)
+            self.rollapply('median',**kwargs)
+        '''
+        return self.rollapply('median', **kwargs)
 
     def rollmean(self, **kwargs):
         '''A :ref:`rolling function <rolling-function>` for mean values:
-Same as::
+        Same as::
 
-    self.rollapply('mean',**kwargs)'''
-        return self.rollapply('mean',**kwargs)
+            self.rollapply('mean',**kwargs)
+            '''
+        return self.rollapply('mean', **kwargs)
 
-    def rollsd(self, scale = 1, **kwargs):
-        '''A :ref:`rolling function <rolling-function>` for stadard-deviation values:
-Same as::
+    def rollsd(self, scale=1, **kwargs):
+        '''A :ref:`rolling function <rolling-function>` for
+        stadard-deviation values:
+        Same as::
 
-    self.rollapply('sd',**kwargs)'''
-        ts = self.rollapply('sd',**kwargs)
+            self.rollapply('sd', **kwargs)
+        '''
+        ts = self.rollapply('sd', **kwargs)
         if scale != 1:
             ts *= scale
         return ts
@@ -555,13 +564,13 @@ Same as::
     # INTERNALS
     ################################################################
 
-    def makename(self, func, window = None, **kwargs):
+    def makename(self, func, window=None, **kwargs):
         if window == len(self) or not window:
-            return '%s(%s)' % (func,self.name)
+            return '%s(%s)' % (func, self.name)
         else:
-            return '%s(%s,window=%s)' % (func,self.name,window)
+            return '%s(%s,window=%s)' % (func, self.name, window)
 
-    def _rollapply(func, window = 20, **kwargs):
+    def _rollapply(func, window=20, **kwargs):
         raise NotImplementedError
 
     def make(self, date, data, **kwargs):

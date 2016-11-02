@@ -1,5 +1,5 @@
-from dynts import test
-from dynts.utils.populate import randomts
+from dynts.utils import test
+from dynts.api import randomts
 
 
 class ZooDelta(test.BenchMark):

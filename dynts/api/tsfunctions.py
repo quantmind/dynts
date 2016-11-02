@@ -7,7 +7,7 @@ def better_ts_function(f):
     fname = f.__name__
 
     def _(ts, *args, **kwargs):
-        func = getattr(ts,fname,None)
+        func = getattr(ts, fname, None)
         if func:
             return func(*args, **kwargs)
         else:
@@ -48,4 +48,3 @@ def prange(ts, **kwargs):
     mi = ts.rollmin(**kwargs)
     ma = ts.rollmax(**kwargs)
     return (ts - mi)/(ma - mi)
-

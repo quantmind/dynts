@@ -1,7 +1,6 @@
 # Modified version of skiplist
 # http://code.activestate.com/recipes/576930-efficient-running-median-using-an-indexable-skipli/
 #
-import sys
 from random import random
 from math import log
 
@@ -21,15 +20,20 @@ class Node(object):
 SKIPLIST_MAXLEVEL = 32     # Should be enough for 2^32 elements
 
 
-class skiplist(object):
+class Skiplist:
     '''Sorted collection supporting O(lg n) insertion,
-removal, and lookup by rank.'''
+    removal, and lookup by rank.'''
 
-    def __init__(self, data = None, unique = False):
+    def __init__(self, *args, unique=False):
         self.unique = unique
         self.clear()
-        if data is not None:
-            self.extend(data)
+        if args:
+            if len(args) > 1:
+                raise TypeError(
+                    'Skiplist() takes at most 1 argument (%d given))'
+                    % len(args)
+                )
+            self.extend(args[0])
 
     def clear(self):
         self.__size = 0

@@ -1,6 +1,6 @@
 from functools import reduce
 
-from dynts import test
+from dynts.utils import test
 
 
 class namejoin(test.BenchMark):
@@ -21,8 +21,8 @@ class namejoin(test.BenchMark):
 
 class namemapreduce(test.BenchMark):
     backend = 'zoo'
-    size    = 10000
-    number  = 10
+    size = 10000
+    number = 10
 
     def setUp(self):
         self.ts = self.size*['test']

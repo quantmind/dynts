@@ -4,8 +4,7 @@ from .names import tsname
 
 class xyserie:
 
-    def __init__(self, name = '', data = None, lines = True,
-                 points = False):
+    def __init__(self, name='', data=None, lines=True, points=False):
         self.points = points if lines else True
         self.lines = lines
         self.name = name
@@ -28,11 +27,11 @@ class Scatter(Data):
             self.add(xyserie(name=self.name, data=data, **kw))
 
     def add(self, data):
-        if isinstance(data,xyserie):
+        if isinstance(data, xyserie):
             self._series.append(data)
-        elif isinstance(data,self.__class__):
+        elif isinstance(data, self.__class__):
             for serie in data.series():
-                self.name = tsname(self.name,serie.name)
+                self.name = tsname(self.name, serie.name)
                 self._series.append(serie)
 
     def series(self):

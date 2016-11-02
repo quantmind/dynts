@@ -5,7 +5,7 @@
 import numpy as np
 
 from ..api.timeseries import TimeSeries, is_timeseries
-from ..lib import skiplist
+from ..lib import Skiplist
 from ..utils.section import asarray
 
 
@@ -30,14 +30,12 @@ def days(d1, d0):
 class Numpy(TimeSeries):
     """A timeserie based on numpy
     """
-
     def make(self, date, data, raw=False, **params):
-        if date is not None:
-            if not raw:
-                c = self.dateinverse
-                date = (c(d) for d in date)
-            date = asarray(date)
-        self.__skl = skiplist(date)
+        if date is not None and not raw:
+            c = self.dateinverse
+            date = (c(d) for d in date)
+        date = asarray(date)
+        self._skl = Skiplist(date)
         if date is None or not len(date):
             self._date = None
             self._data = None
@@ -45,7 +43,7 @@ class Numpy(TimeSeries):
             self._date = date
             data = asarray(data, self._dtype)
             if len(data.shape) == 1:
-                data = data.reshape(len(data),1)
+                data = data.reshape(len(data), 1)
             self._data = data
 
     @property
@@ -60,7 +58,7 @@ class Numpy(TimeSeries):
         if self._data is not None:
             return self._data.shape
         else:
-            return (0,0)
+            return 0, 0
 
     def __getitem__(self, i):
         return self._data[i]
@@ -97,7 +95,7 @@ class Numpy(TimeSeries):
                 self._data = np.array([values])
             else:
                 # search for the date
-                index = self.__skl.rank(dte)
+                index = self._skl.rank(dte)
                 if index < 0:
                     # date not available
                     N = len(self._data)
@@ -109,10 +107,10 @@ class Numpy(TimeSeries):
                         self._data[index+1:] = self._data[index:-1]
                 self._date[index] = dte
                 self._data[index] = values
-            self.__skl.insert(dte)
+            self._skl.insert(dte)
 
     def isregular(self):
-        dates = self.dates().__iter__()
+        dates = iter(self.dates())
         d0 = next(dates)
         d1 = next(dates)
         dt = d1 - d0
@@ -125,7 +123,7 @@ class Numpy(TimeSeries):
 
     def frequency(self):
         freq = 0;
-        for d1,d0 in laggeddates(self):
+        for d1, d0 in laggeddates(self):
             freq += days(d1,d0)
         return freq/(len(self)-1)
 
@@ -137,7 +135,7 @@ class Numpy(TimeSeries):
                           self._data[i1:i2+1])
 
     def merge(self, tserie, fill=nan, **kwargs):
-        if istimeseries(tserie):
+        if is_timeseries(tserie):
             tserie = [tserie]
         else:
             tserie = tuple(tserie)

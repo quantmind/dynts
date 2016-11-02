@@ -70,9 +70,9 @@ dsl language translation.
 
 class CouldNotParse(ExpressionError):
 
-    def __init__(self, f, data = None):
-        msg = 'Failed to parse expression {0}: {1}'.format(f,data or '')
-        super(CouldNotParse,self).__init__(msg)
+    def __init__(self, f, data=None):
+        msg = 'Failed to parse expression {0}: {1}'.format(f, data or '')
+        super().__init__(msg)
 
 
 class FunctionError(ExpressionError):
@@ -82,8 +82,8 @@ class FunctionError(ExpressionError):
 class FunctionInternalError(FunctionError):
     '''Function Error'''
     def __init__(self, function, msg):
-        msg = 'Error in function "%s":' % (function,msg)
-        super(FunctionInternalError,self).__init__(msg)
+        msg = 'Error in function "%s":' % (function, msg)
+        super().__init__(msg)
 
 
 class FunctionDoesNotExist(FunctionError):
@@ -92,23 +92,18 @@ class FunctionDoesNotExist(FunctionError):
     '''
     def __init__(self, function):
         msg = 'Function "%s" does not exist' % function
-        super(FunctionDoesNotExist,self).__init__(msg)
+        super().__init__(msg)
 
 
 class FunctionTypeError(FunctionError):
 
     def __init__(self, function, msg):
-        msg = 'Argument error in function "%s": %s' % (function,msg)
-        super(FunctionTypeError,self).__init__(msg)
+        msg = 'Argument error in function "%s": %s' % (function, msg)
+        super().__init__(msg)
 
 
 class BadConcatenation(ExpressionError):
     '''Error cause by bad concatentaiuon types'''
     def __init__(self, type1, type2):
-        msg = 'Failed to concatenate %s with %s' % (type1,type2)
-        super(BadConcatenation,self).__init__(msg)
-
-
-class MissingDataProvider(DyntsException):
-    '''Data provider is not available'''
-    pass
+        msg = 'Failed to concatenate %s with %s' % (type1, type2)
+        super().__init__(msg)

@@ -28,5 +28,5 @@ def timeseries(name='', backend=None, date=None, data=None, **kwargs):
 def randomts(size=100, cols=1, start=None, delta=1,
              generator=None, backend=None, name='randomts'):
     dates = datepopulate(size, start=start, delta=delta)
-    data  = populate(size, cols=cols, generator=generator)
+    data = populate(size, cols=cols, generator=generator)
     return timeseries(name=name, backend=backend, date=dates, data=data)

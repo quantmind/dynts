@@ -6,31 +6,22 @@ import numpy as np
 from .common import *
 
 
-from .skiplist import skiplist
+from .skiplist import Skiplist
 
 
-__all__ = ['roll_max',
-           'roll_min',
-           'roll_median',
-           'roll_mean',
-           'roll_sd',
-           'roll_sharpe',
-           'rollingOperation']
-
-
-def roll_max(iterable, window, skiplist_class = skiplist):
+def roll_max(iterable, window, skiplist_class=None):
     return rollingOperation(iterable, window, smax,
-                            skiplist_class = skiplist)
+                            skiplist_class=skiplist_class)
 
 
-def roll_min(iterable, window, skiplist_class = skiplist):
+def roll_min(iterable, window, skiplist_class=None):
     return rollingOperation(iterable, window, smin,
-                            skiplist_class = skiplist)
+                            skiplist_class=skiplist_class)
 
 
-def roll_median(iterable, window, skiplist_class = skiplist):
+def roll_median(iterable, window, skiplist_class=None):
     return rollingOperation(iterable, window, smedian,
-                            skiplist_class = skiplist)
+                            skiplist_class=skiplist_class)
 
 
 def smax(olist,nobs):
@@ -60,11 +51,11 @@ def smedian(olist,nobs):
         return NaN
 
 
-def rollingOperation(iterable, window, op, skiplist_class = skiplist):
+def rollingOperation(iterable, window, op, skiplist_class=None):
     it = iter(iterable)
     queue = deque(islice(it, window))
-    ol    = skiplist_class()
-    nobs  = 0
+    ol = (skiplist_class or Skiplist)()
+    nobs = 0
     for elem in queue:
         if elem == elem:
             nobs += 1
@@ -90,16 +81,16 @@ This is a simple rolling aggregation.'''
 
     if window > N:
         raise ValueError('Out of bound')
-    
+
     output = np.ndarray(N-window+1,dtype=input.dtype)
-    
+
     for val in input[:window]:
         if val == val:
             nobs += 1
             sum_x += val
-        
+
     output[j] = NaN if not nobs else sum_x / nobs
-    
+
     for val in input[window:]:
         prev = input[j]
         if prev == prev:
@@ -126,18 +117,18 @@ sums.'''
 
     if window > N:
         raise ValueError('Out of bound')
-    
+
     output = np.ndarray(N-window+1,dtype=input.dtype)
-    
+
     for val in input[:window]:
         if val == val:
             nobs += 1
             sx += val
             sxx += val*val
-        
+
     nn = nobs - ddof
     output[j] = NaN if nn<=0 else sqrt(scale * (sxx - sx*sx/nobs) / nn)
-    
+
     for val in input[window:]:
         prev = input[j]
         if prev == prev:
@@ -166,17 +157,17 @@ This is a simple rolling aggregation.'''
 
     if window > N:
         raise ValueError('Out of bound')
-    
+
     output = np.ndarray(N-window+1,dtype=input.dtype)
-    
+
     for val in input[:window]:
         if val == val:
             nobs += 1
             sx += val
             sxx += val*val
-        
+
     output[j] = NaN if not nobs else sx * sqrt(scale / ( nobs * sxx ))
-    
+
     for val in input[window:]:
         prev = input[j]
         if prev == prev:
@@ -190,8 +181,7 @@ This is a simple rolling aggregation.'''
             sxx += val*val
 
         j += 1
-        
+
         output[j] = NaN if not nobs else sx * sqrt(scale / ( nobs * sxx ))
 
     return output
-

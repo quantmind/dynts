@@ -30,13 +30,13 @@ cdef class skiplistiterator:
 
     cdef:
         Node node
-        
+
     def __init__(self, node):
         self.node = node
-	    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         cdef Node node
         node = self.node.next[0]
@@ -45,28 +45,34 @@ cdef class skiplistiterator:
             return node.value
         else:
             raise StopIteration
-            
 
-cdef class skiplist:
+
+cdef class Skiplist:
     '''
     Sorted collection supporting O(lg n) insertion, removal, and lookup by rank.
     '''
     cdef:
         int size, maxlevels
         Node head
-        
+
     def __repr__(self):
         return list(self).__repr__()
-    
+
     def __str__(self):
         return self.__repr__()
 
-    def __init__(self, expected_size=100):
+    def __init__(self, *args, expected_size=100):
         self.size = 0
         self.maxlevels = 1 + int(Log2(expected_size))
-
         self.head = Node(np.NaN, [NIL] * self.maxlevels,
                          np.ones(self.maxlevels, dtype=int))
+        if args:
+            if len(args) > 1:
+                raise TypeError(
+                    'Skiplist() takes at most 1 argument (%d given))'
+                    % len(args)
+                )
+            self.extend(args[0])
 
     def __len__(self):
         return self.size
@@ -78,7 +84,7 @@ cdef class skiplist:
         node = self.head
         i += 1
 
-        for level in xrange(self.maxlevels - 1, -1, -1):
+        for level in range(self.maxlevels - 1, -1, -1):
             while node.width[level] <= i:
                 i -= node.width[level]
                 node = node.next[level]
@@ -87,7 +93,7 @@ cdef class skiplist:
 
     def __getitem__(self, i):
         return self.get(i)
-    
+
     def insert(self, double value):
         cdef int level, steps, d
         cdef Node node, prevnode, newnode, next_at_level
@@ -98,7 +104,7 @@ cdef class skiplist:
         steps_at_level = [0] * self.maxlevels
 
         node = self.head
-        for level in xrange(self.maxlevels - 1, -1, -1):
+        for level in range(self.maxlevels - 1, -1, -1):
             next_at_level = node.next[level]
 
             while next_at_level.value <= value:
@@ -114,7 +120,7 @@ cdef class skiplist:
         newnode = Node(value, [None] * d, np.empty(d, dtype=int))
         steps = 0
 
-        for level in xrange(d):
+        for level in range(d):
             prevnode = chain[level]
 
             newnode.next[level] = prevnode.next[level]
@@ -125,10 +131,15 @@ cdef class skiplist:
 
             steps = steps + steps_at_level[level]
 
-        for level in xrange(d, self.maxlevels):
+        for level in range(d, self.maxlevels):
             (<Node> chain[level]).width[level] += 1
 
         self.size += 1
+
+    def extend(self, iterable):
+        i = self.insert
+        for v in iterable:
+            i(v)
 
     def remove(self, double value):
         cdef int level, d
@@ -139,7 +150,7 @@ cdef class skiplist:
         chain = [None] * self.maxlevels
         node = self.head
 
-        for level in xrange(self.maxlevels - 1, -1, -1):
+        for level in range(self.maxlevels - 1, -1, -1):
             next_at_level = node.next[level]
             while next_at_level.value < value:
                 node = next_at_level
@@ -153,13 +164,13 @@ cdef class skiplist:
         # remove one link at each level
         d = len(chain[0].next[0].next)
 
-        for level in xrange(d):
+        for level in range(d):
             prevnode = chain[level]
             tmpnode = prevnode.next[level]
             prevnode.width[level] += tmpnode.width[level] - 1
             prevnode.next[level] = tmpnode.next[level]
 
-        for level in xrange(d, self.maxlevels):
+        for level in range(d, self.maxlevels):
             tmpnode = chain[level]
             tmpnode.width[level] -= 1
 

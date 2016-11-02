@@ -3,7 +3,7 @@ from . import defaults  # noqa
 from . import fallback
 
 
-def make_skiplist(data=None, use_fallback=False):
+def make_skiplist(*args, use_fallback=False):
     '''Create a new skiplist'''
-    sl = fallback.skiplist if use_fallback else skiplist
-    return sl(data)
+    sl = fallback.Skiplist if use_fallback else Skiplist
+    return sl(*args)

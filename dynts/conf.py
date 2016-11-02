@@ -83,7 +83,7 @@ class Settings(object):
 
     @property
     def special_operators(self):
-        return [self.concat_operator,self.separator_operator]
+        return [self.concat_operator, self.separator_operator]
 
     def getdc(self):
         return ccy.getdc(self.default_daycounter)

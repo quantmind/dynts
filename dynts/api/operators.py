@@ -34,9 +34,9 @@ def binOp(op, indx, amap, bmap, fill_vec):
         else:
             try:
                 result = op(va, vb)
-            except Exception as e:
+            except Exception:
                 result = None
-            if result == None:
+            if result is None:
                 result = fill_vec
             return result
     seq_arys = map(op_or_missing, indx)
@@ -45,17 +45,18 @@ def binOp(op, indx, amap, bmap, fill_vec):
 
 
 def applyfn(op, v1, v2, fill_vec):
-    def op_or_missing(a,b):
+    def op_or_missing(a, b):
         try:
-            result = op(a,b)
+            result = op(a, b)
         except Exception:
             result = None
         if result is None:
                 result = fill_vec
         return result
     if len(v1) != len(v2):
-        msg = "Vectors %s, %s are different lengths %s, %s" %(v1, v2, len(v1),
-                len(v2))
+        msg = "Vectors %s, %s are different lengths %s, %s" % (
+            v1, v2, len(v1), len(v2)
+        )
         raise ExpressionError(msg)
     rt = map(op_or_missing, v1, v2)
     return rt
@@ -116,14 +117,14 @@ def op_ts_ts(op_name, op, ts, ts2, all, fill_fn):
     hash2 = ts2.ashash()
 
     fill = _create_fill_vec(ts, fill_fn)
-    #fill = np.array([fill_fn()])
+    # fill = np.array([fill_fn()])
     for dt in indx:
-        v  = hash.get(dt,None)
-        v2 = hash2.get(dt,None)
+        v = hash.get(dt, None)
+        v2 = hash2.get(dt, None)
         if v is None or v2 is None:
             v = fill
         else:
-            v = op(v,v2)
+            v = op(v, v2)
         hash[dt] = v
     new_ts = hash.getts()
     rt = zip(*new_ts.items())
