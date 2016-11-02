@@ -2,17 +2,18 @@ A statistic package for python with enphasis on timeseries analysis.
 Built around numpy_, it provides several back-end timeseries classes including R-based objects via rpy2_.
 It is shipped with a domain specific language for timeseries analysis
 and manipulation built on to of ply_.
-It requires Python 2.6 and up, including Python 3 versions.
 
---
+|
 
-:Documentation: http://packages.python.org/dynts/
+:Badges: |license|  |pyversions| |status| |pypiversion|
+:Master CI: |master-build|_ |coverage-master|
+:Documentation: http://quantmind.github.io/dynts/
 :Dowloads: http://pypi.python.org/pypi/dynts/
 :Source: http://github.com/quantmind/dynts
+:Platforms: Linux, OSX, Windows. Python 3.5 and above
 :Keywords: timeseries, quantitative, finance, statistics, numpy, R, web
 
---
-
+|
 
 .. contents::
     :local:
@@ -40,7 +41,7 @@ DSL
 The package comes with a Domain-Specific-Language (DSL_) dedicated
 to timeserie analysis and manipulation.
 This is a simple multiplication::
-	
+
 	>>> import dynts
 	>>> e = dynts.parse('2*GOOG')
 	>>> e
@@ -72,7 +73,7 @@ For example, there are back-ends depending on the following R packages:
 
 * rpy2_ if an R_ TimeSeries back-end is used (default).
 * zoo_ and PerformanceAnlytics_ for the ``zoo`` back-end (currently the default one)
-* timeSeries_ for the ``rmetrics`` back-end 
+* timeSeries_ for the ``rmetrics`` back-end
 
 Installing rpy2_ on Linux is straightforward, on windows it requires the
 `python for windows`__ extension library.
@@ -98,31 +99,31 @@ There are three types of tests available:
 * ``regression`` for unit and regression tests.
 * ``profile`` for analysing performance of different backends and impact of cython_.
 * ``bench`` same as ``profile`` but geared towards speed rather than profiling.
-  
+
 From the distribution directory type::
-	
+
 	python runtests.py
-	
+
 This will run by default the regression tests. To run a profile test
 type::
 
 	python runtests.py -t profile <test-name>
-	
+
 where ``<test-name>`` is the name of a profile test.
 To obtain a list of available tests for each test type, run::
 
 	python runtests.py --list
 
-for regression, or:: 
+for regression, or::
 
 	python runtests.py -t profile --list
-	
+
 for profile, or::
 
 	python runtests.py -t bench --list
-	
+
 from benchmarks.
-	
+
 If you access the internet behind a proxy server, pass the ``-p`` option, for example::
 
 	python runtests.py -p http://myproxy.com:80
@@ -132,7 +133,7 @@ It is needed since during tests some data is fetched from google finance.
 To access coverage of tests you need to install the coverage_ package and run the tests using::
 
 	coverage run runtests.py
-	
+
 and to check out the coverage report::
 
 	coverage report -m
@@ -153,7 +154,20 @@ Trying to use an IRC channel **#dynts** on ``irc.freenode.net``
 If you find a bug or would like to request a feature, please `submit an issue`__.
 
 __ http://github.com/quantmind/dynts/issues
-    
+
+
+.. |pypiversion| image:: https://badge.fury.io/py/dynts.svg
+    :target: https://pypi.python.org/pypi/dynts
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/dynts.svg
+  :target: https://pypi.python.org/pypi/dynts
+.. |license| image:: https://img.shields.io/pypi/l/dynts.svg
+  :target: https://pypi.python.org/pypi/dynts
+.. |status| image:: https://img.shields.io/pypi/status/dynts.svg
+  :target: https://pypi.python.org/pypi/dynts
+.. |master-build| image:: https://travis-ci.org/quantmind/dynts.svg?branch=master
+  :target: https://travis-ci.org/quantmind/dynts
+.. |coverage-master| image:: https://coveralls.io/repos/github/quantmind/dynts/badge.svg?branch=master
+  :target: https://coveralls.io/github/quantmind/dynts?branch=master
 .. _numpy: http://numpy.scipy.org/
 .. _ply: http://www.dabeaz.com/ply/
 .. _rpy2: http://rpy.sourceforge.net/rpy2.html
