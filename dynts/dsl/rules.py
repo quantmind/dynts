@@ -1,9 +1,9 @@
 from ply import yacc, lex
 
-from .grammar import *
+from ..conf import settings
 
 
-class rules(object):
+class Rules:
 
     # Regular expression rules for simple tokens
     t_PLUS = r'\+'
@@ -19,9 +19,7 @@ class rules(object):
     t_CONCAT = r'\%s' % settings.concat_operator
     t_SPLIT = r'\%s' % settings.separator_operator
 
-    def __init__(self, oper = None):
-        self.t_CONCAT = r'\%s' % settings.concat_operator
-        self.t_SPLIT = r'\%s' % settings.separator_operator
+    def __init__(self, oper=None):
         self.lexer = None
         self.oper = oper or {}
 
@@ -110,7 +108,7 @@ class rules(object):
 
 
 def parsefunc(timeseries_expression, functions, method, debug):
-    ru = rules(functions)
+    ru = Rules(functions)
     ru.build()
     ru.input(timeseries_expression)
     # Important! needed by yacc

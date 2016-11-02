@@ -1,7 +1,7 @@
-from dynts.conf import settings
-from dynts.exc import ExpressionError
+from ..conf import settings
+from ..exc import ExpressionError
 
-from .ast import *
+from .ast import String
 
 
 def p_expression_string(p):

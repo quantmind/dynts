@@ -1,13 +1,16 @@
 import numpy as np
 
-from dynts.conf import settings
-from dynts.exceptions import ExpressionError
+from ..conf import settings
+from ..exc import ExpressionError
 
-_ops = {'add' : lambda x,y : x+y,
-        'sub' : lambda x,y : x-y,
-        'mul' : lambda x,y : x*y,
-        'div' : lambda x,y : x/y,
-        }
+
+_ops = {
+    'add': lambda x, y: x+y,
+    'sub': lambda x, y: x-y,
+    'mul': lambda x, y: x*y,
+    'div': lambda x, y: x/y,
+}
+
 
 def _get_op(op_name):
     global _ops
@@ -27,7 +30,8 @@ def binOp(op, indx, amap, bmap, fill_vec):
         va = amap.get(id, None)
         vb = bmap.get(id, None)
         if va is None or vb is None:
-            result = fill_vec #This should create as many elements as the number of columns!?
+            # This should create as many elements as the number of columns!?
+            result = fill_vec
         else:
             try:
                 result = op(va, vb)
@@ -67,20 +71,23 @@ def _toVec(shape, val):
     mat.fill(val)
     return mat
 
+
 def _create_fill_vec(ts, fill_fn):
     shape = (ts.count(),)
     fill = _toVec(shape, fill_fn())
     return fill
+
 
 def _handle_scalar_ts(op_name, op, scalar, ts, fill_fn):
     fill_vec = _create_fill_vec(ts, fill_fn)
     values = ts.values()
     shape = values.shape
     v2 = _toVec(shape, scalar)
-    
+
     dts = ts.dates()
     result = applyfn(op, v2, values, fill_vec)
     return dts, result
+
 
 def _handle_ts_scalar(op_name, op, ts, scalar, fill_fn):
     values = ts.values()
@@ -94,6 +101,7 @@ def _handle_ts_scalar(op_name, op, ts, scalar, fill_fn):
     else:
         return None, None
 
+
 def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
     if ts.count() != ts2.count():
         raise ExpressionError("Cannot %s two timeseries with different number of series." % op_name)
@@ -104,7 +112,7 @@ def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
         indx = dts1.intersection(ts2.dates())
     hash = ts.ashash()
     hash2 = ts2.ashash()
-    
+
     fill = _create_fill_vec(ts, fill_fn)
     #fill = np.array([fill_fn()])
     for dt in indx:
@@ -119,10 +127,10 @@ def _handle_ts_ts(op_name, op, ts, ts2, all, fill_fn):
     rt = zip(*new_ts.items())
     return rt
 
-def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None):
-    '''
-    this is the main entry point for any arithmetic type function performed on a timeseries
-    and/or a scalar. 
+
+def _handle_ts_or_scalar(op_name, ts1, ts2, all=True, fill=None, name=None):
+    '''Entry point for any arithmetic type function performed on a timeseries
+    and/or a scalar.
     op_name - name of the function to be performed
     ts1, ts2 - timeseries or scalars that the function is to performed over
     all - whether all dates should be included in the result
@@ -143,7 +151,7 @@ def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None
         ts = ts1
         if istimeseries(ts2):
             dts, data =  _handle_ts_ts(op_name, op, ts1, ts2, all, fill_fn)
-            
+
         else:
             dts, data = _handle_ts_scalar(op_name, op, ts1, ts2, fill_fn)
     else:
@@ -152,12 +160,15 @@ def _handle_ts_or_scalar(op_name, ts1, ts2, all = True, fill = None, name = None
             dts, data = _handle_scalar_ts(op_name, op, ts1, ts2, fill_fn)
         else:
             return op(ts1,ts2)
-        
+
     return ts.clone(date = dts, data = data, name = name)
 
+
 def ts_fn(op_name):
-    fn = lambda  *args,  **kwargs : _handle_ts_or_scalar(op_name, *args, **kwargs)
+    def fn(*args,  **kwargs):
+        return _handle_ts_or_scalar(op_name, *args, **kwargs)
     return fn
+
 
 add = ts_fn('add')
 sub = ts_fn('sub')

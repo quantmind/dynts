@@ -5,18 +5,14 @@ of the popular compiler construction tools lex and yacc.
 '''
 from ccy import todate
 
-from dynts.conf import settings
-from dynts.exc import ExpressionError, CouldNotParse
-from dynts.backends import istimeseries, isxy
-from dynts.data import providers
+from ..conf import settings
+from ..exc import ExpressionError, CouldNotParse
+from ..api import is_timeseries, is_scatter
+from ..data import providers
 
 from .ast import *
 from .registry import FunctionBase, ComposeFunction, function_registry
-
-try:
-    from .rules import parsefunc
-except ImportError:
-    parsefunc = None
+from .rules import parsefunc
 
 
 def parse(timeseries_expression, method=None, functions=None, debug=False):
@@ -171,7 +167,7 @@ Typical usage::
     min(GS,window=30)
     >>> ts = r.ts()
     '''
-    if isinstance(expression, strtype):
+    if isinstance(expression, str):
         expression = parse(expression)
     if not expression or expression.malformed():
         raise CouldNotParse(expression)

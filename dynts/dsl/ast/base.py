@@ -1,17 +1,10 @@
 from functools import reduce
 
 from dynts.conf import settings
-from dynts import timeseries, istimeseries
+from ...api import timeseries, is_timeseries
 
 
-__all__ = ['Expr','BaseExpression','BadExpression',
-           'Expression','Number','String','Parameter',
-           'Symbol','MultiExpression','ConcatOp',
-           'ConcatenationOp','SplittingOp',
-           'BinOp','EqualOp','Bracket','uMinus']
-
-
-class Expr(object):
+class Expr:
     '''Base class for abstract syntax nodes
     '''
     def count(self):

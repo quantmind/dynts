@@ -1,14 +1,9 @@
-try:
-    from itertools import izip as zip
-except:
-    pass
-
 import numpy as np
 
 from dynts.utils import laggeddates, ashash, asbtree, asarray
-from dynts.exceptions import *
-from .xy import *
+from .data import Data
 from . import operators
+from ..exc import DyntsException, NotAvailable
 
 nan = np.nan
 
@@ -17,23 +12,41 @@ ts_bin_op = operators._handle_ts_or_scalar
 object_type = np.dtype(object)
 
 
-__all__ = ['TimeSeries', 'ops', 'ts_bin_op', 'nan']
+def is_timeseries(value):
+    return isinstance(value, TimeSeries)
 
 
-class TimeSeries(DynData):
-    '''A :class:`dynts.DynData` specialisation for timeseries back-ends.
-This class expose all the main functionalities of a timeseries
+BACKENDS = {
+    'zoo': 'zoo',
+    'numpy': 'tsnumpy',
+}
 
-.. attribute:: type
 
-    string indicating the backend type (``zoo``, ``rmetrics``,
-    ``numpy``, etc...)
+class TSmeta(type):
 
-.. attribute:: shape
+    def __new__(cls, name, bases, attrs):
+        abstract = attrs.pop('abstract', False)
+        attrs['type'] = (attrs.get('type') or name).lower()
+        klass = super(TSmeta, cls).__new__(cls, name, bases, attrs)
+        if not abstract:
+            BACKENDS[klass.type] = klass
+        return klass
 
-    tuple containing the timeseries dimensions.
+
+class TimeSeries(Data, metaclass=TSmeta):
+    '''A :class:`~.DynData` specialisation for timeseries.
+    This class expose all the main functionalities of a timeseries
+
+    .. attribute:: type
+
+        string indicating the backend type (``zoo``, ``rmetrics``,
+        ``numpy``, etc...)
+
+    .. attribute:: shape
+
+        tuple containing the timeseries dimensions.
     '''
-    type = None
+    abstract = True
     default_align = 'right'
     _algorithms = {}
 
@@ -221,7 +234,7 @@ which exposes hash-table like functionalities of ``self``.'''
     def merge(self, ts, all=True):
         '''Merge this :class:`TimeSeries` with one or more :class:`TimeSeries`
 and return a new one.'''
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def clone(self, date=None, data=None, name=None):
         '''Create a clone of timeseries'''
@@ -242,7 +255,7 @@ and return a new one.'''
         if size >= len(self):
             return self
         return self.getalgo('reduce',method)(self,size,**kwargs)
-    
+
     def clean(self, algorithm=None):
         '''Create a new :class:`TimeSeries` with missing data removed or
 replaced by the *algorithm* provided'''
@@ -293,7 +306,7 @@ replaced by the *algorithm* provided'''
             if cross:
                 cdate.append(dt)
                 cdata.append(cross)
-        return self.clone(date=cdate, data=cdata)            
+        return self.clone(date=cdate, data=cdata)
 
     ######################################################################
     # SCALAR STANDARD FUNCTIONS
@@ -511,6 +524,6 @@ Same as::
 * *data* iterable/iterator/generator over values'''
         raise NotImplementedError
 
-    def precondition(self, precond, errorclass = DyntsException, msg = ''):
+    def precondition(self, precond, errorclass=None, msg=''):
         if not precond:
-            raise errorclass(msg)
+            raise (errorclass or DyntsException)(msg)

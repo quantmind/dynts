@@ -1,4 +1,5 @@
-from .xy import *
-from .base import *
-from .main import *
-from . import tsfunctions
+from . import np    # noqa
+try:
+    from .r import zoo     # noqa
+except ImportError:     # pragma  nocover
+    pass

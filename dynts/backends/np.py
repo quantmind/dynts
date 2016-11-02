@@ -2,61 +2,36 @@
 # TimeSeries Backend based on numpy
 #
 #
-from collections import deque
-
 import numpy as np
 
-import dynts
-from dynts import lib, composename
-from dynts.lib import skiplist
-from dynts.conf import settings
-from dynts.utils import laggeddates, asarray
+from ..api.timeseries import TimeSeries, is_timeseries
+from ..lib import skiplist
+from ..conf import settings
+from ..utils import laggeddates, asarray
 
 
 arraytype = np.ndarray
 nan = np.nan
 
 
-_functions = {'min':'min',
-              'max':'max',
-              'mean': 'mean',
-              'med': 'median',
-              'sd': 'sd'
-              }
+_functions = {
+    'min': 'min',
+    'max': 'max',
+    'mean': 'mean',
+    'med': 'median',
+    'sd': 'sd'
+}
 
 
-def rollsingle(self, func, window = 20, name = None,
-               fallback = False, align = 'right',
-               **kwargs):
-    '''Efficient rolling window calculation for min, max type functions'''
-    rname = 'roll_{0}'.format(func)
-    if fallback:
-        rfunc = getattr(lib.fallback,rname)
-    else:
-        rfunc = getattr(lib,rname,None)
-        if not rfunc:
-            rfunc = getattr(lib.fallback,rname)
-    rolling = lambda serie : list(rfunc(serie,window))
-    data = np.array([rolling(serie) for serie in self.series()])
-    name = name or self.makename(func,window=window)
-    dates = asarray(self.dates())
-    desc = settings.desc
-    if (align == 'right' and not desc) or desc:
-        dates = dates[window-1:]
-    else:
-        dates = dates[:-window+1]
-    return self.clone(dates, data.transpose(), name = name)
-    
-
-def days(d1,d0):
+def days(d1, d0):
     t = d1 - d0
     return t.days + (t.seconds + 0.000001*t.microseconds)/86400.0
 
 
-class TimeSeries(dynts.TimeSeries):
-    '''A timeserie based on numpy'''
-    type = 'numpy'
-    
+class Numpy(TimeSeries):
+    """A timeserie based on numpy
+    """
+
     def make(self, date, data, raw=False, **params):
         if date is not None:
             if not raw:
@@ -73,47 +48,47 @@ class TimeSeries(dynts.TimeSeries):
             if len(data.shape) == 1:
                 data = data.reshape(len(data),1)
             self._data = data
-    
+
     @property
     def dtype(self):
         if self._data is None:
             return self._dtype
         else:
             return self._data.dtype
-    
+
     @property
     def shape(self):
         if self._data is not None:
             return self._data.shape
         else:
             return (0,0)
-    
+
     def __getitem__(self, i):
         return self._data[i]
-    
+
     def values(self, desc=None):
         if self._data is not None:
             return reversed(self._data) if desc else self._data
         else:
             return ()
-    
+
     def dates(self, desc=None):
         if self._date is not None:
             return reversed(self._date) if desc else self._date
         else:
             return ()
-    
+
     def keys(self, desc = None):
         return self.dates(desc = desc)
-    
+
     def start(self):
         if self:
             return self._date[0]
-    
+
     def end(self):
         if self:
             return self._date[-1]
-        
+
     def insert(self, dte, values):
         '''insert *values* at date *dte*.'''
         if len(values):
@@ -136,7 +111,7 @@ class TimeSeries(dynts.TimeSeries):
                 self._date[index] = dte
                 self._data[index] = values
             self.__skl.insert(dte)
-        
+
     def isregular(self):
         dates = self.dates().__iter__()
         d0 = next(dates)
@@ -148,22 +123,22 @@ class TimeSeries(dynts.TimeSeries):
                 continue
             return False
         return True
-    
+
     def frequency(self):
         freq = 0;
         for d1,d0 in laggeddates(self):
-            freq += days(d1,d0) 
+            freq += days(d1,d0)
         return freq/(len(self)-1)
-    
+
     def window(self, start, end):
         b = self.asbtree()
         i1 = b.find_ge(start)
         i2 = b.find_le(end)
         return self.clone(self._date[i1:i2+1],
                           self._data[i1:i2+1])
-    
+
     def merge(self, tserie, fill=nan, **kwargs):
-        if dynts.istimeseries(tserie):
+        if istimeseries(tserie):
             tserie = [tserie]
         else:
             tserie = tuple(tserie)
@@ -187,40 +162,40 @@ class TimeSeries(dynts.TimeSeries):
         for dt in alldates:
             hash[dt] = mdt(dt)
         return hash.getts()
-    
+
     def min(self, fallback = False):
         return self._data.min(0)
-    
+
     def mean(self, fallback = False):
         return self._data.mean(0)
-    
+
     def max(self, fallback = False):
         return self._data.max(0)
-    
+
     def var(self, ddof = 0):
         return self._data.var(0, ddof = ddof)
-    
+
     def log(self, name = None, **kwargs):
         v = np.log(self._data)
         name = name or composename('log',*self.names())
         return self.clone(self._date,v,name)
-    
+
     def sqrt(self, name = None, **kwargs):
         v = np.sqrt(self._data)
         name = name or composename('sqrt',*self.names())
         return self.clone(self._date,v,name)
-    
+
     def square(self, name = None, **kwargs):
         v = np.square(self._data)
         name = name or composename('square',*self.names())
         return self.clone(self._date,v,name)
-            
+
     def delta(self, lag = 1, name = None, **kwargs):
         self.precondition(lag<len(self) and lag > 0,dynts.DyntsOutOfBound)
         v = self._data[lag:] - self._data[:-lag]
         name = name or 'delta(%s,%s)' % (self.name,lag)
         return self.clone(self._date[lag:],v,name)
-    
+
     def delta2(self, lag = 1, name = None, **kwargs):
         lag2 = 2*lag
         self.precondition(lag2<len(self) and lag2 > 0,dynts.DyntsOutOfBound)
@@ -228,13 +203,13 @@ class TimeSeries(dynts.TimeSeries):
         v = d[lag2:] + d[:-lag2] - 2*d[lag:-lag]
         name = name or 'delta2(%s,%s)' % (self.name,lag)
         return self.clone(self._date[lag2:],v,name)
-    
+
     def logdelta(self, lag = 1, name = None, **kwargs):
         self.precondition(lag<len(self) and lag > 0,dynts.DyntsOutOfBound)
         v = np.log(self._data[lag:]/self._data[:-lag])
         name = name or 'logdelta(%s,%s)' % (self.name,lag)
         return self.clone(self._date[lag:],v,name)
-    
+
     def _rollapply(self,
                    func,
                    window = 20,
@@ -246,5 +221,4 @@ class TimeSeries(dynts.TimeSeries):
             return rollsingle(self, func, window = window, **kwargs)
         else:
             raise NotImplementedError
-        
-    
+
